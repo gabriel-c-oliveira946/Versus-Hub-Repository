@@ -59,18 +59,21 @@ A aplicação foi estruturada utilizando uma arquitetura baseada em componentes 
 
 ### Passo a Passo
 
+Para visualizar a interface da plataforma corretamente e garantir o funcionamento do armazenamento local (`localStorage`), recomendamos o uso da extensão **Live Server** no VS Code ou a abertura direta do arquivo principal "index.html" localizado na pasta "pagina_inicial", o passo a passo será detalhado a seguir:
+
 1. Clone este repositório:
    ```bash
    git clone [https://github.com/gabriel-c-oliveira946/Versus-Hub-Repository.git](https://github.com/gabriel-c-oliveira946/Versus-Hub-Repository.git)
-Acesse a pasta do projeto:
 
-cd Versus-Hub-Repository
-Instale as dependências:
+Abra a pasta do projeto clonado no seu editor de código (ex: VS Code).
 
-npm install
-Inicie o servidor de desenvolvimento:
+No explorador de arquivos, navegue até a pasta pagina_inicial.
 
-npm run dev
-# ou npm start para inicializar o servidor Express (porta 3000)
-Acesse no seu navegador:
+Inicie a aplicação:
+
+Opção A (Recomendada): Clique com o botão direito no arquivo index.html e selecione "Open with Live Server".
+
+Opção B: Acesse no seu navegador:
 http://localhost:3000
+
+ 
