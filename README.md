@@ -1,97 +1,79 @@
-Contextualização
+# VersusHub - Plataforma de Gestão de E-Sports
 
+![Node.js](https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white)
+![Express.js](https://img.shields.io/badge/Express.js-404D59?style=for-the-badge)
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-B73BFE?style=for-the-badge&logo=vite&logoColor=FFD62E)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
 
+O **VersusHub** é uma plataforma web completa projetada para criar, gerenciar e participar de torneios de E-Sports on-line e presenciais. O sistema centraliza a divulgação de eventos, inscrições de jogadores e equipes, chaveamentos (brackets) e acompanhamento de resultados em tempo real.
 
+---
 
-1) Problema que motivou a aplicação
+## Contextualização e Problema
 
-A cada ano que passa o cenário de jogos cresce mais, isso acaba resultando em torneios grandes (E-Sports) e  independentes. A organização desses eventos em grande parte, com planilhas, grupos de mensagem e redes sociais e formulários que acabam complicando a criação de eventos tanto para o organizador quanto para os jogadores e espectadores. Isso gera:
-dificuldade para divulgar eventos e encontrar torneios ativos;
+Com o crescimento exponencial do cenário de jogos competitivos, a organização de torneios independentes frequentemente esbarra em limitações logísticas. O uso descentralizado de planilhas, formulários e grupos de mensagens gera:
 
+*   Dificuldade na divulgação e localização de torneios ativos.
+*   Desorganização nas inscrições (erros de limite de vagas e confirmações manuais).
+*   Falta de transparência em resultados, regras e andamento das chaves.
+*   Pouca visibilidade para eventos locais e jogadores amadores.
 
-inscrições desorganizadas (erros de limite de vagas e confirmação);
+## A Solução (VersusHub)
 
+O projeto resolve esses gargalos operacionais oferecendo um hub centralizado. Os objetivos alcançados incluem:
+1.  **Fluxo Simplificado para Organizadores:** Criação intuitiva de torneios, definição de regras, premiações e gerenciamento de inscritos.
+2.  **Organização de Equipes:** Jogadores podem criar times, enviar convites e gerenciar solicitações de entrada de forma autônoma.
+3.  **Transparência e Tempo Real:** Recálculo automático de pontuações, atualização de chaves de partidas (brackets) e páginas públicas para espectadores acompanharem os resultados e links de transmissão (Twitch/YouTube).
 
-falta de transparência em resultados, pontuação e andamento das partidas/fases;
+---
 
+## Principais Funcionalidades
 
-ausência de um lugar único para acompanhar links oficiais de transmissão;
+*   **Gestão de Usuários e Equipes:** Perfis customizáveis, histórico de estatísticas (Vitórias/Derrotas) e sistema completo de criação e moderação de equipes.
+*   **Motor de Torneios:** Cadastro detalhado de eventos (banner, jogo, online/presencial, datas, regras, limite de vagas).
+*   **Chaveamento Interativo (Brackets):** Geração visual de chaves com avanço automatizado de vencedores até a Grande Final.
+*   **Sistema de Inscrição Inteligente:** Controle rigoroso de vagas e status de participação (pendente, aceita, recusada).
+*   **Módulo de Busca e Filtros:** Pesquisa avançada de torneios por nome, categoria, plataforma e status ("Aberto", "Em andamento", "Encerrado").
+*   **Leaderboard e Ranking:** Sistema de pontuação global baseado no rendimento dos jogadores nos torneios disputados.
 
+---
 
-pouca visibilidade para torneios locais/independentes e para jogadores amadores.
+## Arquitetura e Tecnologias
 
+A aplicação foi estruturada utilizando uma arquitetura baseada em componentes e microsserviços simulados, garantindo alta reatividade no Front-end e roteamento eficiente no Back-end:
 
-2) Descrição da solução
+*   **Back-end:** Node.js com Express.js para roteamento estático e dinâmico de páginas e recursos.
+*   **Front-end Moderno:** Configuração base com Vite, integrando React e estilização avançada com TailwindCSS.
+*   **Lógica de Interface:** JavaScript Vanilla moderno (ES6+) para manipulação avançada de DOM, gerenciamento de estado das chaves de torneios e transições.
+*   **Armazenamento de Dados:** Persistência de dados locais focada na API `localStorage` do navegador, simulando bancos relacionais para as entidades de Usuários, Torneios e Equipes.
 
-Objetivos da aplicação proposta
-O VersusHub é uma plataforma web para criar, gerenciar e participar de torneios on-line ou presenciais. Os objetivos principais são:
+---
 
-Reunir divulgação, inscrições e acompanhamento do torneio em um único lugar.
+## ⚙️ Como Executar o Projeto Localmente
 
+### Pré-requisitos
+*   [Node.js](https://nodejs.org/) (versão 18 ou superior).
+*   Gerenciador de pacotes (`npm` ou `yarn`).
 
-Oferecer fluxo simples para organizador (criar torneio, cadastrar partidas/fases, atualizar pontuação/resultados e notificar inscritos).
+### Passo a Passo
 
+1. Clone este repositório:
+   ```bash
+   git clone [https://github.com/SEU_USUARIO/SEU_REPOSITORIO.git](https://github.com/SEU_USUARIO/SEU_REPOSITORIO.git)
+Acesse a pasta do projeto:
 
-Permitir que jogadores e equipes participem de forma organizada (inscrição individual ou por equipe, convites e solicitações).
+Bash
+cd SEU_REPOSITORIO
+Instale as dependências:
 
+Bash
+npm install
+Inicie o servidor de desenvolvimento:
 
-Disponibilizar páginas públicas para espectadores acompanharem eventos, resultados e links de transmissão fornecidos pelo organizador.
-
-
-Garantir transparência (regras, limite de vagas, pontuação por partida/fase, ranking do torneio) e usabilidade (busca por nome/ID/organizador, perfis, lista de equipes).
-
-Como a aplicação auxilia a resolver o problema
-
-
-Organização de equipes: criação de equipes, convites/solicitações e inscrição “por equipe” ou “individual” reduzem ruído operacional.
-
-
-Acompanhamento em tempo real: o organizador atualiza resultados e o sistema recalcula a pontuação e o ranking do torneio.
-
-
-Divulgação clara: página do torneio exibe banner, jogo/categoria, datas, local (se presencial), regras, premiação, vagas e link de transmissão (Twitch/YouTube/… informado pelo organizador).
-
-
-Acesso amplo: espectadores (não cadastrados) podem pesquisar e visualizar torneios e equipes, aumentando o alcance dos eventos.
-
-
-Notificações: inscritos recebem avisos de início e atualização de resultados, diminuindo ausências e dúvidas.
-
-
-Delimitação do escopo da aplicação 
-
-Incluído no projeto modelado/entregue:
-
-Perfis de usuário (cadastro/login, edição de nome/foto/bio, jogos preferidos).
-
-
-Torneios: criação/edição antes do início; dados do evento (banner, jogo, tipo online/presencial, datas/horários, regras, premiações, limite de participantes, vagas, plataforma+link de transmissão informado manualmente).
-
-
-Pontuação: registro por partida/fase para cada participante; geração do ranking do torneio.
-
-
-Inscrição: individual ou por equipe; controle de vagas e status (pendente/aceita/recusada).
-
-
-Equipes: criar equipe, convidar usuários, aceitar solicitações, inscrição de equipe em torneio.
-
-
-Busca de torneios por nome, ID, jogo e organizador; listagens “Ao vivo”.
-
-
-Notificações aos inscritos (início do torneio, atualização de resultados, término).
-
-
-Requisitos normativos básicos (Termos de Uso, isenção de responsabilidade por eventos presenciais).
-
-
-Fora do escopo (planejado para versões futuras):
-
-Integração direta com APIs de streaming (Twitch/YouTube) 
-
-chat/comentários em tempo real.
-
-
-modo “premium” (criação ilimitada sem restrições).
-
+Bash
+npm run dev
+# ou npm start para inicializar o servidor Express (porta 3000)
+Acesse no seu navegador:
+http://localhost:3000
