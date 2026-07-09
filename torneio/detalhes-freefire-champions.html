@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- estilos globais -->
+  <link rel="stylesheet" href="/pagina_inicial/css/estilos.css" />
+  <!-- estilos específicos desta página -->
+  <link rel="stylesheet" href="/torneio/detalhes.css" />
+  <link rel="stylesheet" href="/torneio/bracket.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="icon" href="/image/logo.png" sizes="32x32"> 
+  <title>Free Fire Champions Brasil - VersusHub</title>
+</head>
+<body>
+
+  <!-- ========= HEADER ========= -->
+  <header>
+    <nav class="navbar">
+
+      <div class="header-left">
+        <button id="menuToggle" class="menu-button">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="menu-svg"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+
+        <div class="logo_header">
+          <a href="/pagina_inicial/index.html">
+            <img referrerpolicy="no-referrer" src="/image/logo%20plus%20tipo%20textura.png" alt="VersusHub">
+          </a>
+        </div>
+      </div>
+
+      <!-- CENTRO: botões principais -->
+    <div class="botoes_header">
+     <a href="/aovivo/aovivo.html"> <button id="aovivo_header">Ao Vivo</button></a>
+     <a href="/criar_torneio/criar_torneio.html"> <button id="criar_header">Criar Torneio</button> </a> 
+      <a href="/equipes/equipes.html"> <button id="equipes_header">Equipes</button> </a>
+    </div>
+
+      <div class="header-right">
+        <form class="search-header" action="#" onsubmit="return false">
+          <input
+            type="text"
+            placeholder="Buscar torneios, jogos..."
+            id="searchInput"
+          >
+          <button type="submit" id="searchBtn" aria-label="Buscar"><i class="fa-solid fa-magnifying-glass"></i></button>
+        </form>
+
+        <a href="/login/login.html" id="btentrar">Entrar</a>
+        <a href="/cadastro/cadastro.html" id="btcadastrar">Cadastrar-se</a>
+
+        <style>
+
+
+
+        </style>
+
+        <div class="user-icon">
+          <img referrerpolicy="no-referrer" src="/image/boneco_logo_ofc.png" alt="Usuário" id="userBtn">
+          <ul id="menuUser" class="hidden"></ul>
+        </div>
+      </div>
+
+    </nav>
+  </header>
+  <!-- ========= FIM HEADER ========= -->
+
+<!-- SIDEBAR -->
+<aside id="sidebar" class="sidebar">
+  <h2 class="sidebar-title"></h2>
+  <nav class="sidebar-nav">
+    <a href="/pagina_inicial/index.html"><i class="fa-solid fa-house" style="margin-right: 10px; width: 16px; text-align: center;"></i>Início</a>
+    <a href="/pagina_inicial/torneios.html"><i class="fa-solid fa-trophy" style="margin-right: 10px; width: 16px; text-align: center;"></i>Todos os torneios</a>
+    <a href="/criar_torneio/criar_torneio.html"><i class="fa-solid fa-award" style="margin-right: 10px; width: 16px; text-align: center;"></i>Criar Torneio</a>
+    <a href="/equipes/equipes.html"><i class="fa-solid fa-users" style="margin-right: 10px; width: 16px; text-align: center;"></i>Equipes</a>
+    <a href="/gerenciartorneios/gerentornindex.html"><i class="fa-solid fa-file-invoice" style="margin-right: 10px; width: 16px; text-align: center;"></i>Gerenciar torneios</a>
+    <a href="/termos/termos.html"><i class="fa-solid fa-briefcase" style="margin-right: 10px; width: 16px; text-align: center;"></i>Termos de Uso</a>
+    <a href="/feedback/feedback.html"><i class="fa-solid fa-star" style="margin-right: 10px; width: 16px; text-align: center;"></i>Enviar feedback / Sugestão</a>
+  </nav>
+</aside>
+
+  <!-- efeito da tela ficar escura no fundo -->
+
+<div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+<!-- FIM SIDEBAR -->
+
+
+  <!-- ========= CONTEÚDO DA PÁGINA DE TORNEIO ========= -->
+  <main class="torneio-page">
+
+    <!-- HERO DO TORNEIO -->
+    <section class="torneio-hero">
+      <div class="torneio-banner">
+        <!-- mesma imagem que você usa no card da home -->
+        <img referrerpolicy="no-referrer" src="/images/ff_championsbrasil.jpg" alt="Free Fire Champions Brasil">
+        <div class="torneio-status-badge status-aberto">
+          Inscrições abertas
+        </div>
+      </div>
+
+      <div class="torneio-hero-info">
+        <h1>Free Fire Champions Brasil</h1>
+        <p class="torneio-meta">Free Fire • Battle Royale • Mobile</p>
+        <p class="torneio-data">Início: 03/01/2026 às 20h</p>
+
+        <!-- 👍 Like do torneio -->
+  <div class="torneio-like-box">
+    <button class="like-btn" data-id="cerrado-cup-csgo">
+      <span class="like-icon">👍</span>
+      <span class="like-count">0</span>
+    </button>
+  </div>
+  
+        <div class="torneio-tags">
+          <span>Plataforma Mobile</span>
+          <span>Battle Royale</span>
+          <span>Salas personalizadas</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- LAYOUT EM 2 COLUNAS -->
+    <section class="torneio-layout">
+
+      <!-- COLUNA ESQUERDA -->
+      <div class="torneio-col-info">
+
+        <div class="torneio-card-box">
+          <h2>Sobre o torneio</h2>
+          <p>
+            O Free Fire Champions Brasil é um campeonato focado em equipes
+            competitivas que querem mostrar seu nível no cenário nacional.
+            Partidas intensas em salas personalizadas, com transmissão e destaque
+            para os melhores squads do torneio.
+          </p>
+        </div>
+
+        <div class="torneio-card-box">
+          <h2>Regras principais</h2>
+          <ul>
+            <li>Times com até 4 jogadores titulares + 1 reserva.</li>
+            <li>Modo Battle Royale em salas personalizadas (mapas do FF).</li>
+            <li>Serão jogadas várias quedas por dia; a pontuação é por colocação + abates.</li>
+            <li>É obrigatório estar online e no Discord 15 minutos antes do início.</li>
+            <li>Uso de hacks, emuladores não permitidos ou qualquer trapaça resulta em banimento.</li>
+          </ul>
+        </div>
+
+        <div class="torneio-card-box">
+          <h2>Cronograma</h2>
+          <ul>
+            <li><strong>03/01 – 20h:</strong> Classificatórias (queds iniciais).</li>
+            <li><strong>04/01 – 20h:</strong> Fase de grupos.</li>
+            <li><strong>05/01 – 20h:</strong> Semifinais.</li>
+            <li><strong>06/01 – 21h:</strong> Grande final.</li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- COLUNA DIREITA -->
+      <aside class="torneio-col-side">
+
+        <div class="torneio-card-box destaque-inscricao">
+          <h2>Inscrições</h2>
+          <ul class="info-list">
+            <li><span>Taxa:</span> Gratuito</li>
+            <li><span>Vagas:</span> 64 equipes</li>
+            <li><span>Plataforma:</span> Free Fire (Mobile)</li>
+            <li><span>Servidor:</span> Brasil</li>
+          </ul>
+<button class="btn-principal" id="btnInscreverFF">
+  Inscrever equipe
+</button>
+        </div>
+
+        <div class="torneio-card-box">
+          <h2>Premiação</h2>
+          <ul class="info-list">
+            <li><span>1º lugar:</span> R$ 4.000 + diamantes + destaque na página inicial</li>
+            <li><span>2º lugar:</span> R$ 2.000 + diamantes</li>
+            <li><span>3º lugar:</span> R$ 1.000 em diamantes ou gift cards</li>
+          </ul>
+        </div>
+
+        <div class="torneio-card-box">
+          <h2>Requisitos dos jogadores</h2>
+          <ul>
+            <li>Conta Free Fire regular, sem histórico de banimento.</li>
+            <li>Idade mínima: 14 anos (podendo exigir autorização do responsável).</li>
+            <li>Participar do servidor de Discord oficial do campeonato.</li>
+          </ul>
+        </div>
+
+      </aside>
+
+    </section>
+
+    <!-- SEÇÃO DE CHAVEAMENTO (BRACKET) -->
+    <section class="torneio-container-bracket" style="margin-top: 40px; margin-bottom: 40px; clear: both;">
+      <div class="torneio-card-box">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #2d2a38; padding-bottom: 15px; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+          <h2 style="margin: 0; color: #fff; font-size: 20px; font-weight: 800; text-transform: uppercase;"><i class="fa-solid fa-sitemap" style="color: #ff7300; margin-right: 10px;"></i> Chaveamento do Torneio</h2>
+          <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <label for="bracketSizeSelect" style="color: #9cb1cf; font-size: 13px; font-weight: bold;">Tamanho:</label>
+            <select id="bracketSizeSelect" style="background: #111015; border: 1.5px solid #2a2a38; padding: 6px 12px; border-radius: 6px; color: #fff; cursor: pointer; font-size: 13px;">
+              <option value="4">4 Participantes (Semifinais)</option>
+              <option value="8">8 Participantes (Quartas)</option>
+              <option value="16" selected>16 Participantes (Oitavas)</option>
+            </select>
+            <button id="btnResetBracket" class="btn-principal" style="padding: 6px 14px; font-size: 13px; font-weight: 700; border-radius: 6px; margin: 0; background: #ff7300; border: none; cursor: pointer; color: #fff;">Reiniciar Chave</button>
+          </div>
+        </div>
+        
+        <div id="bracketContainer" class="bracket-scroll-container">
+          <!-- Gerado via bracket.js -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+  <!-- ========= FIM CONTEÚDO ========= -->
+
+  <!-- ========= FOOTER ========= -->
+  <footer>
+    <div id="footer_content">
+      <div id="footer_logo">
+        <img referrerpolicy="no-referrer" src="/image/logo.png" alt="" id="logofooter">
+      </div>
+
+      <div id="footer_sobrenos">
+        <h1>Sobre Nós</h1>
+        <br>
+        <p>O Versus Hub é uma plataforma criada para conectar jogadores, organizadores e fãs de e-sports em um só lugar. Oferecemos torneios competitivos, rankings dinâmicos e recompensas exclusivas para quem ama competir. Nosso objetivo é tornar a experiência gamer mais acessível, divertida e profissional — seja você um iniciante ou um pro player.</p>
+      </div>
+
+      <div id="footer_versushub">
+        <h1>Versus Hub</h1>
+        <br>
+        <p>
+          Torneios e Rankings atualizados <br><br>
+          Sistema seguro e fácil de participar <br><br>
+          Suporte ativo todos os dias
+        </p>
+      </div>
+
+      <div id="footer_politicas">
+        <h1>Políticas</h1><br>
+        <li>Termos de uso</li><br>
+        <li>Política de Privacidade</li><br>
+        <li>Política de Reembolso (para eventos pagos)</li>
+      </div>
+    </div>
+  </footer>
+  <!-- ========= FIM FOOTER ========= -->
+<script>
+  // Dados fixos desse torneio (id precisa ser único)
+  const FF_TORNEIO_INFO = {
+    id: 'ff-champions-brasil',
+    nome: 'Free Fire Champions Brasil',
+    jogo: 'Free Fire • Battle Royale • Mobile',
+    data: 'Início: 03/01/2026 às 20h',
+    status: 'Inscrições abertas',
+    statusClass: 'status-aberto',
+    banner: '/images/ff_championsbrasil.jpg',
+    link: '/torneio/detalhes-freefire-champions.html'
+  };
+
+  function getLoggedUser() {
+    const raw = localStorage.getItem('vh_loggedUser');
+    if (raw) {
+      try { return JSON.parse(raw); } catch (e) {}
+    }
+    return null;
+  }
+
+  function addJoinedTournament(info) {
+    const u = getLoggedUser();
+    const storageKey = u ? `vh_joinedTournaments_${u.email}` : 'vh_joinedTournaments';
+    let arr = [];
+    try {
+      arr = JSON.parse(localStorage.getItem(storageKey) || '[]');
+    } catch (e) {
+      arr = [];
+    }
+
+    if (!arr.some(t => t.id === info.id)) {
+      arr.push(info);
+      localStorage.setItem(storageKey, JSON.stringify(arr));
+    }
+  }
+
+  function showToast(message) {
+    let toast = document.getElementById('customToast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'customToast';
+      toast.style.position = 'fixed';
+      toast.style.bottom = '30px';
+      toast.style.right = '30px';
+      toast.style.background = '#1e1b2e';
+      toast.style.color = '#fff';
+      toast.style.borderLeft = '4px solid #ff7300';
+      toast.style.padding = '15px 25px';
+      toast.style.borderRadius = '8px';
+      toast.style.boxShadow = '0 10px 30px rgba(0,0,0,0.5)';
+      toast.style.zIndex = '99999';
+      toast.style.fontFamily = 'sans-serif';
+      toast.style.fontSize = '14px';
+      toast.style.fontWeight = 'bold';
+      toast.style.transition = 'all 0.4s ease';
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateY(20px)';
+      document.body.appendChild(toast);
+    }
+    
+    toast.textContent = message;
+    void toast.offsetWidth;
+    toast.style.opacity = '1';
+    toast.style.transform = 'translateY(0)';
+    
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateY(20px)';
+    }, 4000);
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const btnInscreverFF = document.getElementById('btnInscreverFF');
+
+    if (btnInscreverFF) {
+      const u = getLoggedUser();
+      const storageKey = u ? `vh_joinedTournaments_${u.email}` : 'vh_joinedTournaments';
+      let arr = [];
+      try {
+        arr = JSON.parse(localStorage.getItem(storageKey) || '[]');
+      } catch (e) {
+        arr = [];
+      }
+      
+      const isJoined = u && arr.some(t => t.id === FF_TORNEIO_INFO.id);
+      if (isJoined) {
+        btnInscreverFF.textContent = 'Já inscrito';
+        btnInscreverFF.disabled = true;
+        btnInscreverFF.style.background = '#2c2c3b';
+        btnInscreverFF.style.cursor = 'not-allowed';
+      }
+
+      btnInscreverFF.addEventListener('click', () => {
+        const loggedUser = getLoggedUser();
+        if (!loggedUser) {
+          showToast('Você precisa estar logado para se inscrever! Redirecionando...');
+          setTimeout(() => {
+            window.location.href = '/login/login.html';
+          }, 1500);
+          return;
+        }
+
+        addJoinedTournament(FF_TORNEIO_INFO);
+        showToast('Inscrição realizada com sucesso! Confira na aba "Participando" em Gerenciar Torneios.');
+        btnInscreverFF.textContent = 'Já inscrito';
+        btnInscreverFF.disabled = true;
+        btnInscreverFF.style.background = '#2c2c3b';
+        btnInscreverFF.style.cursor = 'not-allowed';
+      });
+    }
+  });
+</script>
+
+  <script src="/pagina_inicial/js/scrip.js"></script>
+  <script src="/torneio/js/likes.js"></script>
+  <script src="/torneio/js/bracket.js"></script>
+
+</body>
+</html>

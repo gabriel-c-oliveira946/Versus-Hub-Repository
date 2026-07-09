@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <meta charset="UTF-8">
+  <title>Equipe - VersusHub</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- estilos globais -->
+  <link rel="stylesheet" href="/pagina_inicial/css/estilos.css">
+  <link rel="icon" href="/image/logo.png" sizes="32x32"> 
+
+  <style>
+    body {
+      background: #0b0b0d;
+      color: #ffffff;
+      font-family: system-ui, sans-serif;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 14px auto 60px;
+      padding: 0 20px;
+    }
+
+    /* HEADER DA EQUIPE */
+    .team-header {
+      display: flex;
+      gap: 25px;
+      background: #141419;
+      padding: 25px;
+      border-radius: 16px;
+      border: 2px solid #282833;
+    }
+
+    .team-header img {
+      width: 220px;
+      height: 220px;
+      padding: 10px;
+      border-radius: 16px;
+      border: 3px solid #d41111;
+      object-fit: cover;
+      background: #050505;
+    }
+
+    .team-header-info h1 {
+      font-size: 32px;
+      margin-bottom: 6px;
+      color: #f83838;
+    }
+
+    .team-meta {
+      font-size: 14px;
+      color: #b1b1cf;
+      margin: 4px 0;
+    }
+
+    .team-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .team-tag-pill {
+      background: #1f1f2b;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 12px;
+      border: 1px solid #3f3f4f;
+    }
+
+    .btn-solicitacoes {
+      margin-top: 12px;
+      padding: 10px 18px;
+      border-radius: 999px;
+      background: #d41111;
+      border: none;
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    .btn-solicitacoes:hover {
+      filter: brightness(1.1);
+    }
+
+    /* SEÇÕES */
+    .section-box {
+      background: #141419;
+      border-radius: 12px;
+      border: 2px solid #2a2a38;
+      padding: 20px;
+      margin-top: 28px;
+    }
+
+    .section-box h2 {
+      font-size: 22px;
+      margin-bottom: 14px;
+      color: #f83838;
+    }
+
+    .section-box p {
+      font-size: 14px;
+      color: #d4d4dd;
+    }
+
+    /* INTEGRANTES */
+    .member {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #1b1b26;
+      border: 1px solid #32323f;
+      border-radius: 10px;
+      padding: 10px;
+      max-width: 380px;
+      margin-bottom: 10px;
+    }
+
+    .member img {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #f83838;
+    }
+
+    /* CARDS DE TORNEIO */
+    .torneio-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .torneio-card {
+      background: #1c1c26;
+      border: 2px solid #2c2c3b;
+      border-radius: 14px;
+      width: 260px;
+      overflow: hidden;
+      transition: .2s;
+    }
+
+    .torneio-card img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+    }
+
+    .torneio-card-info {
+      padding: 12px;
+    }
+
+    .torneio-card-info h3 {
+      margin: 0 0 4px;
+      font-size: 16px;
+    }
+
+    .torneio-card-info p {
+      margin: 0;
+      font-size: 13px;
+      color: #b1b1cf;
+    }
+
+    .empty-msg {
+      font-size: 14px;
+      color: #9ca3af;
+    }
+
+    @media (max-width: 768px) {
+      .team-header {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .team-header img {
+        width: 180px;
+        height: 180px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER padrão -->
+<header>
+  <nav class="navbar">
+    <div class="header-left">
+      <button id="menuToggle" class="menu-button">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="menu-svg"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+
+      <div class="logo_header">
+        <a href="/pagina_inicial/index.html">
+          <img referrerpolicy="no-referrer" src="/image/logo%20plus%20tipo%20textura.png" alt="VersusHub">
+        </a>
+      </div>
+    </div>
+
+    <div class="botoes_header">
+      <a href="/aovivo/aovivo.html"><button id="aovivo_header">Ao Vivo</button></a>
+      <a href="/criar_torneio/criar_torneio.html"><button id="criar_header">Criar Torneio</button></a>
+      <a href="/equipes/equipes.html"><button id="equipes_header">Equipes</button></a>
+    </div>
+
+    <div class="header-right">
+      <form class="search-header" action="#" onsubmit="return false">
+        <input type="text" placeholder="Buscar torneios, jogos..." id="searchInput">
+        <button type="submit" id="searchBtn" aria-label="Buscar"><i class="fa-solid fa-magnifying-glass"></i></button>
+      </form>
+
+      <a href="/login/login.html" id="btentrar">Entrar</a>
+      <a href="/cadastro/cadastro.html" id="btcadastrar">Cadastrar-se</a>
+
+      <div class="user-icon">
+        <img referrerpolicy="no-referrer" src="/image/boneco_logo_ofc.png" alt="Usuário" id="userBtn">
+        <ul id="menuUser" class="hidden">
+          <li><a href="/login/login.html">Login</a></li>
+          <hr>
+          <li><a href="/cadastro/cadastro.html">Cadastro</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<!-- SIDEBAR -->
+<aside id="sidebar" class="sidebar">
+  <h2 class="sidebar-title"></h2>
+  <nav class="sidebar-nav">
+    <a href="/pagina_inicial/index.html"><i class="fa-solid fa-house" style="margin-right: 10px; width: 16px; text-align: center;"></i>Início</a>
+    <a href="/pagina_inicial/torneios.html"><i class="fa-solid fa-trophy" style="margin-right: 10px; width: 16px; text-align: center;"></i>Todos os torneios</a>
+    <a href="/criar_torneio/criar_torneio.html"><i class="fa-solid fa-award" style="margin-right: 10px; width: 16px; text-align: center;"></i>Criar Torneio</a>
+    <a href="/equipes/equipes.html"><i class="fa-solid fa-users" style="margin-right: 10px; width: 16px; text-align: center;"></i>Equipes</a>
+    <a href="/gerenciartorneios/gerentornindex.html"><i class="fa-solid fa-file-invoice" style="margin-right: 10px; width: 16px; text-align: center;"></i>Gerenciar torneios</a>
+    <a href="/termos/termos.html"><i class="fa-solid fa-briefcase" style="margin-right: 10px; width: 16px; text-align: center;"></i>Termos de Uso</a>
+    <a href="/feedback/feedback.html"><i class="fa-solid fa-star" style="margin-right: 10px; width: 16px; text-align: center;"></i>Enviar feedback / Sugestão</a>
+  </nav>
+</aside>
+
+  <!-- efeito da tela ficar escura no fundo -->
+
+<div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+<!-- FIM SIDEBAR -->
+
+<main>
+  <!-- HEADER DA EQUIPE (dinâmico) -->
+  <section class="team-header">
+    <img referrerpolicy="no-referrer" id="teamLogo" src="/image/logo.png" alt="Logo da equipe">
+
+    <div class="team-header-info">
+      <h1 id="teamName">Nome da equipe</h1>
+      <p class="team-meta" id="teamLeaderText">Líder: -</p>
+      <p class="team-meta" id="teamJogosMeta">Jogos principais: -</p>
+      <p class="team-meta" id="teamPlataformaMeta">Plataforma: -</p>
+      <p class="team-meta" id="teamRegiaoMeta">Região: -</p>
+
+      <div class="team-tags" id="teamTags"></div>
+
+      <button class="btn-solicitacoes" type="button" id="btnSolicitacoes">
+        Ver solicitações
+      </button>
+    </div>
+  </section>
+
+  <!-- SOBRE A EQUIPE -->
+  <section class="section-box">
+    <h2>Sobre a equipe</h2>
+    <p id="teamSobre">
+      Nenhuma descrição informada.
+    </p>
+  </section>
+
+  <!-- INTEGRANTES -->
+  <section class="section-box">
+    <h2>Integrantes</h2>
+    <div id="teamMembersList">
+      <!-- o líder é inserido via JS -->
+    </div>
+  </section>
+
+  <!-- TORNEIOS GANHOS -->
+  <section class="section-box">
+    <h2>Torneios ganhos</h2>
+    <div id="teamTorneiosGanhos" class="torneio-list">
+      <!-- lista ou mensagem vazia via JS -->
+    </div>
+  </section>
+
+  <!-- TORNEIOS ATUAIS -->
+  <section class="section-box">
+    <h2>Participando atualmente</h2>
+    <div id="teamTorneiosAtuais" class="torneio-list">
+      <!-- lista ou mensagem vazia via JS -->
+    </div>
+  </section>
+</main>
+
+<!-- FOOTER padrão -->
+<footer>
+  <div id="footer_content">
+    <div id="footer_logo">
+      <img referrerpolicy="no-referrer" src="/image/logo.png" alt="" id="logofooter">
+    </div>
+
+    <div id="footer_sobrenos">
+      <h1>Sobre Nós</h1><br>
+      <p>O Versus Hub é uma plataforma criada para conectar jogadores, organizadores e fãs de e-sports em um só lugar.</p>
+    </div>
+
+    <div id="footer_versushub">
+      <h1>Versus Hub</h1><br>
+      <p>
+        Torneios e Rankings atualizados <br><br>
+        Sistema seguro e fácil de participar <br><br>
+        Suporte ativo todos os dias
+      </p>
+    </div>
+
+    <div id="footer_politicas">
+      <h1>Políticas</h1><br>
+      <li>Termos de uso</li><br>
+      <li>Política de Privacidade</li><br>
+      <li>Política de Reembolso (para eventos pagos)</li>
+    </div>
+  </div>
+</footer>
+
+<!-- JS global -->
+<script src="/pagina_inicial/js/scrip.js"></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const params = new URLSearchParams(window.location.search);
+    const teamId = params.get("id");
+
+    if (!teamId) {
+      console.warn("Nenhum id de equipe na URL.");
+      return;
+    }
+
+    let teams = [];
+    try {
+      teams = JSON.parse(localStorage.getItem("vh_createdTeams") || "[]");
+    } catch (e) {
+      teams = [];
+    }
+
+    const equipe = teams.find(t => t.id === teamId);
+    if (!equipe) {
+      console.warn("Equipe não encontrada no localStorage.");
+      document.getElementById("teamName").textContent = "Equipe não encontrada";
+      document.getElementById("teamSobre").textContent =
+        "Não encontramos essa equipe no seu protótipo. Tente voltar para a página de equipes.";
+      return;
+    }
+
+    // Preenche header
+    const logoEl = document.getElementById("teamLogo");
+    const nameEl = document.getElementById("teamName");
+    const leaderTextEl = document.getElementById("teamLeaderText");
+    const jogosMetaEl = document.getElementById("teamJogosMeta");
+    const platMetaEl = document.getElementById("teamPlataformaMeta");
+    const regiaoMetaEl = document.getElementById("teamRegiaoMeta");
+    const tagsContainer = document.getElementById("teamTags");
+    const sobreEl = document.getElementById("teamSobre");
+
+    logoEl.src = equipe.logo || "/image/logo.png";
+    nameEl.textContent = equipe.nome || "Equipe sem nome";
+
+    const leaderName = equipe.leaderName || "Líder";
+    leaderTextEl.textContent = "Líder: " + leaderName;
+
+    jogosMetaEl.textContent =
+      "Jogos principais: " + (equipe.jogos || "—");
+
+    platMetaEl.textContent =
+      "Plataforma: " + (equipe.plataforma || "—");
+
+    regiaoMetaEl.textContent =
+      "Região: " + (equipe.regiao || "—");
+
+    sobreEl.textContent = equipe.sobre || "Nenhuma descrição informada.";
+
+    // TAGS (quebra por vírgula)
+    tagsContainer.innerHTML = "";
+    if (equipe.tag) {
+      const brutas = equipe.tag.split(",");
+      brutas.forEach(t => {
+        const limpo = t.trim();
+        if (!limpo) return;
+        const pill = document.createElement("span");
+        pill.className = "team-tag-pill";
+        pill.textContent = limpo;
+        tagsContainer.appendChild(pill);
+      });
+    }
+
+    // INTEGRANTES: pelo menos o líder
+    const membersList = document.getElementById("teamMembersList");
+    membersList.innerHTML = "";
+
+    const leaderDiv = document.createElement("div");
+    leaderDiv.className = "member";
+    const leaderAvatar = equipe.leaderAvatar || "/image/boneco_logo_ofc.png";
+    leaderDiv.innerHTML = `
+      <img referrerpolicy="no-referrer" src="${leaderAvatar}" alt="${leaderName}">
+      <span><strong>${leaderName}</strong> (Líder)</span>
+    `;
+    membersList.appendChild(leaderDiv);
+
+    // TORNEIOS GANHOS
+    const ganhosEl = document.getElementById("teamTorneiosGanhos");
+    const ganhos = Array.isArray(equipe.torneiosGanhos) ? equipe.torneiosGanhos : [];
+
+    if (!ganhos.length) {
+      ganhosEl.innerHTML = '<p class="empty-msg">Nenhum torneio cadastrado ainda.</p>';
+    } else {
+      ganhosEl.innerHTML = "";
+      ganhos.forEach(torn => {
+        const card = document.createElement("div");
+        card.className = "torneio-card";
+        card.innerHTML = `
+          <img referrerpolicy="no-referrer" src="${torn.banner || '/images/cerradocup.jpg'}" alt="${torn.nome || ''}">
+          <div class="torneio-card-info">
+            <h3>${torn.nome || 'Torneio'}</h3>
+            <p>${torn.info || ''}</p>
+          </div>
+        `;
+        ganhosEl.appendChild(card);
+      });
+    }
+
+    // TORNEIOS ATUAIS
+    const atuaisEl = document.getElementById("teamTorneiosAtuais");
+    const atuais = Array.isArray(equipe.torneiosAtuais) ? equipe.torneiosAtuais : [];
+
+    if (!atuais.length) {
+      atuaisEl.innerHTML = '<p class="empty-msg">A equipe ainda não está participando de nenhum torneio.</p>';
+    } else {
+      atuaisEl.innerHTML = "";
+      atuais.forEach(torn => {
+        const card = document.createElement("div");
+        card.className = "torneio-card";
+        card.innerHTML = `
+          <img referrerpolicy="no-referrer" src="${torn.banner || '/images/cerradocup.jpg'}" alt="${torn.nome || ''}">
+          <div class="torneio-card-info">
+            <h3>${torn.nome || 'Torneio'}</h3>
+            <p>${torn.info || ''}</p>
+          </div>
+        `;
+        atuaisEl.appendChild(card);
+      });
+    }
+
+    // Botão "Ver solicitações" (protótipo)
+    const btnSolic = document.getElementById("btnSolicitacoes");
+    if (btnSolic) {
+      btnSolic.addEventListener("click", () => {
+        alert("Você ainda não possui solicitações!");
+      });
+    }
+  });
+</script>
+
+</body>
+</html>
+
+
+http://localhost:5500/perfil/perfil.html

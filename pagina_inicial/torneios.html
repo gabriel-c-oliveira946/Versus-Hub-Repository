@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/pagina_inicial/css/torneios.css" />
+  <link rel="stylesheet" href="/pagina_inicial/css/estilos.css">
+  <link rel="icon" href="/image/logo.png" sizes="32x32"> 
+  <title>Todos os Torneios - VersusHub</title>
+</head>
+
+<body>
+
+    <!-- HEADER -->
+<header>
+  <nav class="navbar">
+
+    <!-- ESQUERDA: menu + logo -->
+    <div class="header-left">
+
+      <!-- Botão do menu lateral (hambúrguer) -->
+      <button id="menuToggle" class="menu-button">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="menu-svg"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+
+      <!-- LOGO -->
+      <div class="logo_header">
+        <a href="/pagina_inicial/index.html">
+          <img referrerpolicy="no-referrer" src="/image/logo%20plus%20tipo%20textura.png" alt="VersusHub">
+        </a>
+      </div>
+
+    </div>
+
+    <!-- CENTRO: botões principais -->
+    <div class="botoes_header">
+     <a href="/aovivo/aovivo.html"> <button id="aovivo_header">Ao Vivo</button></a>
+     <a href="/criar_torneio/criar_torneio.html"> <button id="criar_header">Criar Torneio</button> </a> 
+      <a href="/equipes/equipes.html"> <button id="equipes_header">Equipes</button> </a>
+    </div>
+
+    <!-- DIREITA: pesquisa + entrar + cadastrar + usuário -->
+    <div class="header-right">
+
+      <!-- BARRA DE PESQUISA NO HEADER -->
+      <form class="search-header" action="#" onsubmit="return false">
+        <input
+          type="text"
+          placeholder="Buscar torneios, jogos..."
+          id="searchInput"
+        >
+        <button type="submit" id="searchBtn" aria-label="Buscar"><i class="fa-solid fa-magnifying-glass"></i></button>
+      </form>
+
+      <!-- BOTÕES À DIREITA -->
+      <a href="/login/login.html" id="btentrar">Entrar</a>
+      <a href="/cadastro/cadastro.html" id="btcadastrar">Cadastrar-se</a>
+
+      <!-- ÍCONE DO USUÁRIO -->
+      <div class="user-icon">
+        <img referrerpolicy="no-referrer" src="/image/boneco_logo_ofc.png" alt="Usuário" id="userBtn">
+
+        <ul id="menuUser" class="hidden">
+          <li>
+            <a href="/login/login.html">
+              Login
+            </a>
+          </li>
+          <hr>
+          <li><a href="/cadastro/cadastro.html">Cadastro</a></li>
+        </ul>
+      </div>
+
+    </div>
+
+  </nav>
+</header>
+<!-- FIM HEADER -->
+
+<!-- SIDEBAR -->
+<aside id="sidebar" class="sidebar">
+  <h2 class="sidebar-title"></h2>
+  <nav class="sidebar-nav">
+    <a href="/pagina_inicial/index.html"><i class="fa-solid fa-house" style="margin-right: 10px; width: 16px; text-align: center;"></i>Início</a>
+    <a href="/pagina_inicial/torneios.html"><i class="fa-solid fa-trophy" style="margin-right: 10px; width: 16px; text-align: center;"></i>Todos os torneios</a>
+    <a href="/criar_torneio/criar_torneio.html"><i class="fa-solid fa-award" style="margin-right: 10px; width: 16px; text-align: center;"></i>Criar Torneio</a>
+    <a href="/equipes/equipes.html"><i class="fa-solid fa-users" style="margin-right: 10px; width: 16px; text-align: center;"></i>Equipes</a>
+    <a href="/ranking.html">📊 Ranking Global</a>
+    <a href="/gerenciartorneios/gerentornindex.html"><i class="fa-solid fa-file-invoice" style="margin-right: 10px; width: 16px; text-align: center;"></i>Gerenciar torneios</a>
+    <a href="/termos/termos.html"><i class="fa-solid fa-briefcase" style="margin-right: 10px; width: 16px; text-align: center;"></i>Termos de Uso</a>
+    <a href="/feedback/feedback.html"><i class="fa-solid fa-star" style="margin-right: 10px; width: 16px; text-align: center;"></i>Enviar feedback / Sugestão</a>
+  </nav>
+</aside>
+
+  <!-- efeito da tela ficar escura no fundo -->
+
+<div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+<!-- FIM SIDEBAR -->
+
+
+  <!-- CONTEÚDO ESPECÍFICO DA PÁGINA DE TORNEIOS -->
+  <main class="pagina-torneios">
+
+    <!-- FILTROS -->
+    <section class="filtros-torneios">
+      <h1>Todos os Torneios</h1>
+
+      <div class="linha-filtros">
+
+        <!-- Busca por texto -->
+        <div class="campo-filtro">
+          <label for="filtroBusca">Buscar</label>
+          <input
+            type="text"
+            id="filtroBusca"
+            placeholder="Nome do torneio, jogo..."
+          >
+        </div>
+
+        <!-- Categoria geral: FPS, MOBA, Esportes... -->
+        <div class="campo-filtro">
+          <label for="filtroCategoria">Categoria</label>
+          <select id="filtroCategoria">
+            <option value="todos">Todas</option>
+            <option value="fps">FPS</option>
+            <option value="moba">MOBA</option>
+            <option value="battle-royale">Battle Royale</option>
+            <option value="esportes">Esportes</option>
+            <option value="luta">Luta / Combate</option>
+            <option value="cartas">Card Game</option>
+          </select>
+        </div>
+
+        <!-- Jogo específico -->
+        <div class="campo-filtro">
+          <label for="filtroJogo">Jogo</label>
+          <select id="filtroJogo">
+            <option value="todos">Todos</option>
+            <option value="csgo">CS:GO</option>
+            <option value="freefire">Free Fire</option>
+            <option value="fifa">FIFA / FC</option>
+            <option value="valorant">Valorant</option>
+            <option value="lol">League of Legends</option>
+          </select>
+        </div>
+
+        <!-- Plataforma -->
+        <div class="campo-filtro">
+          <label for="filtroPlataforma">Plataforma</label>
+          <select id="filtroPlataforma">
+            <option value="todas">Todas</option>
+            <option value="pc">PC</option>
+            <option value="console">Console</option>
+            <option value="mobile">Mobile</option>
+          </select>
+        </div>
+
+        <!-- Status -->
+        <div class="campo-filtro">
+          <label for="filtroStatus">Status</label>
+          <select id="filtroStatus">
+            <option value="todos">Todos</option>
+            <option value="aberto">Inscrições abertas</option>
+            <option value="andamento">Em andamento</option>
+            <option value="encerrado">Encerrado</option>
+          </select>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- LISTA DE TORNEIOS -->
+    <section class="lista-torneios" id="listaTorneios">
+
+      <!-- Cada card representa um torneio
+           Use data-* pros filtros funcionarem -->
+      <article class="card-torneio"
+        data-nome="Cerrado Cup CS:GO"
+        data-jogo="csgo"
+        data-categoria="fps"
+        data-plataforma="pc"
+        data-status="aberto">
+        
+        <img referrerpolicy="no-referrer" src="/images/cerradocup.jpg" alt="Cerrado Cup CS:GO">
+        <div class="card-info">
+          <h2>Cerrado Cup CS:GO</h2>
+          <p class="jogo">Jogo: CS:GO • FPS • PC</p>
+          <p class="data">Início: 22/03/2026</p>
+          <p class="status status-aberto">Inscrições abertas</p>
+          <a href="/torneio/detalhes-cerradocup.html"> <button class="btn-detalhes">Ver detalhes</button></a>
+        </div>
+      </article>
+
+      <article class="card-torneio"
+        data-nome="Contra Cup Free Fire"
+        data-jogo="freefire"
+        data-categoria="battle-royale"
+        data-plataforma="mobile"
+        data-status="andamento">
+        
+        <img referrerpolicy="no-referrer" src="/images/contracup.jpeg" alt="Contra Cup Free Fire">
+        <div class="card-info">
+          <h2>Contra Cup Free Fire</h2>
+          <p class="jogo">Jogo: Free Fire • Battle Royale • Mobile</p>
+          <p class="data">Início: 01/03/2026</p>
+          <p class="status status-andamento">Em andamento</p>
+          <a href="/torneio/custom.html?id=contra-cup"><button class="btn-detalhes">Ver detalhes</button></a>
+        </div>
+      </article>
+
+      <article class="card-torneio"
+        data-nome="Liga FF Brasil"
+        data-jogo="freefire"
+        data-categoria="battle-royale"
+        data-plataforma="mobile"
+        data-status="encerrado">
+        
+        <img referrerpolicy="no-referrer" src="/images/liga-ff-brasil.jpeg" alt="Liga FF Brasil">
+        <div class="card-info">
+          <h2>Liga FF Brasil</h2>
+          <p class="jogo">Jogo: Free Fire • Battle Royale • Mobile</p>
+          <p class="data">Início: 29/02/2026</p>
+          <p class="status status-encerrado">Encerrado</p>
+          <a href="/torneio/custom.html?id=liga-ff"><button class="btn-detalhes">Ver detalhes</button></a>
+        </div>
+      </article>
+
+      <article class="card-torneio"
+        data-nome="FIFA Global Series"
+        data-jogo="fifa"
+        data-categoria="esportes"
+        data-plataforma="console"
+        data-status="aberto">
+        
+        <img referrerpolicy="no-referrer" src="/images/fifa23_globalseries.webp" alt="FIFA Global Series">
+        <div class="card-info">
+          <h2>FIFA Global Series</h2>
+          <p class="jogo">Jogo: FIFA • Esportes • Console</p>
+          <p class="data">Início: 22/02/2026</p>
+          <p class="status status-aberto">Inscrições abertas</p>
+          <a href="/torneio/detalhes-fifaglobalseries.html"> <button class="btn-detalhes">Ver detalhes</button></a>
+        </div>
+      </article>
+
+      <article class="card-torneio"
+        data-nome="Gamescom Latam CS:GO"
+        data-jogo="csgo"
+        data-categoria="fps"
+        data-plataforma="pc"
+        data-status="aberto">
+
+        <img referrerpolicy="no-referrer" src="/pagina_inicial/image/gamescom_latam.webp" alt="Gamescom Latam CS:GO">
+        <div class="card-info">
+          <h2>Gamescom Latam CS:GO</h2>
+          <p class="jogo">Jogo: CS:GO • FPS • PC</p>
+          <p class="data">Início: 01/04/2026</p>
+          <p class="status status-aberto">Inscrições abertas</p>
+          <a href="/torneio/custom.html?id=gamescom-latam"><button class="btn-detalhes">Ver detalhes</button></a>
+        </div>
+      </article>
+
+      <article class="card-torneio"
+        data-nome="Paraná Startups Challenge"
+        data-jogo="csgo"
+        data-categoria="fps"
+        data-plataforma="pc"
+        data-status="andamento">
+
+        <img referrerpolicy="no-referrer" src="/pagina_inicial/image/parana.jpg" alt="Paraná Startups Challenge">
+        <div class="card-info">
+          <h2>Paraná Startups Challenge</h2>
+          <p class="jogo">Jogo: CS:GO • FPS • PC</p>
+          <p class="data">Início: 15/03/2026</p>
+          <p class="status status-andamento">Em andamento</p>
+          <a href="/torneio/custom.html?id=parana-startups"><button class="btn-detalhes">Ver detalhes</button></a>
+        </div>
+      </article>
+
+      <article class="card-torneio"
+        data-nome="Evo Championship Series CS:GO"
+        data-jogo="csgo"
+        data-categoria="fps"
+        data-plataforma="pc"
+        data-status="encerrado">
+
+        <img referrerpolicy="no-referrer" src="/pagina_inicial/image/evolution-championship-series.jpg" alt="Evo Championship Series CS:GO">
+        <div class="card-info">
+          <h2>Evo Championship Series CS:GO</h2>
+          <p class="jogo">Jogo: CS:GO • FPS • PC</p>
+          <p class="data">Início: 10/02/2026</p>
+          <p class="status status-encerrado">Encerrado</p>
+          <a href="/torneio/custom.html?id=evo-csgo"><button class="btn-detalhes">Ver detalhes</button></a>
+        </div>
+      </article>
+
+      <!-- --- MAIS TORNEIOS FREE FIRE --- -->
+      <article class="card-torneio"
+        data-nome="Evo Championship Series Free Fire"
+        data-jogo="freefire"
+        data-categoria="battle-royale"
+        data-plataforma="mobile"
+        data-status="aberto">
+
+        <img referrerpolicy="no-referrer" src="/pagina_inicial/image/evoff.jpg" alt="Evo Championship Series Free Fire">
+        <div class="card-info">
+          <h2>Evo Championship Series Free Fire</h2>
+          <p class="jogo">Jogo: Free Fire • Battle Royale • Mobile</p>
+          <p class="data">Início: 05/04/2026</p>
+          <p class="status status-aberto">Inscrições abertas</p>
+          <a href="/torneio/custom.html?id=evo-ff"><button class="btn-detalhes">Ver detalhes</button></a>
+        </div>
+      </article>
+
+      <article class="card-torneio"
+        data-nome="C.O.P.A - Free Fire"
+        data-jogo="freefire"
+        data-categoria="battle-royale"
+        data-plataforma="mobile"
+        data-status="aberto">
+
+        <img referrerpolicy="no-referrer" src="/pagina_inicial/image/BR6-2021-o-campeonato-brasileiro-de-Rainbow-Six-Siege.jpeg" alt="C.O.P.A - Free Fire">
+        <div class="card-info">
+          <h2>Campeonato Brasileiro Rainbow Six Siege</h2>
+          <p class="jogo">Jogo: Rainbow Six Siege • FPS • PC</p>
+          <p class="data">Início: 18/04/2026</p>
+          <p class="status status-aberto">Inscrições abertas</p>
+          <a href="/torneio/custom.html?id=r6-siege"><button class="btn-detalhes">Ver detalhes</button></a>
+        </div>
+      </article>
+
+      <article class="card-torneio"
+        data-nome="Campeonato Brasileiro Rainbow Six Siege"
+        data-jogo="csgo"
+        data-categoria="fps"
+        data-plataforma="pc"
+        data-status="encerrado">
+
+        <img referrerpolicy="no-referrer" src="/pagina_inicial/image/COPA-FF.jpeg" alt="C.O.P.A - FF 2028">
+        <div class="card-info">
+          <h2>C.O.P.A - FF 2028</h2>
+          <p class="jogo">Jogo: Free Fire • Battle Royale • Mobile</p>
+          <p class="data">Início: 10/01/2026</p>
+          <p class="status status-encerrado">Encerrado</p>
+          <a href="/torneio/custom.html?id=copa-ff"><button class="btn-detalhes">Ver detalhes</button></a>
+        </div>
+      </article>
+
+      <!-- --- MAIS TORNEIOS FIFA / FUTEBOL --- -->
+      <article class="card-torneio"
+        data-nome="Campeonato Presencial FIFA 22"
+        data-jogo="fifa"
+        data-categoria="esportes"
+        data-plataforma="console"
+        data-status="andamento">
+
+        <img referrerpolicy="no-referrer" src="/pagina_inicial/image/camppresencial.jpg" alt="Campeonato Presencial FIFA 22">
+        <div class="card-info">
+          <h2>Campeonato Presencial FIFA 22</h2>
+          <p class="jogo">Jogo: FIFA • Esportes • Console</p>
+          <p class="data">Início: 30/03/2026</p>
+          <p class="status status-andamento">Em andamento</p>
+        <a href="/torneio/detalhes-campeonato-presen-fifa.html"> <button class="btn-detalhes">Ver detalhes</button>
+          </a>
+        </div>
+      </article>
+
+      <article class="card-torneio"
+        data-nome="ARENA - FC25"
+        data-jogo="fifa"
+        data-categoria="esportes"
+        data-plataforma="console"
+        data-status="aberto">
+
+        <img referrerpolicy="no-referrer" src="/pagina_inicial/image/arenafc25.jpg" alt="ARENA - FC25">
+        <div class="card-info">
+          <h2>ARENA - FC25</h2>
+          <p class="jogo">Jogo: FIFA • Esportes • Console</p>
+          <p class="data">Início: 05/05/2026</p>
+          <p class="status status-aberto">Inscrições abertas</p>
+          <a href="/torneio/custom.html?id=arena-fc25"><button class="btn-detalhes">Ver detalhes</button></a>
+        </div>
+      </article>
+
+    
+ 
+
+      
+
+      <!-- Você pode continuar adicionando mais cards seguindo esse padrão -->
+
+    </section>
+  </main>
+
+  <!-- PARTE DE BAIXO DO SITE< CHAMADA DE FOOTER -->
+
+    <footer>
+
+      <div id="footer_content">
+        <div id="footer_logo">
+          <img referrerpolicy="no-referrer" src="/image/logo.png" alt="" id="logofooter">
+
+        </div>
+      
+      <div id="footer_sobrenos">
+
+         <h1>Sobre Nós</h1>
+        <br>
+         <p>O Versus Hub é uma plataforma criada para conectar jogadores, organizadores e fãs de e-sports em um só lugar. Oferecemos torneios competitivos, rankings dinâmicos e recompensas exclusivas para quem ama competir. Nosso objetivo é tornar a experiência gamer mais acessível, divertida e profissional — seja você um iniciante ou um pro player.</p>
+
+      </div>
+
+      <div id="footer_versushub">
+
+         <h1>Versus Hub</h1>
+        <br>
+          <p>
+              Torneios e Rankings atualizados 
+              <br><br> 
+              Sistema seguro e fácil de participar 
+              <br><br>
+              Suporte ativo todos os dias
+          </p>
+
+
+      </div>
+      
+      <div id="footer_politicas">
+
+          <h1>Políticas</h1><br>
+          <li>
+              Termos de uso  </li><br>
+<li>
+  Política de Privacidade  </li><br>
+   <li>
+  Política de Reembolso (para eventos pagos) </li>
+
+ </div>
+    </div>
+  
+   
+  </div>
+
+
+    
+    </footer>
+
+
+<!-- --------------------------------------------------- -->
+
+  </div>
+  </div>
+  <!-- ... footer global ... -->
+
+  
+  <script src="/pagina_inicial/js/scrip.js"></script>
+    <script src="/pagina_inicial/js/torneios.js"></script>
+
+</body>
+</html>

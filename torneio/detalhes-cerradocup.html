@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- estilos globais -->
+  <link rel="stylesheet" href="/pagina_inicial/css/estilos.css" />
+  <!-- estilos específicos desta página -->
+  <link rel="stylesheet" href="/torneio/detalhes.css" />
+  <link rel="stylesheet" href="/torneio/bracket.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="icon" href="/image/logo.png" sizes="32x32"> 
+  <title>Cerrado Cup CS:GO - VersusHub</title>
+</head>
+<body>
+
+  <!-- ========= HEADER (o mesmo de sempre) ========= -->
+  <header>
+    <nav class="navbar">
+
+      <div class="header-left">
+        <button id="menuToggle" class="menu-button">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="menu-svg"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+
+        <div class="logo_header">
+          <a href="/pagina_inicial/index.html">
+            <img referrerpolicy="no-referrer" src="/image/logo%20plus%20tipo%20textura.png" alt="VersusHub">
+          </a>
+        </div>
+      </div>
+
+      <div class="botoes_header">
+        <a href="/aovivo/aovivo.html"><button id="aovivo_header">Ao Vivo</button></a>
+        <a href="/criar_torneio/criar_torneio.html"> <button id="criar_header">Criar Torneio</button> </a>
+        <a href="/equipes/equipes.html"> <button id="equipes_header">Equipes</button> </a>
+      </div>
+
+      <div class="header-right">
+        <form class="search-header" action="#" onsubmit="return false">
+          <input
+            type="text"
+            placeholder="Buscar torneios, jogos..."
+            id="searchInput"
+          >
+          <button type="submit" id="searchBtn" aria-label="Buscar"><i class="fa-solid fa-magnifying-glass"></i></button>
+        </form>
+
+        <a href="/login/login.html" id="btentrar">Entrar</a>
+        <a href="/cadastro/cadastro.html" id="btcadastrar">Cadastrar-se</a>
+
+        <div class="user-icon">
+          <img referrerpolicy="no-referrer" src="/image/boneco_logo_ofc.png" alt="Usuário" id="userBtn">
+          <ul id="menuUser" class="hidden"></ul>
+        </div>
+      </div>
+
+    </nav>
+  </header>
+  <!-- ========= FIM HEADER ========= -->
+
+<!-- SIDEBAR -->
+<aside id="sidebar" class="sidebar">
+  <h2 class="sidebar-title"></h2>
+  <nav class="sidebar-nav">
+    <a href="/pagina_inicial/index.html"><i class="fa-solid fa-house" style="margin-right: 10px; width: 16px; text-align: center;"></i>Início</a>
+    <a href="/pagina_inicial/torneios.html"><i class="fa-solid fa-trophy" style="margin-right: 10px; width: 16px; text-align: center;"></i>Todos os torneios</a>
+    <a href="/criar_torneio/criar_torneio.html"><i class="fa-solid fa-award" style="margin-right: 10px; width: 16px; text-align: center;"></i>Criar Torneio</a>
+    <a href="/equipes/equipes.html"><i class="fa-solid fa-users" style="margin-right: 10px; width: 16px; text-align: center;"></i>Equipes</a>
+    <a href="/gerenciartorneios/gerentornindex.html"><i class="fa-solid fa-file-invoice" style="margin-right: 10px; width: 16px; text-align: center;"></i>Gerenciar torneios</a>
+    <a href="/termos/termos.html"><i class="fa-solid fa-briefcase" style="margin-right: 10px; width: 16px; text-align: center;"></i>Termos de Uso</a>
+    <a href="/feedback/feedback.html"><i class="fa-solid fa-star" style="margin-right: 10px; width: 16px; text-align: center;"></i>Enviar feedback / Sugestão</a>
+  </nav>
+</aside>
+
+  <!-- efeito da tela ficar escura no fundo -->
+
+<div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+<!-- FIM SIDEBAR -->
+
+
+  <!-- ========= CONTEÚDO DA PÁGINA DE TORNEIO ========= -->
+  <main class="torneio-page">
+
+    <!-- HERO DO TORNEIO -->
+    <section class="torneio-hero">
+      <div class="torneio-banner">
+        <img referrerpolicy="no-referrer" src="/images/cerradocup.jpg" alt="Cerrado Cup CS:GO">
+        <div class="torneio-status-badge status-aberto">
+          Inscrições abertas
+        </div>
+      </div>
+
+      <div class="torneio-hero-info">
+  <h1>Cerrado Cup CS:GO</h1>
+  <p class="torneio-meta">CS:GO • FPS • PC</p>
+  <p class="torneio-data">Início: 03/01/2026 às 19h</p>
+
+  <!-- 👍 Like do torneio -->
+  <div class="torneio-like-box">
+    <button class="like-btn" data-id="cerrado-cup-csgo">
+      <span class="like-icon">👍</span>
+      <span class="like-count">0</span>
+    </button>
+  </div>
+
+  <div class="torneio-tags">
+    <span>Formato 5x5</span>
+    <span>Eliminação simples</span>
+    <span>Servidor Brasil</span>
+  </div>
+</div>
+
+    </section>
+
+    <!-- LAYOUT EM 2 COLUNAS: INFO + LATERAL -->
+    <section class="torneio-layout">
+
+      <!-- COLUNA ESQUERDA: DESCRIÇÃO / REGRAS / CRONOGRAMA -->
+      <div class="torneio-col-info">
+
+        <div class="torneio-card-box">
+          <h2>Sobre o torneio</h2>
+          <p>
+            A Cerrado Cup CS:GO reúne times de todo o Brasil em uma competição
+            acirrada em formato eliminatório. Ideal para equipes amadoras e
+            semiprofissionais que querem ganhar visibilidade e experiência em
+            cenário competitivo.
+          </p>
+        </div>
+
+        <div class="torneio-card-box">
+          <h2>Regras principais</h2>
+          <ul>
+            <li>Times de 5 jogadores (até 2 reservas cadastrados).</li>
+            <li>Map pool padrão competitivo (Dust II, Mirage, Inferno, Nuke, Overpass, Vertigo, Ancient).</li>
+            <li>Partidas MD1 até a semifinal, final MD3.</li>
+            <li>É obrigatório estar no servidor 10 minutos antes do horário marcado.</li>
+            <li>Uso de cheats, macros ou scripts resulta em desclassificação imediata.</li>
+          </ul>
+        </div>
+
+        <div class="torneio-card-box">
+          <h2>Cronograma</h2>
+          <ul>
+            <li><strong>22/03 – 19h:</strong> Fase de grupos / chaveamento inicial.</li>
+            <li><strong>23/03 – 19h:</strong> Quartas de final.</li>
+            <li><strong>24/03 – 19h:</strong> Semifinais.</li>
+            <li><strong>25/03 – 20h:</strong> Grande final.</li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- COLUNA DIREITA: INSCRIÇÃO / PREMIAÇÃO / REQUISITOS -->
+      <aside class="torneio-col-side">
+
+        <div class="torneio-card-box destaque-inscricao">
+          <h2>Inscrições</h2>
+          <ul class="info-list">
+            <li><span>Taxa:</span> Gratuito</li>
+            <li><span>Vagas:</span> 32 equipes</li>
+            <li><span>Plataforma:</span> PC (Steam)</li>
+            <li><span>Servidor:</span> Brasil – São Paulo</li>
+          </ul>
+<button class="btn-principal" id="btnInscrever">Inscrever equipe</button>
+
+<script>
+  // dados fixos desse torneio (id precisa ser único)
+  const TORNEIO_INFO = {
+    id: 'cerrado-cup-csgo',
+    nome: 'Cerrado Cup CS:GO',
+    jogo: 'CS:GO • FPS • PC',
+    data: 'Início: 22/03/2026',
+    status: 'Em andamento',
+    statusClass: 'status-andamento',
+    banner: '/images/cerradocup.jpg',
+    link: '/torneio/detalhes-cerradocup.html'
+  };
+
+  function getLoggedUser() {
+    const raw = localStorage.getItem('vh_loggedUser');
+    if (raw) {
+      try { return JSON.parse(raw); } catch (e) {}
+    }
+    return null;
+  }
+
+  function addJoinedTournament(info) {
+    const u = getLoggedUser();
+    const storageKey = u ? `vh_joinedTournaments_${u.email}` : 'vh_joinedTournaments';
+    let arr = [];
+    try {
+      arr = JSON.parse(localStorage.getItem(storageKey) || '[]');
+    } catch (e) {
+      arr = [];
+    }
+
+    if (!arr.some(t => t.id === info.id)) {
+      arr.push(info);
+      localStorage.setItem(storageKey, JSON.stringify(arr));
+    }
+  }
+
+  function showToast(message) {
+    let toast = document.getElementById('customToast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'customToast';
+      toast.style.position = 'fixed';
+      toast.style.bottom = '30px';
+      toast.style.right = '30px';
+      toast.style.background = '#1e1b2e';
+      toast.style.color = '#fff';
+      toast.style.borderLeft = '4px solid #ff7300';
+      toast.style.padding = '15px 25px';
+      toast.style.borderRadius = '8px';
+      toast.style.boxShadow = '0 10px 30px rgba(0,0,0,0.5)';
+      toast.style.zIndex = '99999';
+      toast.style.fontFamily = 'sans-serif';
+      toast.style.fontSize = '14px';
+      toast.style.fontWeight = 'bold';
+      toast.style.transition = 'all 0.4s ease';
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateY(20px)';
+      document.body.appendChild(toast);
+    }
+    
+    toast.textContent = message;
+    void toast.offsetWidth;
+    toast.style.opacity = '1';
+    toast.style.transform = 'translateY(0)';
+    
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateY(20px)';
+    }, 4000);
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('btnInscrever');
+    if (btn) {
+      const u = getLoggedUser();
+      const storageKey = u ? `vh_joinedTournaments_${u.email}` : 'vh_joinedTournaments';
+      let arr = [];
+      try {
+        arr = JSON.parse(localStorage.getItem(storageKey) || '[]');
+      } catch (e) {
+        arr = [];
+      }
+      
+      const isJoined = u && arr.some(t => t.id === TORNEIO_INFO.id);
+      if (isJoined) {
+        btn.textContent = 'Já inscrito';
+        btn.disabled = true;
+        btn.style.background = '#2c2c3b';
+        btn.style.cursor = 'not-allowed';
+      }
+
+      btn.addEventListener('click', () => {
+        const loggedUser = getLoggedUser();
+        if (!loggedUser) {
+          showToast('Você precisa estar logado para se inscrever! Redirecionando...');
+          setTimeout(() => {
+            window.location.href = '/login/login.html';
+          }, 1500);
+          return;
+        }
+
+        addJoinedTournament(TORNEIO_INFO);
+        showToast('Inscrição realizada com sucesso! Confira na aba "Participando" em Gerenciar Torneios.');
+        btn.textContent = 'Já inscrito';
+        btn.disabled = true;
+        btn.style.background = '#2c2c3b';
+        btn.style.cursor = 'not-allowed';
+      });
+    }
+  });
+</script>
+          
+        </div>
+
+        <div class="torneio-card-box">
+          <h2>Premiação</h2>
+          <ul class="info-list">
+            <li><span>1º lugar:</span> R$ 2.000 + medalhas</li>
+            <li><span>2º lugar:</span> R$ 1.000</li>
+            <li><span>3º lugar:</span> R$ 500</li>
+          </ul>
+        </div>
+
+        <div class="torneio-card-box">
+          <h2>Requisitos dos jogadores</h2>
+          <ul>
+            <li>Conta Steam sem banimentos VAC.</li>
+            <li>Idade mínima: 16 anos.</li>
+            <li>Microfone e Discord para comunicação com a staff.</li>
+          </ul>
+        </div>
+
+      </aside>
+
+    </section>
+
+    <!-- SEÇÃO DE CHAVEAMENTO (BRACKET) -->
+    <section class="torneio-container-bracket" style="margin-top: 40px; margin-bottom: 40px; clear: both;">
+      <div class="torneio-card-box">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #2d2a38; padding-bottom: 15px; margin-bottom: 20px; flex-wrap: wrap; gap: 10px;">
+          <h2 style="margin: 0; color: #fff; font-size: 20px; font-weight: 800; text-transform: uppercase;"><i class="fa-solid fa-sitemap" style="color: #ff7300; margin-right: 10px;"></i> Chaveamento do Torneio</h2>
+          <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <label for="bracketSizeSelect" style="color: #9cb1cf; font-size: 13px; font-weight: bold;">Tamanho:</label>
+            <select id="bracketSizeSelect" style="background: #111015; border: 1.5px solid #2a2a38; padding: 6px 12px; border-radius: 6px; color: #fff; cursor: pointer; font-size: 13px;">
+              <option value="4">4 Participantes (Semifinais)</option>
+              <option value="8">8 Participantes (Quartas)</option>
+              <option value="16" selected>16 Participantes (Oitavas)</option>
+            </select>
+            <button id="btnResetBracket" class="btn-principal" style="padding: 6px 14px; font-size: 13px; font-weight: 700; border-radius: 6px; margin: 0; background: #ff7300; border: none; cursor: pointer; color: #fff;">Reiniciar Chave</button>
+          </div>
+        </div>
+        
+        <div id="bracketContainer" class="bracket-scroll-container">
+          <!-- Gerado via bracket.js -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+  <!-- ========= FIM CONTEÚDO ========= -->
+
+  <!-- ========= FOOTER GLOBAL ========= -->
+  <footer>
+    <div id="footer_content">
+      <div id="footer_logo">
+        <img referrerpolicy="no-referrer" src="/image/logo.png" alt="" id="logofooter">
+      </div>
+
+      <div id="footer_sobrenos">
+        <h1>Sobre Nós</h1>
+        <br>
+        <p>O Versus Hub é uma plataforma criada para conectar jogadores, organizadores e fãs de e-sports em um só lugar. Oferecemos torneios competitivos, rankings dinâmicos e recompensas exclusivas para quem ama competir. Nosso objetivo é tornar a experiência gamer mais acessível, divertida e profissional — seja você um iniciante ou um pro player.</p>
+      </div>
+
+      <div id="footer_versushub">
+        <h1>Versus Hub</h1>
+        <br>
+        <p>
+          Torneios e Rankings atualizados <br><br>
+          Sistema seguro e fácil de participar <br><br>
+          Suporte ativo todos os dias
+        </p>
+      </div>
+
+      <div id="footer_politicas">
+        <h1>Políticas</h1><br>
+        <li>Termos de uso</li><br>
+        <li>Política de Privacidade</li><br>
+        <li>Política de Reembolso (para eventos pagos)</li>
+      </div>
+    </div>
+  </footer>
+  <!-- ========= FIM FOOTER ========= -->
+
+  <!-- mesmo JS global que você já usa (sidebar, login fake, busca, etc) -->
+  <script src="/pagina_inicial/js/scrip.js"></script>
+  <script src="/torneio/js/likes.js"></script>
+  <script src="/torneio/js/bracket.js"></script>
+</body>
+</html>

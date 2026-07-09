@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Suporte e Feedback - VersusHub</title>
+
+  <!-- CSS global -->
+  <link rel="stylesheet" href="/pagina_inicial/css/estilos.css">
+  <!-- CSS específico desta página -->
+  <link rel="stylesheet" href="/feedback/css/feedback.css">
+  <link rel="icon" href="/image/logo.png" sizes="32x32">
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <nav class="navbar">
+    <div class="header-left">
+      <button id="menuToggle" class="menu-button">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="menu-svg"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+
+      <div class="logo_header">
+        <a href="/pagina_inicial/index.html">
+          <img referrerpolicy="no-referrer" src="/image/logo%20plus%20tipo%20textura.png" alt="VersusHub">
+        </a>
+      </div>
+    </div>
+
+    <div class="botoes_header">
+      <a href="/aovivo/aovivo.html"><button id="aovivo_header">Ao Vivo</button></a>
+      <a href="/criar_torneio/criar_torneio.html"><button id="criar_header">Criar Torneio</button></a>
+      <a href="/equipes/equipes.html"><button id="equipes_header">Equipes</button></a>
+    </div>
+
+    <div class="header-right">
+      <form class="search-header" action="#" onsubmit="return false">
+        <input type="text" placeholder="Buscar torneios, equipes..." id="searchInput">
+        <button type="submit" id="searchBtn" aria-label="Buscar"><i class="fa-solid fa-magnifying-glass"></i></button>
+      </form>
+
+      <a href="/login/login.html" id="btentrar">Entrar</a>
+      <a href="/cadastro/cadastro.html" id="btcadastrar">Cadastrar-se</a>
+
+      <div class="user-icon">
+        <img referrerpolicy="no-referrer" src="/image/boneco_logo_ofc.png" alt="Usuário" id="userBtn">
+        <ul id="menuUser" class="hidden"></ul>
+      </div>
+    </div>
+  </nav>
+</header>
+<!-- FIM HEADER -->
+
+<!-- SIDEBAR -->
+<aside id="sidebar" class="sidebar">
+  <h2 class="sidebar-title"></h2>
+  <nav class="sidebar-nav">
+    <a href="/pagina_inicial/index.html"><i class="fa-solid fa-house" style="margin-right: 10px; width: 16px; text-align: center;"></i>Início</a>
+    <a href="/pagina_inicial/torneios.html"><i class="fa-solid fa-trophy" style="margin-right: 10px; width: 16px; text-align: center;"></i>Todos os torneios</a>
+    <a href="/criar_torneio/criar_torneio.html"><i class="fa-solid fa-award" style="margin-right: 10px; width: 16px; text-align: center;"></i>Criar Torneio</a>
+    <a href="/equipes/equipes.html"><i class="fa-solid fa-users" style="margin-right: 10px; width: 16px; text-align: center;"></i>Equipes</a>
+    <a href="/gerenciartorneios/gerentornindex.html"><i class="fa-solid fa-file-invoice" style="margin-right: 10px; width: 16px; text-align: center;"></i>Gerenciar torneios</a>
+    <a href="/termos/termos.html"><i class="fa-solid fa-briefcase" style="margin-right: 10px; width: 16px; text-align: center;"></i>Termos de Uso</a>
+    <a href="/feedback/feedback.html"><i class="fa-solid fa-star" style="margin-right: 10px; width: 16px; text-align: center;"></i>Enviar feedback / Sugestão</a>
+  </nav>
+</aside>
+
+  <!-- efeito da tela ficar escura no fundo -->
+
+<div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+<!-- FIM SIDEBAR -->
+
+<main class="support-main">
+
+  <!-- CABEÇALHO DA PÁGINA -->
+  <section class="support-header">
+    <h1>Suporte & Feedback</h1>
+    <p>
+      Teve algum problema, sugestão ou achou um bug?  
+      Fala com a gente aqui que usamos esses envios para melhorar o VersusHub.
+    </p>
+  </section>
+
+  <section class="support-grid" id="feedback">
+
+    <!-- FORMULÁRIO PRINCIPAL -->
+    <div class="support-card">
+      <h2>Envie sua mensagem</h2>
+
+      <form id="formFeedback">
+        <div class="form-block">
+          <label for="tipoFeedback">Tipo de mensagem</label>
+          <select id="tipoFeedback" required>
+            <option value="">Selecione...</option>
+            <option value="bug">Erro / Bug</option>
+            <option value="sugestao">Sugestão de melhoria</option>
+            <option value="elogio">Elogio</option>
+            <option value="denuncia">Denúncia / Comportamento tóxico</option>
+            <option value="outro">Outro</option>
+          </select>
+        </div>
+
+        <div class="form-block">
+          <label for="nomeUser">Seu nome (opcional)</label>
+          <input type="text" id="nomeUser" placeholder="Como podemos te chamar?">
+        </div>
+
+        <div class="form-block">
+          <label for="emailUser">Seu e-mail</label>
+          <input type="email" id="emailUser" placeholder="Para respondermos você" required>
+        </div>
+
+        <div class="form-block">
+          <label for="assunto">Assunto</label>
+          <input type="text" id="assunto" placeholder="Ex: Bug ao criar torneio de CS2" required>
+        </div>
+
+        <div class="form-block">
+          <label for="pageRef">Página ou link relacionado (opcional)</label>
+          <input type="text" id="pageRef" placeholder="Ex: /criar_torneio/criar_torneio.html">
+        </div>
+
+        <div class="form-block">
+          <label for="descricaoMsg">Descrição</label>
+          <textarea id="descricaoMsg" rows="5" placeholder="Explique o que aconteceu ou sua ideia com o máximo de detalhes possível." required></textarea>
+        </div>
+
+        <div class="form-block">
+          <label for="urgencia">Prioridade</label>
+          <select id="urgencia">
+            <option value="normal">Normal</option>
+            <option value="alta">Alta</option>
+            <option value="critica">Crítica (impede o uso do site)</option>
+          </select>
+        </div>
+
+        <div class="support-actions">
+          <button type="submit" class="btn-enviar-feedback">Enviar</button>
+          <span id="feedbackStatus" class="feedback-status"></span>
+        </div>
+      </form>
+    </div>
+
+    <!-- LADO DIREITO: DICAS / CONTATO -->
+    <aside class="support-side">
+      <div class="support-card side-card">
+        <h2>Dicas antes de enviar</h2>
+        <ul class="tips-list">
+          <li>Descreva o passo a passo até o erro acontecer.</li>
+          <li>Se for bug, diga o navegador e se está no PC ou celular.</li>
+          <li>Se for sugestão, explique como imagina essa função funcionando.</li>
+        </ul>
+      </div>
+
+     
+    </aside>
+
+  </section>
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div id="footer_content">
+    <div id="footer_logo">
+      <img referrerpolicy="no-referrer" src="/image/logo.png" alt="VersusHub" id="logofooter">
+    </div>
+
+    <div id="footer_sobrenos">
+      <h1>Sobre Nós</h1>
+      <p>O Versus Hub conecta jogadores, equipes e organizadores em um ambiente competitivo completo.</p>
+    </div>
+
+    <div id="footer_versushub">
+      <h1>Versus Hub</h1>
+      <p><br>Torneios | Equipes | Rankings <br>Suporte ativo todos os dias</p>
+    </div>
+
+    <div id="footer_politicas">
+      <h1>Políticas</h1>
+      <li>Termos de uso</li>
+      <li>Política de Privacidade</li>
+      <li>Política de Reembolso (para eventos pagos)</li>
+    </div>
+  </div>
+</footer>
+
+<!-- JS -->
+<script src="/pagina_inicial/js/scrip.js"></script>
+
+<!-- JS específico do feedback (simples) -->
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("formFeedback");
+  const statusSpan = document.getElementById("feedbackStatus");
+
+  if (!form) return;
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    // (aqui, no futuro, você poderia mandar para um backend)
+    form.reset();
+    statusSpan.textContent = "Mensagem enviada! Obrigado por ajudar o VersusHub.";
+    statusSpan.style.color = "#a7f3d0";
+
+    setTimeout(() => {
+      statusSpan.textContent = "";
+    }, 3000);
+  });
+});
+</script>
+
+</body>
+</html>

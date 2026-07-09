@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Versus Hub - VersusHub</title>
+
+<link rel="stylesheet" href="/pagina_inicial/css/estilos.css" />
+   <link rel="icon" href="/image/logo.png" sizes="32x32"> 
+<style>
+/* ======== ESTILO DO LAYOUT GERAL ======== */
+body {
+  background: #0b0b0d;
+  color: #ffffff;
+  font-family: system-ui, sans-serif;
+}
+
+main {
+  max-width: 1100px;
+  margin: 13px auto 50px;
+  padding: 0 20px;
+}
+
+/* ======== CABEÇALHO DA EQUIPE ======== */
+.team-header {
+  display: flex;
+  gap: 25px;
+  background: #141419;
+  padding: 25px;
+  border-radius: 16px;
+  border: 2px solid #282833;
+}
+
+.team-header img {
+  width: 220px;
+  height: 220px;
+  padding: 10px;
+  border-radius: 16px;
+  border: 3px solid #d41111;
+  object-fit: cover;
+}
+
+.team-header-info h1 {
+  font-size: 32px;
+  margin-bottom: 6px;
+  color: #f83838;
+}
+
+.btn-solicitacoes {
+  margin-top: 12px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: #d41111;
+  border: none;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: .2s;
+}
+
+.btn-solicitacoes:hover {
+  filter: brightness(1.1);
+}
+
+/* ======== SEÇÕES ======== */
+.section-box {
+  background: #141419;
+  border-radius: 12px;
+  border: 2px solid #2a2a38;
+  padding: 20px;
+  margin-top: 28px;
+
+}
+
+.section-box h2 {
+  font-size: 22px;
+  margin-bottom: 14px;
+  color: #f83838;
+}
+
+/* ======== INTEGRANTES ======== */
+.member {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #1b1b26;
+  border: 1px solid #32323f;
+  border-radius: 10px;
+  padding: 10px;
+  max-width: 380px;
+  margin-bottom: 10px;
+}
+
+.member img {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #f83838;
+}
+
+/* ======== CARDS DE TORNEIO ======== */
+.torneio-card {
+  background: #1c1c26;
+  border: 2px solid #2c2c3b;
+  border-radius: 14px;
+  width: 260px;
+  overflow: hidden;
+  transition: .2s;
+}
+
+.torneio-card img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+}
+
+.torneio-card-info {
+  padding: 12px;
+}
+
+.torneio-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+/* ======== PAINEL LATERAL DE SOLICITAÇÕES ======== */
+.solic-panel {
+  position: fixed;
+  top: 0;
+  right: -350px;
+  width: 350px;
+  height: 100vh;
+  background: #141419;
+  border-left: 2px solid #272732;
+  padding: 20px;
+  transition: .3s;
+  z-index: 900;
+}
+
+.solic-panel.open {
+  right: 0;
+  width: 850px;
+}
+
+.solic-panel h2 {
+  margin-top: 60px;
+  font-size: 22px;
+  color: #f83838;
+}
+
+.request-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #1b1b26;
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 10px;
+  border: 1px solid #32323f;
+  width: 820px;
+}
+
+.request-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.request-left img {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #f83838;
+}
+
+.request-actions button {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.accept {
+  background: #22c55e;
+  color: #fff;
+}
+
+.reject {
+  background: #ef4444;
+  color: #fff;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<header>
+  <nav class="navbar">
+
+    <!-- ESQUERDA: menu + logo -->
+    <div class="header-left">
+
+      <!-- Botão do menu lateral (hambúrguer) -->
+      <button id="menuToggle" class="menu-button">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="menu-svg"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+
+      <!-- LOGO -->
+      <div class="logo_header">
+        <a href="/pagina_inicial/index.html">
+          <img referrerpolicy="no-referrer" src="/image/logo%20plus%20tipo%20textura.png" alt="VersusHub">
+        </a>
+      </div>
+
+    </div>
+
+    <!-- CENTRO: botões principais -->
+    <div class="botoes_header">
+     <a href="/aovivo/aovivo.html"> <button id="aovivo_header">Ao Vivo</button></a>
+     <a href="/criar_torneio/criar_torneio.html"> <button id="criar_header">Criar Torneio</button> <a href="/equipes/equipes.html"> <button id="equipes_header">Equipes</button> </a>
+    </div>
+
+    <!-- DIREITA: pesquisa + entrar + cadastrar + usuário -->
+    <div class="header-right">
+
+      <!-- BARRA DE PESQUISA NO HEADER -->
+      <form class="search-header" action="#" onsubmit="return false">
+        <input
+          type="text"
+          placeholder="Buscar torneios, jogos..."
+          id="searchInput"
+        >
+        <button type="submit" id="searchBtn" aria-label="Buscar"><i class="fa-solid fa-magnifying-glass"></i></button>
+      </form>
+
+      <!-- BOTÕES À DIREITA -->
+      <a href="/login/login.html" id="btentrar">Entrar</a>
+      <a href="/cadastro/cadastro.html" id="btcadastrar">Cadastrar-se</a>
+
+      <!-- ÍCONE DO USUÁRIO -->
+      <div class="user-icon">
+        <img referrerpolicy="no-referrer" src="/image/boneco_logo_ofc.png" alt="Usuário" id="userBtn">
+
+        <ul id="menuUser" class="hidden">
+          <li>
+            <a href="/login/login.html">
+              Login
+            </a>
+          </li>
+          <hr>
+          <li><a href="/cadastro/cadastro.html">Cadastro</a></li>
+        </ul>
+      </div>
+
+    </div>
+
+  </nav>
+</header>
+<!-- FIM HEADER -->
+
+<!-- SIDEBAR -->
+<aside id="sidebar" class="sidebar">
+  <h2 class="sidebar-title"></h2>
+  <nav class="sidebar-nav">
+    <a href="/pagina_inicial/index.html"><i class="fa-solid fa-house" style="margin-right: 10px; width: 16px; text-align: center;"></i>Início</a>
+    <a href="/pagina_inicial/torneios.html"><i class="fa-solid fa-trophy" style="margin-right: 10px; width: 16px; text-align: center;"></i>Todos os torneios</a>
+    <a href="/criar_torneio/criar_torneio.html"><i class="fa-solid fa-award" style="margin-right: 10px; width: 16px; text-align: center;"></i>Criar Torneio</a>
+    <a href="/equipes/equipes.html"><i class="fa-solid fa-users" style="margin-right: 10px; width: 16px; text-align: center;"></i>Equipes</a>
+    <a href="/gerenciartorneios/gerentornindex.html"><i class="fa-solid fa-file-invoice" style="margin-right: 10px; width: 16px; text-align: center;"></i>Gerenciar torneios</a>
+    <a href="/termos/termos.html"><i class="fa-solid fa-briefcase" style="margin-right: 10px; width: 16px; text-align: center;"></i>Termos de Uso</a>
+    <a href="/feedback/feedback.html"><i class="fa-solid fa-star" style="margin-right: 10px; width: 16px; text-align: center;"></i>Enviar feedback / Sugestão</a>
+  </nav>
+</aside>
+
+  <!-- efeito da tela ficar escura no fundo -->
+
+<div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+<!-- FIM SIDEBAR -->
+
+<main>
+
+<!-- =================== HEADER DA EQUIPE =================== -->
+<section class="team-header">
+  <img referrerpolicy="no-referrer" src="/image/logo.png">
+
+  <div class="team-header-info">
+    <h1>Versus Hub</h1>
+    <p><strong>Líder:</strong> Caíque Brandão</p>
+
+    <p><strong>Integrantes:</strong> 5 / 5</p>
+    <p><strong>Jogos principais:</strong> Brawl Stars / Fortnite / Street Fighter</p>
+    <p><strong>Plataforma:</strong> PC / Mobile</p>
+    <p><strong>Região:</strong> Brasil</p>
+    <button class="btn-solicitacoes">Ver solicitações</button>
+  </div>
+</section>
+
+<!-- =================== INTEGRANTES =================== -->
+  <!-- SOBRE A EQUIPE -->
+  <section class="section-box">
+    <h2>Sobre a equipe</h2>
+    <p>
+      Olá pessoal, espero que estejam gostando do projeto, essa é a nossa equipe, a Versus Hub!
+    </p>
+  </section>
+
+<section class="section-box">
+  <h2>Integrantes</h2>
+  <div id="memberList">
+    <div class="member">
+     <a href="/perfil/perfil-publico.html?id=caique"> <img referrerpolicy="no-referrer" src="/equipes/images/caiquebrandao.jpg"></a>
+      <a href="/perfil/perfil-publico.html?id=caique"><span><strong>Caíque Brandão</strong><strong> (Lider)</strong></span></a>
+    </div>
+     <div class="member">
+      <img referrerpolicy="no-referrer" src="/equipes/images/gabrieloliveira.webp">
+      <span><strong>Gabriel Oliveira</strong><strong> (Colíder)</strong></span>
+    </div>
+
+<div class="member">
+      <img referrerpolicy="no-referrer" src="/equipes/images/joaovitor.jpeg">
+      <span><strong>João Vitor</strong><strong> (Colíder)</strong>  </span>
+    </div>
+
+    <div class="member">
+      <img referrerpolicy="no-referrer" src="/equipes/images/lucas.jpeg">
+      <span><strong>Lucas Vinicius</strong><strong> (Colíder)</strong> </span>
+    </div>
+    <div class="member">
+      <img referrerpolicy="no-referrer" src="/images/pngtree-avatar-icon-profile-icon-member-login-vector-isolated-png-image_1978396.jpg">
+      <span><strong>João Pedro</strong><strong> (Colíder)</strong> </span>
+    </div>
+    
+  </div>
+</section>
+
+<!-- =================== TORNEIOS GANHOS =================== -->
+<section class="section-box">
+  <h2>Torneios Ganhos</h2>
+
+  <div class="torneio-list">
+
+    <div class="torneio-card">
+      <img referrerpolicy="no-referrer" src="/images/cerradocup.jpg">
+      <div class="torneio-card-info">
+        <h3>Cerrado Cup CS2</h3>
+        <p>Campeões - 2025</p>
+      </div>
+    </div>
+
+    <div class="torneio-card">
+      <img referrerpolicy="no-referrer" src="/images/fifa_torneiofile1.jpg">
+      <div class="torneio-card-info">
+        <h3>Brasil FPS League</h3>
+        <p>1º Lugar - 2024</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- =================== TORNEIOS ATUAIS =================== -->
+<section class="section-box">
+  <h2>Participando atualmente</h2>
+
+  <div class="torneio-list">
+    <div class="torneio-card">
+      <img referrerpolicy="no-referrer" src="/images/ff_championsbrasil.jpg">
+      <div class="torneio-card-info">
+        <h3>Free Fire Champions Brasil</h3>
+        <p>Em andamento</p>
+      </div>
+    </div>
+
+    <div class="torneio-card">
+      <img referrerpolicy="no-referrer" src="/images/cerradocup.jpg">
+      <div class="torneio-card-info">
+        <h3>CS2 Ultimate Series</h3>
+        <p>Classificatórias</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- =================== PAINEL LATERAL DE SOLICITAÇÕES =================== -->
+<div class="solic-panel" id="solicPanel">
+  <h2>Solicitações</h2>
+  <div id="solicList"></div>
+</div>
+
+
+<!-- PARTE DE BAIXO DO SITE< CHAMADA DE FOOTER -->
+
+    <footer>
+
+      <div id="footer_content">
+        <div id="footer_logo">
+          <img referrerpolicy="no-referrer" src="/image/logo.png" alt="" id="logofooter">
+
+        </div>
+      
+      <div id="footer_sobrenos">
+
+         <h1>Sobre Nós</h1>
+        <br>
+         <p>O Versus Hub é uma plataforma criada para conectar jogadores, organizadores e fãs de e-sports em um só lugar. Oferecemos torneios competitivos, rankings dinâmicos e recompensas exclusivas para quem ama competir. Nosso objetivo é tornar a experiência gamer mais acessível, divertida e profissional — seja você um iniciante ou um pro player.</p>
+
+      </div>
+
+      <div id="footer_versushub">
+
+         <h1>Versus Hub</h1>
+        <br>
+          <p>
+              Torneios e Rankings atualizados 
+              <br><br> 
+              Sistema seguro e fácil de participar 
+              <br><br>
+              Suporte ativo todos os dias
+          </p>
+
+
+      </div>
+      
+      <div id="footer_politicas">
+
+          <h1>Políticas</h1><br>
+          <li>
+              Termos de uso  </li><br>
+<li>
+  Política de Privacidade  </li><br>
+   <li>
+  Política de Reembolso (para eventos pagos) </li>
+
+ </div>
+    </div>
+ 
+  </div>
+
+    </footer>
+
+<script>
+/* Banco de solicitações fictícias */
+let solicitacoes = [
+  { nome: "Cirilo_gamer343", img: "/images/pngtree-avatar-icon-profile-icon-member-login-vector-isolated-png-image_1978396.jpg" },
+  { nome: "Zz_Stark_zZ", img: "/images/pngtree-avatar-icon-profile-icon-member-login-vector-isolated-png-image_1978396.jpg" },
+  { nome: "60_PRA_1", img: "/images/pngtree-avatar-icon-profile-icon-member-login-vector-isolated-png-image_1978396.jpg" }
+];
+
+const panel = document.getElementById("solicPanel");
+const btnOpen = document.querySelector(".btn-solicitacoes");
+const list = document.getElementById("solicList");
+const memberList = document.getElementById("memberList");
+
+/* Renderizar solicitações */
+function renderSolicitacoes() {
+  list.innerHTML = "";
+
+  if (solicitacoes.length === 0) {
+    list.innerHTML = `<p style="margin-top:10px;color:#bbb;">Nenhuma solicitação pendente.</p>`;
+    return;
+  }
+
+  solicitacoes.forEach((pessoa, i) => {
+    const item = document.createElement("div");
+    item.className = "request-item";
+    item.innerHTML = `
+      <div class="request-left">
+        <img referrerpolicy="no-referrer" src="${pessoa.img}">
+        <span><strong>${pessoa.nome}</strong></span>
+      </div>
+
+      <div class="request-actions">
+        <button class="accept">✔</button>
+        <button class="reject">✖</button>
+      </div>
+    `;
+
+    item.querySelector(".accept").onclick = () => {
+      memberList.innerHTML += `
+        <div class="member">
+          <img referrerpolicy="no-referrer" src="${pessoa.img}">
+          <span><strong>${pessoa.nome}</strong></span>
+        </div>
+      `;
+      solicitacoes.splice(i, 1);
+      renderSolicitacoes();
+    };
+
+    item.querySelector(".reject").onclick = () => {
+      solicitacoes.splice(i, 1);
+      renderSolicitacoes();
+    };
+
+    list.appendChild(item);
+  });
+}
+
+/* Abrir painel */
+btnOpen.onclick = () => {
+  panel.classList.toggle("open");
+  renderSolicitacoes();
+};
+</script>
+
+<script src="/pagina_inicial/js/scrip.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,963 @@
+html {
+  zoom: 0.92;
+}
+
+ /* Reset */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+
+
+
+/* Base */
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+ background: #050407;
+  background-size: cover;
+  padding-top: 70px;      /* por causa do header fixo */
+  display: flex;
+  flex-direction: column; /* empurra o footer para baixo */
+}
+
+
+/* Header */
+
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 70px;
+  background: rgb(158, 8, 8);
+  border-bottom: 3.5px solid #d41111;
+  margin-top: 0;
+  overflow: visible;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  z-index: 2000;
+  box-sizing: border-box;
+}
+
+.navbar {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  background-color: rgb(158, 8, 8);
+  box-sizing: border-box;
+}
+
+
+
+/* Bloco esquerdo: menu + logo */
+.header-left {
+ display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;              /* ocupa 1 parte do espaço restante */
+}
+
+/* Bloco direito: Entrar / Cadastrar / ícone usuário */
+
+.header-right {
+   display: flex;
+  align-items: center;
+  justify-content: flex-end;  /* tudo encostado à direita */
+  gap: 10px;
+  white-space: nowrap;
+  flex: 1;                    /* mesma “força” da esquerda */
+
+}
+
+/* logo do header */
+
+.logo_header img {
+  margin-left: 10px;
+  margin-top: 0;
+  width: 160px;
+  height: auto;
+  display: block;
+}
+
+/* menu de 3 linhas (versão antiga com .menu_header – pode ficar aqui, não atrapalha) */
+
+.menu_header img {
+  height: 36px;
+  width: 36px;
+  display: block;
+  background: none;
+  cursor: pointer;
+   position: relative;
+  margin-top: 10px;
+ bottom: 30px;
+ right: 20px;
+ list-style: none;
+  color: white;
+  list-style: none;
+}
+
+.menu_header[open]{
+
+filter: opacity(0.25s);
+color: white;
+list-style: none;
+}
+
+a {
+
+  text-decoration: none;
+  color: white;
+  list-style: none;
+}
+
+details {
+width: 23px;
+height: 10px;
+transition: width 0.3s;
+border-radius: 7px;
+box-shadow: 0 4px 4px 4px Orgba(0, 0, 0, 0.15);
+list-style: none;
+position: relative;
+
+}
+
+details[open] {
+height: 360px;
+width: 150px;
+position: relative;
+top: 146px;
+background: rgb(28, 29, 29);
+color: white;
+ list-style: none;
+
+}
+
+summary {
+cursor: pointer;
+list-style: none;
+padding: 40px;
+position: relative;
+
+}
+
+/* botoes header */
+
+.botoes_header {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  border-radius: 24px;
+  padding: 4px 16px;
+  transition: 0.3s ease-in-out;
+  flex: 0;              /* largura só do conteúdo (os botões) */
+}
+
+.botoes_header button {
+width: 150px;
+background: none;
+padding: 5px;
+color: whitesmoke;
+font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+font-weight: bolder;
+border: solid 5px red;
+border-radius: 9px;
+transition: 0.2s ease-in-out;
+cursor: pointer;
+}
+
+.botoes_header button:hover{
+
+transform: scale(1.1);
+transition: 0.3s ease-in-out ;
+filter: brightness(1.1);
+
+}
+
+/* -------------------------------- */
+
+/* Botão ENTRAR */
+#btentrar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 16px;
+  height: 40px;
+  font-size: 16px;
+  font-weight: bold;
+  border: 2px solid #000;
+  background: rgb(71, 67, 67);
+  border-radius: 40px;
+  color: #fff;
+  text-decoration: none;
+}
+
+/* Botão CADASTRAR-SE */
+#btcadastrar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 18px;
+  height: 40px;
+  font-size: 16px;
+  font-weight: bold;
+  border: 2px solid #000;
+  background: #d41111;
+  border-radius: 20px;
+  color: #fff;
+  text-decoration: none;
+}
+
+#btentrar:hover,
+#btcadastrar:hover {
+ 
+  filter: brightness(1.05);
+  transition: 0.4s ease-in-out;
+}
+
+#btentrar:hover {
+
+ filter: brightness(1.4);
+  transition: 0.4s ease-in-out;
+
+}
+
+.user-icon {
+  position: relative;
+  display: inline-block;
+  transition: 0.3s ease-in-out;
+  align-items: center;
+}
+
+.user-icon li{
+position: relative;;
+padding: 10px;
+align-items: center;
+justify-content: center;
+}
+
+.user-icon hr{
+
+position: relative;
+top: -10px;
+
+}
+
+
+.user-icon img {
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  transition: 0.3s ease-in-out;
+}
+
+
+
+/* parte do menu quando clica aparece opções */
+
+
+
+
+/* FIM DO HEADER */
+
+/* ===== SIDEBAR LATERAL QUE ABRE PELO MENU ===== */
+
+/* Botão do menu no header (a imagem das 3 linhas) */
+.menu-button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.menu-button img,
+.menu-button svg {
+  height: 32px;
+  width: 32px;
+  display: block;
+}
+
+.menu-button svg {
+  stroke: #ffffff;
+  transition: stroke 0.2s ease, transform 0.2s ease;
+}
+
+.menu-button:hover svg {
+  stroke: #d41111;
+  transform: scale(1.1);
+}
+
+/* Caixa da sidebar */
+.sidebar {
+  position: fixed;                 /* fica presa na tela */
+  top: 70px;                       /* começa logo abaixo do header (70px) */
+  left: 0;
+  width: 290px;
+  height: calc(100vh - 70px);      /* altura da tela menos o header */
+  background: rgba(10, 9, 14, 0.98);
+  backdrop-filter: blur(12px);
+  border-right: 2px solid rgba(212, 17, 17, 0.4);
+  padding: 24px 16px;
+  color: #f5f5f5;
+  transform: translateX(-100%);    /* ESCONDIDA pra fora da tela */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1500;                   /* fica na frente do conteúdo */
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  box-shadow: 10px 0 30px rgba(0, 0, 0, 0.85);
+}
+
+/* Quando tiver a classe .open, ela aparece */
+.sidebar.open {
+  transform: translateX(0);
+}
+
+/* Título da sidebar */
+.sidebar-title {
+  font-size: 16px;
+  margin-bottom: 12px;
+  font-weight: 700;
+}
+
+/* Lista de links da sidebar */
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sidebar-nav a {
+  font-size: 15px;  /* fonte maior na sidebar */
+  font-weight: 600;
+  padding: 12px 16px;
+  border-radius: 10px;
+  text-decoration: none;
+  color: #cccccc;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.2s ease-in-out;
+  border-left: 3px solid transparent;
+}
+
+.sidebar-nav a:hover {
+  background: rgba(212, 17, 17, 0.15);
+  color: #ffffff;
+  border-left: 3px solid #d41111;
+  padding-left: 20px;
+}
+
+/* Fundo escuro atrás da sidebar */
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;                         /* ocupa a tela toda */
+  background: rgba(0, 0, 0, 0.6);
+  opacity: 0;
+  pointer-events: none;             /* não clica quando está invisível */
+  transition: opacity 0.3s ease-in-out;
+  z-index: 1400;
+}
+
+/* Quando a sidebar abre, o overlay também aparece */
+.sidebar-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* Quando a sidebar estiver aberta, o body não rola */
+body.sidebar-locked {
+  overflow: hidden;
+  height: 100vh;
+}
+ 
+/* Carrossel */
+.hero {
+  width: 100%;
+   
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ===== BARRA DE PESQUISA NO HEADER ===== */
+
+.search-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #252531;
+  padding: 4px 10px;
+  border-radius: 999px;          /* bem arredondado */
+  height: 36px;                  /* não passa da altura do header */
+}
+
+.search-header input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #ffffff;
+  font-size: 13px;
+  width: 180px;                  /* largura da caixinha */
+}
+
+/* cor do placeholder (texto apagado) */
+.search-header input::placeholder {
+  color: #bbbbbb;
+}
+
+/* botãozinho da lupa */
+.search-header button {
+  border: none;
+  background: #d41111;
+  color: #ffffff;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.2s ease-in-out;
+}
+
+.search-header button:hover {
+  filter: brightness(1.15);
+  transform: scale(1.05);
+}
+
+
+/* Container do carrossel */
+.carousel {
+  position: relative;
+  width: 58%;
+  height: min(550px);
+   top: 22px;
+  overflow: hidden;
+  border-radius: 16px;
+  border: 4px solid rgb(38, 38, 48);
+  background: rgb(38, 38, 48);
+  transition: 0.3s ease-in-out;
+}
+
+
+.carousel:hover {
+transition: 0.3s ease-in-out;
+cursor: pointer;
+border: solid 8px rgb(163, 8, 8)
+}
+
+
+/* animação: gradualmente "clarear" o box-shadow até o estado normal */
+.carousel.pulse {
+  animation: shadowPulse 0.5ms ease-in-out ;
+}
+
+
+
+
+/* Cada slide */
+.carousel-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: ease-in-out 0.2s;
+  border-radius: 16px;
+}
+
+
+
+.carousel-slide.active { opacity: 1; }
+
+
+
+
+/* A IMAGEM DO SLIDE (SEM CORTAR) */
+.carousel-slide img {
+ 
+  position: relative;          
+  width: 100%;
+  height: 100%;
+  object-fit: fill;          
+  border-radius: 16px;
+
+
+
+
+}
+
+
+
+
+
+
+/* BOTÕES DE NAVEGAÇÃO */
+.carousel-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    color: #fff;
+    font-size: 36px;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: rgba(0,0,0,0.55);
+    transition: 0.25s;
+    z-index: 10;      
+}
+
+
+
+
+/* Hover */
+.carousel-button:hover {
+    background: rgba(255, 0, 0, 0.568);
+    transform: translateY(-50%) scale(1.2);
+}
+
+
+
+
+/* SETA ESQUERDA */
+.carousel-button.prev {
+    left: 10px;        
+}
+/* SETA DIREITA */
+.carousel-button.next {
+    right: 10px;      
+}
+
+
+
+
+
+
+/* ===== INDICADORES (bolinhas) ===== */
+#carouselIndicators {
+
+
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+
+
+}
+
+
+
+
+#carouselIndicators span {
+
+
+  position: relative;
+  top: 15px;
+    width: 15px;
+    height: 15px;
+    background: transparent;
+    border: solid rgb(141, 131, 131) 2px;
+    border-radius: 50%;
+    display: block;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+
+
+
+#carouselIndicators span.active {
+   
+    background: #ff0000;  
+    border: solid white 1px;
+    transform: scale(1.4);
+    transform: border-color black;
+    box-shadow: #ff0000 0px 4px 15px;
+}
+
+
+
+
+
+
+
+
+.btscategorias {
+ top: 60px;
+position: relative;
+display: flex;
+gap: 8px;
+height: 140;
+align-items: center;
+justify-content: center;
+background: none;
+}
+
+
+.btscategorias img {
+
+
+height: 170px;
+width: 17 0px;
+}
+
+
+
+
+.btscategorias button {
+
+
+ margin: 0 20px;
+  border: none;
+background: none;
+cursor: pointer;
+pad: 0px;
+transition: 0.3s ease-in-out;
+
+
+}
+
+
+.btscategorias button:hover {
+
+
+transition: 0.5s ease-in-out;
+
+
+transform: scale(1.1);
+
+
+}
+
+#divisacategorias {
+
+position: relative;
+top: 103px;
+width: 90%;
+left: 150px;
+border: solid 1px rgb(34, 27, 59);
+
+}
+
+
+#joguinhosdestaque {
+color: red;
+border: solid black 3px;  
+position: relative;
+top: 95px;
+right: -140px;
+background: rgb(8, 8, 8);
+width: fit-content ;
+padding: 5px;
+height: fit-content;
+text-align: center;
+border-radius: 10px;
+font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; 
+
+
+
+}
+
+
+
+
+  /* fileiras de torneios */
+
+
+#fileiratorneios {
+
+
+position: relative;
+top: 70px;
+background: blueviolet;
+height: 400px;
+margin: 0 auto;
+width: 20%;
+background: blueviolet;
+height: 400px;
+margin: 0 auto;
+}
+
+
+
+
+
+
+.torneiosdestacadosabaixo img {
+
+
+width: 100%;
+object-fit: fill;
+max-height: 55%;
+
+
+}
+
+
+.filatorneios img {
+  width: 400px;
+  height: 300px
+}
+
+
+.torneioscontainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 50px;
+  margin-top: 150px;
+}
+
+
+.filatorneios{
+
+
+background: rgb(14, 11, 32);
+height: 500px;
+border: solid rgb(44, 42, 42) 5px;
+border-radius: 10px;
+transition: 0.3s ease-in-out;
+}
+
+
+.filatorneios:hover {
+
+
+transform: scale(1.1);
+box-shadow: rgb(241, 7, 7) 1px 1px 10px, rgb(182, 182, 238) -1px -1px 10px;
+transition: 0.3s ease-in-out;
+
+ 
+}
+
+
+#fileiratorneios1_3 {
+float: right;
+position: relative;
+
+}
+
+
+#joguinhosdestaque2 {
+color: red;
+border: solid black 3px;  
+position: relative;
+top: 100px;
+right: -140px;
+background: rgb(8, 8, 8);
+width: fit-content;
+padding: 7px;
+text-align: center;
+border-radius: 30px;
+border-radius: 10px;
+font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; 
+
+}
+
+#divisacategorias2 {
+
+position: relative;
+top: 105px;
+border: solid 1px rgb(58, 55, 102);
+ width: 90%;
+left: 150px;
+
+
+}
+
+
+#h3nomejogo {
+
+color: #7373a0;
+font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+margin-left: 10px ;
+font-weight: bold;
+}
+
+#h2nometorneio {
+
+margin-left: 10px;
+font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+color: white;
+
+}
+
+
+
+/* PARTE DO FOOTER */
+
+
+footer{
+  position: relative;
+  
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  width: 100%;
+  font-size: 15px;
+  font-weight: 600;
+  color: aliceblue;
+  margin-top: 40px;
+  
+}
+
+footer h1{
+  color: rgb(255, 123, 0);
+}
+
+#footer_content {
+
+padding: 30px; 
+padding-bottom: 80px;
+background-color:rgb(158, 8, 8);
+display: grid;  
+grid-template-columns: repeat(5, 1fr);
+gap: 100px;
+}
+
+
+/* ===== PÁGINA DE TORNEIOS GERAIS ===== */
+
+.pagina-torneios {
+  max-width: 1200px;
+  margin: 40px auto 0;
+  padding: 0 16px;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* FILTROS */
+
+.filtros-torneios h1 {
+  color: #fff;
+  margin-bottom: 16px;
+}
+
+.linha-filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  background: #151515;
+  padding: 16px;
+  border-radius: 12px;
+  border: 2px solid #252531;
+}
+
+.campo-filtro {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 160px;
+}
+
+.campo-filtro label {
+  color: #ccc;
+  font-size: 13px;
+}
+
+.campo-filtro input,
+.campo-filtro select {
+  background: #252531;
+  border: 1px solid #3b3b4a;
+  color: #fff;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 14px;
+  outline: none;
+}
+
+.campo-filtro input::placeholder {
+  color: #999;
+}
+
+/* LISTA DE TORNEIOS */
+
+.lista-torneios {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.card-torneio {
+  background: #141419;
+  border-radius: 12px;
+  border: 2px solid #2c2c3b;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: 0.25s ease-in-out;
+}
+
+.card-torneio img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+}
+
+.card-info {
+  padding: 12px 14px 16px;
+}
+
+.card-info h2 {
+  font-size: 18px;
+  color: #fff;
+  margin-bottom: 6px;
+}
+
+.card-info .jogo,
+.card-info .data {
+  font-size: 13px;
+  color: #b1b1cf;
+  margin-bottom: 4px;
+}
+
+.status {
+  font-size: 13px;
+  font-weight: 600;
+  margin: 6px 0 12px;
+}
+
+/* cores diferentes por status */
+.status-aberto {
+  color: #4ade80; /* verde */
+}
+
+.status-andamento {
+  color: #facc15; /* amarelo */
+}
+
+.status-encerrado {
+  color: #f97373; /* vermelho claro */
+}
+
+.btn-detalhes {
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 2px solid #d41111;
+  background: #d41111;
+  color: #fff;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: 0.2s ease-in-out;
+}
+
+.btn-detalhes:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.card-torneio:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.6);
+  border-color: #d41111;
+}
+
+/* um ajuste responsivo leve */
+@media (max-width: 768px) {
+  .linha-filtros {
+    flex-direction: column;
+  }
+}

@@ -1,0 +1,610 @@
+/* BASE DA PÁGINA DE PERFIL */
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: #0b0b0d;
+  color: #fff;
+}
+
+/* CONTAINER PRINCIPAL DO PERFIL */
+.perfil_container {
+  max-width: 1140px;
+  padding: 0 20px;
+  margin: 40px auto 80px;
+}
+
+/* GRID LAYOUT PRINCIPAL DO PERFIL */
+.perfil-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 30px;
+  align-items: start;
+}
+
+@media (max-width: 991px) {
+  .perfil-layout {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+}
+
+/* COLUNA LATERAL - SIDEBAR */
+.perfil-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* PROFILE CARD (LATERAL) */
+.profile-card {
+  background: #121217;
+  padding: 30px 24px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 24px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+}
+
+/* CONTÊINER DA IMAGEM DE PERFIL COM SOBREPOSIÇÃO */
+.profile-image-wrapper {
+  position: relative;
+  width: 140px;
+  height: 140px;
+}
+
+.profile-image {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 3px solid #d41111;
+  background-size: cover;
+  background-position: center;
+  background-color: #1a1a24;
+  box-shadow: 0 4px 20px rgba(212, 17, 17, 0.35);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.profile-image:hover {
+  transform: scale(1.03);
+  border-color: #ff2a2a;
+  box-shadow: 0 6px 24px rgba(212, 17, 17, 0.5);
+}
+
+/* Botão de câmera sobreposto à foto */
+.profile-image-wrapper .btn-photo {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  background: #d41111;
+  color: #ffffff;
+  border: none;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+.profile-image-wrapper .btn-photo:hover {
+  background: #ff2a2a;
+  transform: scale(1.1);
+}
+
+/* Informações principais do usuário */
+.profile-user-info {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.username-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.username {
+  font-size: 22px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+}
+
+.btn-edit {
+  background: none;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.btn-edit:hover {
+  color: #d41111;
+}
+
+/* EMAIL BOX DE VISUALIZAÇÃO */
+.email-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  padding: 8px 12px;
+  width: 100%;
+}
+
+.email-input {
+  background: transparent;
+  border: none;
+  color: #d1d5db;
+  font-size: 13px;
+  text-align: center;
+  width: 100%;
+  outline: none;
+}
+
+.icon-edit-small {
+  background: none;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.icon-edit-small:hover {
+  color: #ef4444;
+}
+
+/* METADADOS RÁPIDOS */
+.profile-quick-meta {
+  width: 100%;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: left;
+}
+
+.meta-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+}
+
+.meta-label {
+  color: #9ca3af;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.meta-val {
+  color: #f3f4f6;
+  font-weight: 600;
+}
+
+/* BOTÃO DE VISUALIZAR PERFIL PÚBLICO */
+.btn-view-public {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(212, 17, 17, 0.1);
+  border: 1px solid rgba(212, 17, 17, 0.3);
+  color: #ff4d4d;
+  padding: 14px 20px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 14px;
+  text-decoration: none;
+  width: 100%;
+  transition: all 0.2s ease;
+}
+
+.btn-view-public:hover {
+  background: #d41111;
+  color: #ffffff;
+  box-shadow: 0 4px 15px rgba(212, 17, 17, 0.3);
+  transform: translateY(-2px);
+}
+
+/* CONTEÚDO PRINCIPAL (FORMULÁRIOS) */
+.perfil-content {
+  display: flex;
+  flex-direction: column;
+}
+
+/* TÍTULOS DE SEÇÕES */
+.section-header-block {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.section-title {
+  font-size: 15px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #9cb1cf;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+/* SEÇÃO - BOX CONTAINER */
+.section {
+  background: #121217;
+  padding: 24px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  margin-bottom: 30px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* BLOCO DE FORMULÁRIO */
+.form-block {
+  margin-bottom: 20px;
+}
+
+.form-block:last-child {
+  margin-bottom: 0;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 640px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #9ca3af;
+}
+
+/* INPUTS E TEXTAREAS */
+.input-box, .textarea-box {
+  background: #171720;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.input-box:focus, .textarea-box:focus {
+  border-color: #d41111;
+  background: #1a1a24;
+  box-shadow: 0 0 0 3px rgba(212, 17, 17, 0.15);
+}
+
+.textarea-box {
+  height: 100px;
+  resize: none;
+}
+
+/* OPÇÕES DE PLATAFORMA */
+.platform-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.platform-options label {
+  background: #171720;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: normal;
+  color: #d1d5db;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+  margin-bottom: 0;
+}
+
+.platform-options label:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.platform-options input[type="checkbox"] {
+  accent-color: #d41111;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+/* ENVELOPE DE UPLOAD DE BANNER */
+.banner-upload-wrapper {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.btn-upload-banner-trigger {
+  background: #171720;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  padding: 12px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.btn-upload-banner-trigger:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* GRID DE ESTATÍSTICAS */
+.stats-form-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 640px) {
+  .stats-form-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* CONQUISTAS E TROFÉUS */
+.conquistas-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.add-conquista-box {
+  background: rgba(0, 0, 0, 0.15);
+  padding: 18px;
+  border-radius: 12px;
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.add-conquista-fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.btn-add-conquista {
+  background: #22c55e;
+  color: #ffffff;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  align-self: flex-start;
+}
+
+.btn-add-conquista:hover {
+  background: #16a34a;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+}
+
+/* LISTA DE EQUIPES */
+.teams-list-profile {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.profile-team-card {
+  background: #171720;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  transition: all 0.25s ease;
+}
+
+.profile-team-card:hover {
+  border-color: rgba(212, 17, 17, 0.4);
+  background: #1b1b26;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.profile-team-main {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.profile-team-logo {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #000;
+  border: 2px solid #d41111;
+}
+
+.profile-team-text h3 {
+  font-size: 15px;
+  font-weight: 700;
+  margin: 0 0 2px 0;
+  color: #ffffff;
+}
+
+.profile-team-text p {
+  font-size: 12px;
+  color: #9ca3af;
+  margin: 0;
+}
+
+.profile-team-card a {
+  font-size: 13px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  background: #d41111;
+  border: none;
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+.profile-team-card a:hover {
+  background: #ff1c1c;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(212, 17, 17, 0.3);
+}
+
+/* JOGOS PREFERIDOS E TAGS */
+.games-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.game-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #171720;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #e5e7eb;
+  transition: all 0.2s ease;
+}
+
+.game-tag:hover {
+  background: rgba(212, 17, 17, 0.1);
+  border-color: rgba(212, 17, 17, 0.3);
+}
+
+.game-tag button {
+  border: none;
+  background: transparent;
+  color: #ef4444;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 0;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s;
+}
+
+.game-tag button:hover {
+  transform: scale(1.2);
+}
+
+/* BOTÃO DE SALVAR ALTERAÇÕES */
+.save-row {
+  margin-top: 30px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-save-profile {
+  background: #d41111;
+  border: none;
+  color: #ffffff;
+  padding: 14px 32px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(212, 17, 17, 0.4);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-save-profile:hover {
+  background: #ff1c1c;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(212, 17, 17, 0.5);
+}
+
+.games-hint {
+  display: block;
+  margin-top: 6px;
+  font-size: 11px;
+  color: #9ca3af;
+}
+
+/* LINHAS SEPARADORAS */
+.separator {
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  margin: 25px 0;
+}

@@ -1,0 +1,247 @@
+/* Custom premium styles for Team Creation page */
+
+.criar-equipe-page {
+  max-width: 800px;
+  margin: 40px auto 80px;
+  padding: 0 20px;
+  color: #ffffff;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.criar-header {
+  text-align: center;
+  margin-bottom: 35px;
+}
+
+.criar-header h1 {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin-bottom: 12px;
+  background: linear-gradient(135deg, #ffffff 0%, #a1a1aa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.criar-header p {
+  font-size: 15px;
+  color: #9ca3af;
+  line-height: 1.6;
+}
+
+.criar-header strong {
+  color: #d41111;
+}
+
+.equipe-form-card {
+  background: rgba(20, 20, 25, 0.85);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(212, 17, 17, 0.2);
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+  transition: border-color 0.3s ease;
+}
+
+.equipe-form-card:hover {
+  border-color: rgba(212, 17, 17, 0.35);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  margin-bottom: 8px;
+}
+
+.form-block {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 24px;
+}
+
+.form-block.full-row {
+  grid-column: 1 / -1;
+}
+
+.form-block label {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #f3f4f6;
+  letter-spacing: 0.2px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.form-block input,
+.form-block select,
+.form-block textarea {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1.5px solid rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  outline: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.form-block input:hover,
+.form-block select:hover,
+.form-block textarea:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.form-block input:focus,
+.form-block select:focus,
+.form-block textarea:focus {
+  background: rgba(20, 20, 25, 0.95);
+  border-color: #d41111;
+  box-shadow: 0 0 12px rgba(212, 17, 17, 0.2);
+}
+
+/* Custom file upload styling */
+.form-block input[type="file"] {
+  padding: 10px;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.form-block input[type="file"]::file-selector-button {
+  background: #1f1f2b;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-right: 12px;
+  transition: all 0.2s ease;
+}
+
+.form-block input[type="file"]::file-selector-button:hover {
+  background: #d41111;
+  border-color: #d41111;
+}
+
+.form-block textarea {
+  resize: vertical;
+  min-height: 100px;
+  line-height: 1.5;
+}
+
+.form-block input::placeholder,
+.form-block textarea::placeholder {
+  color: #6b7280;
+  font-weight: 400;
+}
+
+.hint {
+  font-size: 12px;
+  color: #9ca3af;
+  margin-top: -4px;
+  margin-bottom: 10px;
+}
+
+/* Preview da logo - centralizado e circular */
+.logo-preview {
+  margin-top: 15px;
+  border-radius: 16px;
+  border: 2px dashed rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.2);
+  min-height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.logo-preview span {
+  font-size: 13px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.logo-preview img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 3px solid #d41111;
+  box-shadow: 0 0 15px rgba(212, 17, 17, 0.3);
+}
+
+/* Linha do botão de submissão */
+.actions-row {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.btn-principal-criar-equipe {
+  padding: 14px 32px;
+  border-radius: 999px;
+  border: none;
+  background: #d41111;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(212, 17, 17, 0.35);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-principal-criar-equipe:hover {
+  filter: brightness(1.1);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(212, 17, 17, 0.5);
+}
+
+.btn-principal-criar-equipe:active {
+  transform: translateY(0);
+}
+
+.feedback-msg {
+  font-size: 14px;
+  font-weight: 600;
+  color: #34d399;
+}
+
+/* Responsividade total */
+@media (max-width: 768px) {
+  .criar-equipe-page {
+    margin: 20px auto 40px;
+  }
+  
+  .equipe-form-card {
+    padding: 24px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  
+  .actions-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .btn-principal-criar-equipe {
+    width: 100%;
+  }
+  
+  .feedback-msg {
+    text-align: center;
+  }
+}

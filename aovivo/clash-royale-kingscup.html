@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- estilos globais -->
+  <link rel="stylesheet" href="/pagina_inicial/css/estilos.css" />
+  <!-- estilos específicos desta página -->
+  <link rel="stylesheet" href="/aovivo/css/transmissao.css" />
+  <link rel="icon" href="/image/logo.png" sizes="32x32"> 
+  <title>Clash Royale Kings Cup - Transmissão Ao Vivo</title>
+</head>
+
+<body class="transmissao-body">
+
+  <!-- ===== HEADER (igual das outras páginas) ===== -->
+  <header>
+    <nav class="navbar">
+
+      <!-- ESQUERDA: menu + logo -->
+      <div class="header-left">
+        <button id="menuToggle" class="menu-button">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="menu-svg"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+
+        <div class="logo_header">
+          <a href="/pagina_inicial/index.html">
+            <img referrerpolicy="no-referrer" src="/image/logo%20plus%20tipo%20textura.png" alt="VersusHub">
+          </a>
+        </div>
+      </div>
+
+      <!-- CENTRO: botões -->
+      <div class="botoes_header">
+        <a href="/aovivo/aovivo.html"><button id="aovivo_header">Ao Vivo</button></a>
+      <a href="/criar_torneio/criar_torneio.html"> <button id="criar_header">Criar Torneio</button>
+      </a>
+        <a href="/equipes/equipes.html"> <button id="equipes_header">Equipes</button> </a>
+      </div>
+
+      <!-- DIREITA -->
+      <div class="header-right">
+        <form class="search-header" action="#" onsubmit="return false">
+          <input
+            type="text"
+            placeholder="Buscar torneios, jogos..."
+            id="searchInput"
+          >
+          <button type="submit" id="searchBtn" aria-label="Buscar"><i class="fa-solid fa-magnifying-glass"></i></button>
+        </form>
+
+        <a href="/login/login.html" id="btentrar">Entrar</a>
+        <a href="/cadastro/cadastro.html" id="btcadastrar">Cadastrar-se</a>
+
+        <div class="user-icon">
+          <img referrerpolicy="no-referrer" src="/image/boneco_logo_ofc.png" alt="Usuário" id="userBtn">
+          <ul id="menuUser" class="hidden">
+            <li><a href="/login/login.html">Login</a></li>
+            <hr>
+            <li><a href="/cadastro/cadastro.html">Cadastro</a></li>
+          </ul>
+        </div>
+      </div>
+
+    </nav>
+  </header>
+  <!-- ===== FIM HEADER ===== -->
+
+<!-- SIDEBAR -->
+<aside id="sidebar" class="sidebar">
+  <h2 class="sidebar-title"></h2>
+  <nav class="sidebar-nav">
+    <a href="/pagina_inicial/index.html"><i class="fa-solid fa-house" style="margin-right: 10px; width: 16px; text-align: center;"></i>Início</a>
+    <a href="/pagina_inicial/torneios.html"><i class="fa-solid fa-trophy" style="margin-right: 10px; width: 16px; text-align: center;"></i>Todos os torneios</a>
+    <a href="/criar_torneio/criar_torneio.html"><i class="fa-solid fa-award" style="margin-right: 10px; width: 16px; text-align: center;"></i>Criar Torneio</a>
+    <a href="/equipes/equipes.html"><i class="fa-solid fa-users" style="margin-right: 10px; width: 16px; text-align: center;"></i>Equipes</a>
+    <a href="/gerenciartorneios/gerentornindex.html"><i class="fa-solid fa-file-invoice" style="margin-right: 10px; width: 16px; text-align: center;"></i>Gerenciar torneios</a>
+    <a href="/termos/termos.html"><i class="fa-solid fa-briefcase" style="margin-right: 10px; width: 16px; text-align: center;"></i>Termos de Uso</a>
+    <a href="/feedback/feedback.html"><i class="fa-solid fa-star" style="margin-right: 10px; width: 16px; text-align: center;"></i>Enviar feedback / Sugestão</a>
+  </nav>
+</aside>
+
+  <!-- efeito da tela ficar escura no fundo -->
+
+<div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+<!-- FIM SIDEBAR -->
+
+
+  <!-- ===== CONTEÚDO ===== -->
+  <main class="live-page">
+
+    <!-- HERO (banner + infos principais) -->
+    <section class="live-hero">
+      <div class="live-hero-banner">
+        <!-- TROQUE O SRC SE O NOME DO ARQUIVO FOR OUTRO -->
+        <img referrerpolicy="no-referrer" src="/aovivo/image/clash_royale.avif" alt="Clash Royale Kings Cup">
+        <div class="live-hero-status">
+          <span class="live-hero-dot"></span>
+          Ao vivo agora
+        </div>
+      </div>
+
+      <div class="live-hero-info">
+        <h1>Clash Royale Kings Cup</h1>
+        <p class="live-meta">Clash Royale • Estratégia • Mobile</p>
+        <p class="live-start">Iniciado às 22:10</p>
+
+        <div class="live-tags">
+          <span>Formato 1x1</span>
+          <span>Eliminação dupla</span>
+          <span>Nível máximo de cartas</span>
+        </div>
+        <!-- 👍 Like do torneio -->
+  <div class="torneio-like-box">
+    <button class="like-btn" data-id="cerrado-cup-csgo">
+      <span class="like-icon">👍</span>
+      <span class="like-count">0</span>
+    </button>
+  </div>
+      </div>
+    </section>
+
+    <!-- LAYOUT EM 2 COLUNAS: infos do torneio + bloco da live -->
+    <section class="live-layout">
+
+      <!-- COLUNA ESQUERDA: Sobre, Regras, Cronograma, Premiação -->
+      <div class="live-col-info">
+
+        <div class="live-card info-card">
+          <h2>Sobre o torneio</h2>
+          <p>
+            A Clash Royale Kings Cup reúne os melhores jogadores em batalhas intensas,
+            com decks variados e muita estratégia. É o palco ideal para quem quer mostrar
+            habilidade em tempo real e disputar partidas em nível competitivo.
+          </p>
+        </div>
+
+        <div class="live-card info-card">
+          <h2>Regras principais</h2>
+          <ul>
+            <li>Modo 1x1 com decks padrão ou personalizados.</li>
+            <li>Cartas liberadas até o nível máximo do torneio.</li>
+            <li>Formato de chaves com eliminação dupla.</li>
+            <li>Tempo de espera máximo de 5 minutos para cada partida.</li>
+            <li>Uso de qualquer programa/script externo resulta em banimento imediato.</li>
+          </ul>
+        </div>
+
+        <div class="live-card info-card">
+          <h2>Cronograma</h2>
+          <ul>
+            <li><strong>Hoje – 22h10:</strong> Início das partidas classificatórias.</li>
+            <li><strong>+1h:</strong> Oitavas e quartas de final.</li>
+            <li><strong>+2h:</strong> Semifinais.</li>
+            <li><strong>+2h30:</strong> Grande final.</li>
+          </ul>
+        </div>
+
+        <div class="live-card info-card">
+          <h2>Premiação</h2>
+          <ul>
+            <li><strong>1º lugar:</strong> 50.000 de ouro + baú lendário</li>
+            <li><strong>2º lugar:</strong> 25.000 de ouro</li>
+            <li><strong>3º lugar:</strong> 10.000 de ouro</li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- COLUNA DIREITA: Transmissão ao vivo -->
+      <aside class="live-col-side">
+
+        <div class="live-card live-transmissao-card">
+          <header class="live-header">
+            <span class="live-badge">Transmissão ao vivo</span>
+            <h2>Assista à Clash Royale Kings Cup</h2>
+          </header>
+
+          <div class="live-info">
+            <div class="live-row">
+              <span class="live-label">Plataforma:</span>
+              <span class="live-value live-platform">YouTube</span>
+            </div>
+
+            <div class="live-row">
+              <span class="live-label">Canal:</span>
+              <span class="live-value">@clashroyale_kingscup</span>
+            </div>
+
+            <div class="live-row">
+              <span class="live-label">Status:</span>
+              <span class="live-value">Transmissão ao vivo em andamento</span>
+            </div>
+
+            <div class="live-row">
+              <span class="live-label">Espectadores:</span>
+              <span class="live-value">7.150 espectadores</span>
+            </div>
+          </div>
+
+          <p class="live-subtitle">
+            Clique no botão abaixo para abrir a live na plataforma oficial.
+          </p>
+
+          <div class="live-actions">
+            <!-- TROCAR PELO LINK REAL DA LIVE -->
+            <a
+              href="https://youtube.com/@seu_canal_aqui"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn-live"
+            >
+              Assistir no YouTube
+            </a>
+
+            <a href="/aovivo/aovivo.html" class="btn-voltar">
+              ← Voltar para lista de torneios ao vivo
+            </a>
+          </div>
+
+          <p class="live-note">
+            Ao clicar em "Assistir", você será redirecionado para a plataforma oficial de transmissão.
+          </p>
+        </div>
+
+      </aside>
+
+    </section>
+
+  </main>
+  <!-- ===== FIM CONTEÚDO ===== -->
+
+  <!-- ===== FOOTER GLOBAL ===== -->
+  <footer>
+    <div id="footer_content">
+      <div id="footer_logo">
+        <img referrerpolicy="no-referrer" src="/image/logo.png" alt="" id="logofooter">
+      </div>
+
+      <div id="footer_sobrenos">
+        <h1>Sobre Nós</h1><br>
+        <p>O Versus Hub é uma plataforma criada para conectar jogadores, organizadores e fãs de e-sports em um só lugar. Oferecemos torneios competitivos, rankings dinâmicos e recompensas exclusivas para quem ama competir. Nosso objetivo é tornar a experiência gamer mais acessível, divertida e profissional — seja você um iniciante ou um pro player.</p>
+      </div>
+
+      <div id="footer_versushub">
+        <h1>Versus Hub</h1><br>
+        <p>
+          Torneios e Rankings atualizados <br><br>
+          Sistema seguro e fácil de participar <br><br>
+          Suporte ativo todos os dias
+        </p>
+      </div>
+
+      <div id="footer_politicas">
+        <h1>Políticas</h1><br>
+        <li>Termos de uso</li><br>
+        <li>Política de Privacidade</li><br>
+        <li>Política de Reembolso (para eventos pagos)</li>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JS global (sidebar, menu do usuário, etc.) -->
+  <script src="/pagina_inicial/js/scrip.js"></script>
+  <script src="/torneio/js/likes.js"></script>
+</body>
+</html>

@@ -1,0 +1,124 @@
+body {
+  background: #0b0b0d;
+  color: #fff;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.support-main {
+  max-width: 1100px;
+  margin: 20px auto 50px;
+  padding: 0 20px;
+}
+
+.support-header h1 {
+  font-size: 32px;
+  color: #ff2c2c;
+  margin-bottom: 6px;
+}
+
+.support-header p {
+  color: #d0d0d0;
+  max-width: 680px;
+}
+
+/* GRID */
+.support-grid {
+  margin-top: 25px;
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1.2fr);
+  gap: 20px;
+}
+
+/* CARDS */
+.support-card {
+  background: #141419;
+  border-radius: 14px;
+  border: 2px solid #2a2a38;
+  padding: 20px 22px;
+}
+
+.support-card h2 {
+  font-size: 22px;
+  color: #ff2c2c;
+  margin-bottom: 14px;
+}
+
+/* FORM */
+.form-block {
+  margin-bottom: 18px;
+}
+
+.form-block label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #e3e3e3;
+}
+
+.form-block input,
+.form-block select,
+.form-block textarea {
+  width: 100%;
+  background: #1c1c24;
+  border-radius: 10px;
+  border: 1px solid #32323f;
+  padding: 9px 10px;
+  color: #fff;
+  font-size: 14px;
+  outline: none;
+}
+
+.form-block textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+/* BOTÃO ENVIAR */
+.support-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-enviar-feedback {
+  background: #d41111;
+  border: 2px solid #d41111;
+  color: #fff;
+  padding: 10px 24px;
+  border-radius: 999px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+  transition: .2s;
+}
+
+.btn-enviar-feedback:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.feedback-status {
+  font-size: 13px;
+}
+
+/* LADO DIREITO */
+.support-side .side-card {
+  margin-bottom: 18px;
+}
+
+.tips-list {
+  padding-left: 18px;
+  font-size: 14px;
+  color: #d0d0d0;
+}
+
+.tips-list li {
+  margin-bottom: 6px;
+}
+
+/* RESPONSIVO */
+@media (max-width: 900px) {
+  .support-grid {
+    grid-template-columns: 1fr;
+  }
+}

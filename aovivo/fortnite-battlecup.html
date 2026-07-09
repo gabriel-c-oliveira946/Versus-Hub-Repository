@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- estilos globais -->
+  <link rel="stylesheet" href="/pagina_inicial/css/estilos.css" />
+  <!-- estilos específicos desta página (o mesmo transmissao.css) -->
+  <link rel="stylesheet" href="/aovivo/css/transmissao.css" />
+  <link rel="icon" href="/image/logo.png" sizes="32x32"> 
+  <title>Fortnite Battle Cup - Transmissão Ao Vivo</title>
+</head>
+
+<body class="transmissao-body">
+
+  <!-- ===== HEADER ===== -->
+  <header>
+    <nav class="navbar">
+
+      <!-- ESQUERDA: menu + logo -->
+      <div class="header-left">
+        <button id="menuToggle" class="menu-button">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="menu-svg"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+
+        <div class="logo_header">
+          <a href="/pagina_inicial/index.html">
+            <img referrerpolicy="no-referrer" src="/image/logo%20plus%20tipo%20textura.png" alt="VersusHub">
+          </a>
+        </div>
+      </div>
+
+      <!-- CENTRO: botões -->
+      <div class="botoes_header">
+        <a href="/aovivo/aovivo.html"><button id="aovivo_header">Ao Vivo</button></a>
+        <a href="/criar_torneio/criar_torneio.html"> <button id="criar_header">Criar Torneio</button>
+      </a>
+       <a href="/equipes/equipes.html"> <button id="equipes_header">Equipes</button> </a>
+      </div>
+
+      <!-- DIREITA -->
+      <div class="header-right">
+        <form class="search-header" action="#" onsubmit="return false">
+          <input
+            type="text"
+            placeholder="Buscar torneios, jogos..."
+            id="searchInput"
+          >
+          <button type="submit" id="searchBtn" aria-label="Buscar"><i class="fa-solid fa-magnifying-glass"></i></button>
+        </form>
+
+        <a href="/login/login.html" id="btentrar">Entrar</a>
+        <a href="/cadastro/cadastro.html" id="btcadastrar">Cadastrar-se</a>
+
+        <div class="user-icon">
+          <img referrerpolicy="no-referrer" src="/image/boneco_logo_ofc.png" alt="Usuário" id="userBtn">
+          <ul id="menuUser" class="hidden">
+            <li><a href="/login/login.html">Login</a></li>
+            <hr>
+            <li><a href="/cadastro/cadastro.html">Cadastro</a></li>
+          </ul>
+        </div>
+      </div>
+
+    </nav>
+  </header>
+  <!-- ===== FIM HEADER ===== -->
+
+<!-- SIDEBAR -->
+<aside id="sidebar" class="sidebar">
+  <h2 class="sidebar-title"></h2>
+  <nav class="sidebar-nav">
+    <a href="/pagina_inicial/index.html"><i class="fa-solid fa-house" style="margin-right: 10px; width: 16px; text-align: center;"></i>Início</a>
+    <a href="/pagina_inicial/torneios.html"><i class="fa-solid fa-trophy" style="margin-right: 10px; width: 16px; text-align: center;"></i>Todos os torneios</a>
+    <a href="/criar_torneio/criar_torneio.html"><i class="fa-solid fa-award" style="margin-right: 10px; width: 16px; text-align: center;"></i>Criar Torneio</a>
+    <a href="/equipes/equipes.html"><i class="fa-solid fa-users" style="margin-right: 10px; width: 16px; text-align: center;"></i>Equipes</a>
+    <a href="/gerenciartorneios/gerentornindex.html"><i class="fa-solid fa-file-invoice" style="margin-right: 10px; width: 16px; text-align: center;"></i>Gerenciar torneios</a>
+    <a href="/termos/termos.html"><i class="fa-solid fa-briefcase" style="margin-right: 10px; width: 16px; text-align: center;"></i>Termos de Uso</a>
+    <a href="/feedback/feedback.html"><i class="fa-solid fa-star" style="margin-right: 10px; width: 16px; text-align: center;"></i>Enviar feedback / Sugestão</a>
+  </nav>
+</aside>
+
+  <!-- efeito da tela ficar escura no fundo -->
+
+<div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+<!-- FIM SIDEBAR -->
+
+
+  <!-- ===== CONTEÚDO ===== -->
+  <main class="live-page">
+
+    <!-- HERO (banner + infos principais) -->
+    <section class="live-hero">
+      <div class="live-hero-banner">
+        <!-- TROQUE O SRC PELO NOME REAL DA IMAGEM, SE FOR OUTRO -->
+        <img referrerpolicy="no-referrer" src="/aovivo/image/fortnite_torneio.jpg" alt="Fortnite Battle Cup">
+        <div class="live-hero-status">
+          <span class="live-hero-dot"></span>
+          Ao vivo agora
+        </div>
+      </div>
+
+      <div class="live-hero-info">
+        <h1>Fortnite Battle Cup</h1>
+        <p class="live-meta">Fortnite • Battle Royale • Multi</p>
+        <p class="live-start">Iniciado às 16:20</p>
+
+        
+  <!-- 👍 Like do torneio -->
+  <div class="torneio-like-box">
+    <button class="like-btn" data-id="cerrado-cup-csgo">
+      <span class="like-icon">👍</span>
+      <span class="like-count">0</span>
+    </button>
+  </div>
+
+        <div class="live-tags">
+          <span>Squads</span>
+          <span>Mapa competitivo</span>
+          <span>Servidor América do Sul</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- LAYOUT EM 2 COLUNAS -->
+    <section class="live-layout">
+
+      <!-- COLUNA ESQUERDA: Sobre, Regras, Cronograma, Premiação -->
+      <div class="live-col-info">
+
+        <div class="live-card info-card">
+          <h2>Sobre o torneio</h2>
+          <p>
+            A Fortnite Battle Cup reúne equipes em partidas intensas de Battle Royale,
+            com foco em rotação, construção rápida e decisões táticas. É o cenário
+            perfeito para squads competitivos que querem mostrar domínio de mapa
+            e sincronia de equipe.
+          </p>
+        </div>
+
+        <div class="live-card info-card">
+          <h2>Regras principais</h2>
+          <ul>
+            <li>Partidas em formato Squad (4 jogadores).</li>
+            <li>Pontuação baseada em eliminações e colocação final.</li>
+            <li>Proibido stream sniping e uso de programas externos.</li>
+            <li>Tempo máximo de 10 minutos para presença no lobby.</li>
+            <li>Jogadores devem estar com a conta regular e sem penalidades ativas.</li>
+          </ul>
+        </div>
+
+        <div class="live-card info-card">
+          <h2>Cronograma</h2>
+          <ul>
+            <li><strong>Hoje – 16h20:</strong> Início das quedas qualificatórias.</li>
+            <li><strong>+1h:</strong> Fase de semifinais.</li>
+            <li><strong>+2h:</strong> Série final melhor de 3 quedas.</li>
+          </ul>
+        </div>
+
+        <div class="live-card info-card">
+          <h2>Premiação</h2>
+          <ul>
+            <li><strong>1º lugar:</strong> R$ 5.000 + skins exclusivas</li>
+            <li><strong>2º lugar:</strong> R$ 2.500</li>
+            <li><strong>3º lugar:</strong> R$ 1.000</li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- COLUNA DIREITA: Transmissão ao vivo -->
+      <aside class="live-col-side">
+
+        <div class="live-card live-transmissao-card">
+          <header class="live-header">
+            <span class="live-badge">Transmissão ao vivo</span>
+            <h2>Assista à Fortnite Battle Cup</h2>
+          </header>
+
+          <div class="live-info">
+            <div class="live-row">
+              <span class="live-label">Plataforma:</span>
+              <span class="live-value live-platform">Twitch</span>
+            </div>
+
+            <div class="live-row">
+              <span class="live-label">Canal:</span>
+              <span class="live-value">@fortnite_battlecup</span>
+            </div>
+
+            <div class="live-row">
+              <span class="live-label">Status:</span>
+              <span class="live-value">Transmissão ao vivo em andamento</span>
+            </div>
+
+            <div class="live-row">
+              <span class="live-label">Espectadores:</span>
+              <span class="live-value">22.300 espectadores</span>
+            </div>
+          </div>
+
+          <p class="live-subtitle">
+            Clique no botão abaixo para abrir a live na plataforma oficial.
+          </p>
+
+          <div class="live-actions">
+            <!-- TROCAR PELO LINK REAL DA LIVE -->
+            <a
+              href="https://twitch.tv/seu_canal_fortnite"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn-live"
+            >
+              Assistir na Twitch
+            </a>
+
+            <a href="/aovivo/aovivo.html" class="btn-voltar">
+              ← Voltar para lista de torneios ao vivo
+            </a>
+          </div>
+
+          <p class="live-note">
+            Ao clicar em "Assistir", você será redirecionado para a plataforma oficial de transmissão.
+          </p>
+        </div>
+
+      </aside>
+
+    </section>
+
+  </main>
+  <!-- ===== FIM CONTEÚDO ===== -->
+
+  <!-- ===== FOOTER GLOBAL ===== -->
+  <footer>
+    <div id="footer_content">
+      <div id="footer_logo">
+        <img referrerpolicy="no-referrer" src="/image/logo.png" alt="" id="logofooter">
+      </div>
+
+      <div id="footer_sobrenos">
+        <h1>Sobre Nós</h1><br>
+        <p>O Versus Hub é uma plataforma criada para conectar jogadores, organizadores e fãs de e-sports em um só lugar. Oferecemos torneios competitivos, rankings dinâmicos e recompensas exclusivas para quem ama competir. Nosso objetivo é tornar a experiência gamer mais acessível, divertida e profissional — seja você um iniciante ou um pro player.</p>
+      </div>
+
+      <div id="footer_versushub">
+        <h1>Versus Hub</h1><br>
+        <p>
+          Torneios e Rankings atualizados <br><br>
+          Sistema seguro e fácil de participar <br><br>
+          Suporte ativo todos os dias
+        </p>
+      </div>
+
+      <div id="footer_politicas">
+        <h1>Políticas</h1><br>
+        <li>Termos de uso</li><br>
+        <li>Política de Privacidade</li><br>
+        <li>Política de Reembolso (para eventos pagos)</li>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JS global -->
+  <script src="/pagina_inicial/js/scrip.js"></script>
+  <script src="/torneio/js/likes.js"></script>
+</body>
+</html>

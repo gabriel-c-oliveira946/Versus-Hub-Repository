@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Perfil Público - VersusHub</title>
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  
+  <!-- Global Styles -->
+  <link rel="stylesheet" href="/pagina_inicial/css/estilos.css" />
+  <link rel="icon" href="/image/logo.png" sizes="32x32">
+
+  <style>
+    body {
+      background: #060508;
+      color: #ffffff;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      margin: 0;
+      padding-top: 70px;
+    }
+
+    main {
+      max-width: 1200px;
+      margin: 30px auto 60px;
+      padding: 0 20px;
+      box-sizing: border-box;
+    }
+
+    /* ===== BANNER DO PERFIL ===== */
+    .profile-hero {
+      position: relative;
+      background: #111116;
+      border-radius: 20px;
+      border: 2px solid #2a2a38;
+      overflow: hidden;
+      margin-bottom: 30px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.75);
+    }
+
+    /* Imagem de backdrop */
+    .profile-banner-bg {
+      width: 100%;
+      height: 280px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .profile-banner-bg img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: brightness(0.4) contrast(1.1);
+    }
+
+    /* Efeito de neon vermelho na transição do banner */
+    .profile-banner-bg::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 120px;
+      background: linear-gradient(to top, #111116, transparent);
+    }
+
+    /* Conteúdo principal sobreposto */
+    .profile-header-content {
+      position: relative;
+      display: flex;
+      align-items: flex-end;
+      gap: 30px;
+      padding: 0 40px 40px;
+      margin-top: -100px; /* Sobrepõe o avatar sobre o banner */
+      z-index: 10;
+    }
+
+    .profile-avatar-container {
+      position: relative;
+      width: 180px;
+      height: 180px;
+      flex-shrink: 0;
+    }
+
+    .profile-avatar-container img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 4px solid #d41111;
+      object-fit: cover;
+      box-shadow: 0 0 25px rgba(212, 17, 17, 0.7);
+      background: #0c0b0d;
+    }
+
+    .profile-user-summary {
+      flex: 1;
+      padding-bottom: 10px;
+    }
+
+    .profile-user-summary h1 {
+      font-size: 34px;
+      font-weight: 800;
+      margin: 0 0 8px;
+      color: #ffffff;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
+      letter-spacing: -0.5px;
+    }
+
+    .user-verified-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: rgba(212, 17, 17, 0.2);
+      border: 1px solid rgba(212, 17, 17, 0.5);
+      font-size: 12px;
+      font-weight: 700;
+      color: #ff4d4d;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .profile-meta-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .profile-meta-list li {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: #9ca3af;
+      background: rgba(0, 0, 0, 0.45);
+      padding: 6px 14px;
+      border-radius: 999px;
+      border: 1px solid #1f1f2b;
+    }
+
+    .profile-meta-list li i {
+      color: #d41111;
+    }
+
+    /* ===== BENTO GRID ESTATÍSTICAS ===== */
+    .grid-container {
+      display: grid;
+      grid-template-columns: 2fr 1.1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .stats-section-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin: 0 0 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #ffffff;
+    }
+
+    .stats-section-title i {
+      color: #d41111;
+    }
+
+    .bento-card {
+      background: #111116;
+      border-radius: 18px;
+      border: 2px solid #2a2a38;
+      padding: 24px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .stats-bento-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      height: 100%;
+    }
+
+    .metric-card {
+      background: rgba(12, 11, 16, 0.7);
+      border-radius: 14px;
+      border: 1.5px solid #1f1f29;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.25s ease;
+    }
+
+    .metric-card:hover {
+      border-color: rgba(212, 17, 17, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .metric-icon-bg {
+      position: absolute;
+      right: 15px;
+      top: 15px;
+      font-size: 32px;
+      color: rgba(212, 17, 17, 0.1);
+      z-index: 1;
+    }
+
+    .metric-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #9cb1cf;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+      z-index: 2;
+    }
+
+    .metric-value {
+      font-size: 36px;
+      font-weight: 800;
+      color: #ffffff;
+      margin: 0;
+      z-index: 2;
+    }
+
+    /* Card Combates (Wins/Losses) */
+    .combat-ratio-container {
+      display: flex;
+      gap: 12px;
+      align-items: flex-end;
+      margin-top: 10px;
+    }
+
+    .combat-stat {
+      flex: 1;
+    }
+
+    .combat-stat-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #9ca3af;
+      margin-bottom: 2px;
+    }
+
+    .combat-stat-value {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .combat-stat-value.wins {
+      color: #22c55e;
+    }
+
+    .combat-stat-value.losses {
+      color: #ef4444;
+    }
+
+    .combat-bar {
+      display: flex;
+      height: 6px;
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 8px;
+      width: 100%;
+    }
+
+    .combat-bar-fill-wins {
+      background: #22c55e;
+      height: 100%;
+    }
+
+    .combat-bar-fill-losses {
+      background: #ef4444;
+      height: 100%;
+    }
+
+    /* Radial/Gauge Win rate visual */
+    .win-rate-indicator {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+    }
+
+    .win-rate-circle {
+      position: relative;
+      width: 70px;
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .win-rate-circle svg {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+
+    .win-rate-circle circle {
+      fill: none;
+      stroke-width: 6;
+    }
+
+    .win-rate-circle .bg-circle {
+      stroke: #1c1a24;
+    }
+
+    .win-rate-circle .progress-circle {
+      stroke: #d41111;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 1s ease;
+      filter: drop-shadow(0 0 5px rgba(212, 17, 17, 0.6));
+    }
+
+    .win-rate-percentage {
+      position: absolute;
+      font-size: 15px;
+      font-weight: 800;
+      color: #ffffff;
+    }
+
+    /* ===== SEÇÕES DO PERFIL (SOBRE + JOGOS) ===== */
+    .bento-twin-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .twin-card-header {
+      border-bottom: 2px solid #1f1f2b;
+      padding-bottom: 12px;
+      margin-bottom: 14px;
+    }
+
+    .twin-card-header h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #ffffff;
+      margin: 0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .twin-card-header h3 i {
+      color: #d41111;
+      margin-right: 8px;
+    }
+
+    .bio-text {
+      color: #d1d1d6;
+      font-size: 14px;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .games-list-public {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .game-badge-public {
+      background: #17161f;
+      border: 1.5px solid #232230;
+      border-radius: 10px;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.2s ease;
+    }
+
+    .game-badge-public:hover {
+      border-color: #d41111;
+      background: rgba(212, 17, 17, 0.05);
+    }
+
+    .game-badge-public span {
+      font-size: 13px;
+      font-weight: 600;
+      color: #ffffff;
+    }
+
+    .game-badge-public i {
+      color: #ff4d4d;
+      font-size: 14px;
+    }
+
+    /* ===== EQUIPES SEÇÃO (Dashboard Style) ===== */
+    .teams-section {
+      margin-top: 24px;
+    }
+
+    .teams-public-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .team-badge-card {
+      background: #111116;
+      border-radius: 16px;
+      border: 2px solid #2a2a38;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .team-badge-card:hover {
+      border-color: #d41111;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.61);
+    }
+
+    .team-badge-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .team-logo-wrapper {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      border: 2px solid #d41111;
+      overflow: hidden;
+      flex-shrink: 0;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .team-logo-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .team-logo-text h4 {
+      font-size: 15px;
+      font-weight: 700;
+      color: #ffffff;
+      margin: 0 0 3px;
+    }
+
+    .team-logo-text p {
+      font-size: 12px;
+      color: #9cb1cf;
+      margin: 0;
+    }
+
+    .team-status-role {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(212, 17, 17, 0.15);
+      border: 1px solid rgba(212, 17, 17, 0.4);
+      color: #ff4d4d;
+      letter-spacing: 0.5px;
+    }
+
+    /* ===== CONQUISTAS SEÇÃO (Achievements) ===== */
+    .achievements-section {
+      margin-top: 24px;
+    }
+
+    .achievements-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .achievement-item {
+      background: #111116;
+      border-radius: 16px;
+      border: 2px solid #2a2a38;
+      padding: 20px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      transition: all 0.25s ease;
+      position: relative;
+    }
+
+    .achievement-item:hover {
+      border-color: #d41111;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(212, 17, 17, 0.15);
+    }
+
+    .achievement-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: rgba(255, 193, 7, 0.1);
+      border: 1.5px solid rgba(255, 193, 7, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      color: #ffc107;
+      flex-shrink: 0;
+    }
+
+    .achievement-icon.special {
+      background: rgba(139, 92, 246, 0.15);
+      border-color: rgba(139, 92, 246, 0.4);
+      color: #a78bfa;
+    }
+
+    .achievement-details h4 {
+      font-size: 14px;
+      font-weight: 700;
+      color: #ffffff;
+      margin: 0 0 4px;
+    }
+
+    .achievement-details p {
+      font-size: 12px;
+      color: #9cb1cf;
+      line-height: 1.5;
+      margin: 0 0 6px;
+    }
+
+    .achievement-unlocked-date {
+      font-size: 11px;
+      color: #6b7280;
+      font-weight: 500;
+    }
+
+    /* ===== RESPONSIVIDADE ===== */
+    @media (max-width: 900px) {
+      .grid-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .profile-header-content {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 0 24px 30px;
+        margin-top: -80px;
+      }
+
+      .profile-avatar-container {
+        width: 140px;
+        height: 140px;
+      }
+
+      .profile-meta-list {
+        justify-content: center;
+      }
+
+      .bento-twin-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER GLOBAL (Unificado, fixo) -->
+  <header>
+    <nav class="navbar">
+      <!-- ESQUERDA: menu + logo -->
+      <div class="header-left">
+        <button id="menuToggle" class="menu-button">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="menu-svg"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+
+        <div class="logo_header">
+          <a href="/pagina_inicial/index.html">
+            <img referrerpolicy="no-referrer" src="/image/logo%20plus%20tipo%20textura.png" alt="VersusHub">
+          </a>
+        </div>
+      </div>
+
+      <!-- CENTRO: botões prncipais -->
+      <div class="botoes_header">
+        <a href="/aovivo/aovivo.html"><button id="aovivo_header">Ao Vivo</button></a>
+        <a href="/criar_torneio/criar_torneio.html"><button id="criar_header">Criar Torneio</button></a>
+        <a href="/equipes/equipes.html"><button id="equipes_header">Equipes</button></a>
+      </div>
+
+      <!-- DIREITA -->
+      <div class="header-right">
+        <form class="search-header" action="#" onsubmit="return false">
+          <input type="text" placeholder="Buscar torneios, jogos..." id="searchInput">
+          <button type="submit" id="searchBtn" aria-label="Buscar"><i class="fa-solid fa-magnifying-glass"></i></button>
+        </form>
+
+        <a href="/login/login.html" id="btentrar">Entrar</a>
+        <a href="/cadastro/cadastro.html" id="btcadastrar">Cadastrar-se</a>
+
+        <div class="user-icon">
+          <img referrerpolicy="no-referrer" src="/image/boneco_logo_ofc.png" alt="Usuário" id="userBtn">
+          <ul id="menuUser" class="hidden"></ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- SIDEBAR LATERAL FIXO -->
+  <aside id="sidebar" class="sidebar">
+    <h2 class="sidebar-title"></h2>
+    <nav class="sidebar-nav">
+      <a href="/pagina_inicial/index.html"><i class="fa-solid fa-house" style="margin-right: 10px; width: 16px; text-align: center;"></i>Início</a>
+      <a href="/pagina_inicial/torneios.html"><i class="fa-solid fa-trophy" style="margin-right: 10px; width: 16px; text-align: center;"></i>Todos os torneios</a>
+      <a href="/criar_torneio/criar_torneio.html"><i class="fa-solid fa-award" style="margin-right: 10px; width: 16px; text-align: center;"></i>Criar Torneio</a>
+      <a href="/equipes/equipes.html"><i class="fa-solid fa-users" style="margin-right: 10px; width: 16px; text-align: center;"></i>Equipes</a>
+      <a href="/ranking.html">📊 Ranking Global</a>
+      <a href="/gerenciartorneios/gerentornindex.html"><i class="fa-solid fa-file-invoice" style="margin-right: 10px; width: 16px; text-align: center;"></i>Gerenciar torneios</a>
+      <a href="/termos/termos.html"><i class="fa-solid fa-briefcase" style="margin-right: 10px; width: 16px; text-align: center;"></i>Termos de Uso</a>
+      <a href="/feedback/feedback.html"><i class="fa-solid fa-star" style="margin-right: 10px; width: 16px; text-align: center;"></i>Enviar feedback / Sugestão</a>
+    </nav>
+  </aside>
+
+  <!-- Overlay para fechar ao clicar -->
+  <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+  <!-- CONTEÚDO PRINCIPAL DO PERFIL PÚBLICO -->
+  <main>
+    
+    <!-- HERO COMPLETO COM BANNER -->
+    <section class="profile-hero">
+      <div class="profile-banner-bg">
+        <img referrerpolicy="no-referrer" id="profileBannerImg" src="/images/torneio_csgo2.webp" alt="Backdrop">
+      </div>
+
+      <div class="profile-header-content">
+        <div class="profile-avatar-container">
+          <img referrerpolicy="no-referrer" id="profileAvatarImg" src="/image/boneco_logo_ofc.png" alt="Avatar">
+        </div>
+
+        <div class="profile-user-summary">
+          <div class="user-verified-badge">
+            <i class="fa-solid fa-circle-check"></i> Pro Player
+          </div>
+          <h1 id="profileName">Carregando...</h1>
+          
+          <ul class="profile-meta-list">
+            <li>
+              <i class="fa-solid fa-earth-americas"></i>
+              <span id="metaRegion">Brasil</span>
+            </li>
+            <li>
+              <i class="fa-solid fa-gamepad"></i>
+              <span id="metaPlatforms">PC / Console</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTAINER SECUNDÁRIO EM GRID (METRICAS ESQUERDA, BIO DIREITA) -->
+    <section class="grid-container">
+      
+      <!-- COLUNA ESTATÍSTICAS (BENTO GRID) -->
+      <div>
+        <h2 class="stats-section-title">
+          <i class="fa-solid fa-chart-simple"></i> Desempenho Competitivo
+        </h2>
+        
+        <div class="bento-card" style="padding: 0; background: transparent; border: none; box-shadow: none;">
+          <div class="stats-bento-grid">
+            
+            <!-- Torneios Jogados -->
+            <div class="metric-card">
+              <div class="metric-icon-bg"><i class="fa-solid fa-trophy"></i></div>
+              <div class="metric-label">Torneios Disputados</div>
+              <h3 class="metric-value" id="statDisputados">--</h3>
+            </div>
+
+            <!-- Torneios Ganhos -->
+            <div class="metric-card">
+              <div class="metric-icon-bg"><i class="fa-solid fa-crown" style="color: rgba(255, 193, 7, 0.15);"></i></div>
+              <div class="metric-label">Primeiro Lugar</div>
+              <h3 class="metric-value" id="statVencidos" style="color: #ffc107;">--</h3>
+            </div>
+
+            <!-- Combates ratio (W/L) -->
+            <div class="metric-card">
+              <div class="metric-label">Registro de Disputas (W/L)</div>
+              
+              <div class="combat-ratio-container">
+                <div class="combat-stat">
+                  <div class="combat-stat-label">Vitórias</div>
+                  <div class="combat-stat-value wins" id="statWins">--</div>
+                </div>
+                <div class="combat-stat" style="text-align: right;">
+                  <div class="combat-stat-label">Derrotas</div>
+                  <div class="combat-stat-value losses" id="statLosses">--</div>
+                </div>
+              </div>
+
+              <div class="combat-bar">
+                <div class="combat-bar-fill-wins" id="combatBarWins" style="width: 50%;"></div>
+                <div class="combat-bar-fill-losses" id="combatBarLosses" style="width: 50%;"></div>
+              </div>
+            </div>
+
+            <!-- Win Rate ratio (Gauge Circle) -->
+            <div class="metric-card">
+              <div class="metric-label">Taxa de Vitória</div>
+              
+              <div class="win-rate-indicator">
+                <div>
+                  <h3 class="metric-value" id="statWinRateText">--%</h3>
+                  <small style="font-size: 11px; color: #a7f3d0;" id="statFeedback">Excelente aproveitamento</small>
+                </div>
+
+                <div class="win-rate-circle">
+                  <svg>
+                    <circle class="bg-circle" cx="35" cy="35" r="30"></circle>
+                    <circle class="progress-circle" cx="35" cy="35" r="30" id="winRateCircleProgress" style="stroke-dasharray: 188.4; stroke-dashoffset: 188.4;"></circle>
+                  </svg>
+                  <span class="win-rate-percentage" id="winRateCircularNumber">--%</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- COLUNA TWIN SOUP (BIO, JOGOS) -->
+      <div>
+        <h2 class="stats-section-title">
+          <i class="fa-solid fa-address-card"></i> Identidade Gamer
+        </h2>
+        
+        <div class="bento-card" style="display: flex; flex-direction: column; gap: 20px;">
+          
+          <!-- BIOGRAFIA -->
+          <div>
+            <div class="twin-card-header">
+              <h3><i class="fa-solid fa-quote-left"></i> Biografia</h3>
+            </div>
+            <p class="bio-text" id="bioText">Carregando descrição do usuário...</p>
+          </div>
+
+          <!-- JOGOS PREFERIDOS -->
+          <div>
+            <div class="twin-card-header">
+              <h3><i class="fa-solid fa-gamepad"></i> Arsenal de Jogos preferidos</h3>
+            </div>
+            <div class="games-list-public" id="gamesListPublic">
+              <!-- preenchido via JS -->
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </section>
+
+    <!-- EQUIPES DA COMUNIDADE -->
+    <section class="teams-section">
+      <h2 class="stats-section-title">
+        <i class="fa-solid fa-users"></i> Assinaturas e Equipes
+      </h2>
+      
+      <div class="teams-public-grid" id="teamsPublicGrid">
+        <!-- carregar cards de equipes do jogador aqui -->
+      </div>
+    </section>
+
+    <!-- CONQUISTAS E HONRARIAS -->
+    <section class="achievements-section">
+      <h2 class="stats-section-title">
+        <i class="fa-solid fa-medal"></i> Conquistas e Troféus de Honra
+      </h2>
+
+      <div class="achievements-grid" id="achievementsGrid">
+        <!-- carregar conquistas personalizadas com base nos medalheiros -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER UNIFICADO GLOBAL -->
+  <footer>
+    <div id="footer_content">
+      <div id="footer_logo">
+        <img referrerpolicy="no-referrer" src="/image/logo.png" alt="VersusHub" id="logofooter">
+      </div>
+
+      <div id="footer_sobrenos">
+        <h1>Sobre Nós</h1>
+        <br>
+        <p>O Versus Hub é uma plataforma criada para conectar jogadores, organizadores e fãs de e-sports em um só lugar. Oferecemos torneios competitivos, rankings dinâmicos e recompensas exclusivas para quem ama competir. Nosso objetivo é tornar a experiência gamer mais acessível, divertida e profissional — seja você um iniciante ou um pro player.</p>
+      </div>
+
+      <div id="footer_versushub">
+        <h1>Versus Hub</h1>
+        <br>
+        <p>
+          Torneios e Rankings atualizados <br><br>
+          Sistema seguro e fácil de participar <br><br>
+          Suporte ativo todos os dias
+        </p>
+      </div>
+
+      <div id="footer_politicas">
+        <h1>Políticas</h1><br>
+        <li><a href="/termos/termos.html" style="text-decoration: none; color: inherit;">Termos de uso</a></li><br>
+        <li>Política de Privacidade</li><br>
+        <li>Política de Reembolso (para eventos pagos)</li>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="/pagina_inicial/js/scrip.js"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // 1) Obter o id da URL
+      const params = new URLSearchParams(window.location.search);
+      const queryId = (params.get("id") || "").trim().toLowerCase();
+
+      // Banco de dados em memória para os 3 perfis nativos, caso o localstorage esteja vazio ou queiram carregar por ID (1, 2, 3)
+      const mockProfiles = {
+        "caique": {
+          id: "caique",
+          nome: "Caíque Brandão",
+          email: "caique@gmail.com",
+          bio: "Opa me chamo Caíque, tenho 18 anos, amo jogos, principalmente Brawl Stars e Fortnite. Curto um bom Rock e amo uma resenha.",
+          avatar: "/equipes/images/caiquebrandao.jpg",
+          banner: "/images/fifa23_globalseries.webp",
+          regiao: "Brasil - Sudeste",
+          plataformas: ["PC", "Mobile"],
+          jogosFavoritos: ["Brawl Stars", "Fortnite", "Street Fighter"],
+          stats: { disputed: 12, won: 4, wins: 35, losses: 10 },
+          teams: [
+            { nome: "Versus Hub", desc: "Equipe oficial do projeto VersusHub", role: "Líder", logo: "/image/logo.png", link: "/equipes/versushub.html" }
+          ],
+          conquistas: [
+            { titulo: "🏆 Campeão Regional", desc: "Conquistou o 1º lugar na Brasil FPS League com a equipe Versus Hub.", data: "Conquistado em 22/03/2025" },
+            { titulo: "🏅 Fundador Supremo", desc: "Selo honorário de criador oficial da Versus Hub.", data: "Conquistado em Autoria" },
+            { titulo: "🔥 Sequência de Fogo", desc: "Alcançou mais de 10 vitórias seguidas em partidas de Brawl Stars.", data: "Conquistado em 14/12/2025" }
+          ]
+        },
+        "dean": {
+          id: "dean",
+          nome: "zZ_Dinho_Winchexxter_Zz",
+          email: "dinho@gmail.com",
+          bio: "Fala aí, eu sou o Dinho. Curto jogar FPS e participar de campeonatos on-line, sempre tentando evoluir mecânica, mira e comunicação de time. Gosto de competir em torneios da comunidade.",
+          avatar: "/equipes/images/dinhowinches.jpg",
+          banner: "/images/torneio_csgo2.webp",
+          regiao: "Brasil - Centro-Oeste",
+          plataformas: ["PC", "Mobile"],
+          jogosFavoritos: ["CS2", "Valorant", "Fortnite", "CoD Mobile"],
+          stats: { disputed: 18, won: 6, wins: 54, losses: 18 },
+          teams: [
+            { nome: "The Caras", desc: "Linhagem competitiva oficial no CS2 e FPS", role: "Líder", logo: "/equipes/image/the caras.png", link: "/equipes/detalhes-thecaras.html" }
+          ],
+          conquistas: [
+            { titulo: "🎯 Olho de Lince", desc: "Média absurda de mais de 90% HS rate em torneios e campeonatos ativos.", data: "Conquistado em 10/05/2025" },
+            { titulo: "🏆 Friday Night Frag Fest", desc: "Campeão invicto do Friday Night Frag Fest.", data: "Conquistado em FRAG FEST" },
+            { titulo: "🛡️ Clutch Master", desc: "Venceu situação 1v5 contra equipe inteira sem tomar dano.", data: "Conquistado em 20/12/2025" }
+          ]
+        },
+        "marcuzcuz": {
+          id: "marcuzcuz",
+          nome: "Mar_cuzcuz",
+          email: "marcuzcuz@gmail.com",
+          bio: "Eu sou o Marcuzcuz, gosto de Cuzcuz, galinhas e do Vasco. Gladiador oficial nos bombsites do Valorant.",
+          avatar: "/equipes/images/marcuzcuz.jpg",
+          banner: "/aovivo/image/Banner-site-torneios-valorant.webp",
+          regiao: "Brasil - Nordeste",
+          plataformas: ["PC"],
+          jogosFavoritos: ["Valorant", "CS2", "Fortnite", "Apex Legends"],
+          stats: { disputed: 14, won: 3, wins: 32, losses: 20 },
+          teams: [
+            { nome: "Viltrumitas", desc: "Line-up de elite inspirada no império galáctico de Viltrum.", role: "Líder", logo: "/equipes/image/Viltrumitas.jpg", link: "/equipes/detalhes-viltrumitas.html" }
+          ],
+          conquistas: [
+            { titulo: "🚀 Conquistador Cósmico", desc: "GLÓRIA AO IMPÉRIO DE VILTRUM! Glória garantida nas chaves competitivas.", data: "Conquistado em 01/01/2026" },
+            { titulo: "🐔 Cuzcuz Power", desc: "Conquistou o poder inabalável de primeiro fragger impulsionando vitórias.", data: "Conquistado Alimentado" },
+            { titulo: "🏆 Glória Eterna", desc: "Primeiro lugar incontestável na Community Clash FPS.", data: "Conquistado em 12/11/2025" }
+          ]
+        }
+      };
+
+      // Mapeamento extra de IDs tradicionais como ?id=1, ?id=2, ?id=3
+      let profileKey = queryId;
+      if (queryId === "1") profileKey = "caique";
+      else if (queryId === "2") profileKey = "dean";
+      else if (queryId === "3") profileKey = "marcuzcuz";
+
+      // 2) Carregar de localStorage se houver dados criados/atualizados
+      let loggedUser = null;
+      let registeredUsers = [];
+      try {
+        const rawLogged = localStorage.getItem("vh_loggedUser");
+        if (rawLogged) loggedUser = JSON.parse(rawLogged);
+
+        const rawReg = localStorage.getItem("vh_users");
+        if (rawReg) registeredUsers = JSON.parse(rawReg);
+      } catch (err) {
+        console.error("Localstorage parsing error:", err);
+      }
+
+      let activeProfile = null;
+
+      // Buscar se a chave de profile coincide com um perfil nativo
+      if (mockProfiles[profileKey]) {
+        activeProfile = mockProfiles[profileKey];
+        
+        // Se este perfil nativo bater com o loggedUser atualmente, atualizamos para usar dados mais novos dele
+        if (loggedUser && loggedUser.email && loggedUser.email.toLowerCase() === activeProfile.email.toLowerCase()) {
+          activeProfile.nome = loggedUser.nome || activeProfile.nome;
+          activeProfile.bio = loggedUser.bio || activeProfile.bio;
+          activeProfile.avatar = loggedUser.avatar || activeProfile.avatar;
+          activeProfile.jogosFavoritos = loggedUser.jogosFavoritos || activeProfile.jogosFavoritos;
+          activeProfile.plataformas = loggedUser.plataformas || activeProfile.plataformas;
+        }
+      } else {
+        // Se for um usuário dinâmico (id não nativo), tentamos encontrar na base geral de cadastros (by nome slugged ou index)
+        const matchUser = registeredUsers.find(u => {
+          const uSlug = (u.nome || "").trim().toLowerCase().replace(/\s+/g, "");
+          return uSlug === queryId || u.email.toLowerCase() === queryId;
+        });
+
+        if (matchUser) {
+          activeProfile = {
+            id: matchUser.nome,
+            nome: matchUser.nome,
+            email: matchUser.email,
+            bio: matchUser.bio || "Este player ainda não possui biografia registrada.",
+            avatar: matchUser.avatar || "/image/boneco_logo_ofc.png",
+            banner: matchUser.banner || "/images/torneio_csgo2.webp",
+            regiao: matchUser.regiao || "Brasil",
+            plataformas: matchUser.plataformas || ["PC"],
+            jogosFavoritos: matchUser.jogosFavoritos || ["Fortnite", "CS2"],
+            stats: matchUser.stats || { disputed: 8, won: 2, wins: 18, losses: 10 },
+            teams: [
+              { nome: "Versus Hub", desc: "Equipe oficial VersusHub", role: "Player", logo: "/image/logo.png", link: "/equipes/versushub.html" }
+            ],
+            conquistas: matchUser.conquistas || [
+              { titulo: "🏆 Recruta Destemido", desc: "Cadastro verificado e pronto para competir nos maiores palcos de e-sports.", data: "Conquistado recentemente" }
+            ]
+          };
+        } else if (loggedUser) {
+          // Se não há ID, ou não deu match com ninguém, mas o usuário atual está logado, servimos o próprio perfil dele
+          activeProfile = {
+            id: loggedUser.nome,
+            nome: loggedUser.nome,
+            email: loggedUser.email,
+            bio: loggedUser.bio || "Esse pro-player ainda não possui uma biografia personalizada.",
+            avatar: loggedUser.avatar || "/image/boneco_logo_ofc.png",
+            banner: loggedUser.banner || "/images/torneio_csgo2.webp",
+            regiao: loggedUser.regiao || "Brasil",
+            plataformas: loggedUser.plataformas || ["PC"],
+            jogosFavoritos: loggedUser.jogosFavoritos || ["Brawl Stars", "Valorant"],
+            stats: loggedUser.stats || { disputed: 10, won: 3, wins: 22, losses: 12 },
+            teams: [
+              { nome: "Versus Hub", desc: "Equipe de e-sports oficial do projeto", role: "Membro Ativo", logo: "/image/logo.png", link: "/equipes/versushub.html" }
+            ],
+            conquistas: loggedUser.conquistas || [
+              { titulo: "🏅 Perfil Ativado", desc: "Configure e atualize suas conquistas para o ranking no painel de perfil.", data: "Desbloqueado" }
+            ]
+          };
+        } else {
+          // Fallback final: Caíque Brandão
+          activeProfile = mockProfiles["caique"];
+        }
+      }
+
+      // Se o usuário dinâmico tiver criado equipes próprias no LocalStorage, nós as renderizamos no perfil dele!
+      let createdTeams = [];
+      try {
+        const rawTeams = localStorage.getItem("vh_createdTeams");
+        if (rawTeams) createdTeams = JSON.parse(rawTeams);
+      } catch (err) {
+        console.error("Created teams parsing error:", err);
+      }
+
+      // Se o usuário logado adicionou equipes ou se este perfil coincidir com o líder das equipes criadas
+      if (createdTeams.length > 0) {
+        createdTeams.forEach(team => {
+          // Evita duplicar ou adiciona se pertencer a esta pessoa
+          const isLider = (team.leaderName || "").toLowerCase() === (activeProfile.nome || "").toLowerCase();
+          const jaExiste = activeProfile.teams.some(t => t.nome.toLowerCase() === team.nome.toLowerCase());
+          if (isLider && !jaExiste) {
+            activeProfile.teams.push({
+              nome: team.nome,
+              desc: team.sobre || "Nova equipe criada na VersusHub",
+              role: "Líder fundador",
+              logo: team.logo || "/image/logo.png",
+              link: `/equipes/template_equipe.html?id=${team.id}`
+            });
+          }
+        });
+      }
+
+      // 3) Preencher dados do Perfil no HTML
+      document.getElementById("profileName").textContent = activeProfile.nome;
+      document.getElementById("bioText").textContent = activeProfile.bio;
+      document.getElementById("metaRegion").textContent = activeProfile.regiao;
+      
+      const avatarEl = document.getElementById("profileAvatarImg");
+      avatarEl.src = activeProfile.avatar || "/image/boneco_logo_ofc.png";
+      
+      const bannerEl = document.getElementById("profileBannerImg");
+      bannerEl.src = activeProfile.banner || "/images/torneio_csgo2.webp";
+
+      // Plataformas
+      const listPlats = (activeProfile.plataformas && activeProfile.plataformas.length > 0) 
+        ? activeProfile.plataformas.join(" • ") 
+        : "Não informado";
+      document.getElementById("metaPlatforms").textContent = listPlats;
+
+      // 4) Preencher Estatísticas
+      const st = activeProfile.stats;
+      document.getElementById("statDisputados").textContent = st.disputed;
+      document.getElementById("statVencidos").textContent = st.won;
+      document.getElementById("statWins").textContent = st.wins;
+      document.getElementById("statLosses").textContent = st.losses;
+
+      // Cálculo de win rate
+      const totalGames = st.wins + st.losses;
+      const winRate = totalGames > 0 ? Math.round((st.wins / totalGames) * 100) : 0;
+      
+      document.getElementById("statWinRateText").textContent = winRate + "%";
+      document.getElementById("winRateCircularNumber").textContent = winRate + "%";
+
+      // Feedbacks dinâmicos de estatísticas
+      const feedEl = document.getElementById("statFeedback");
+      if (winRate >= 75) {
+        feedEl.textContent = "🏆 Desempenho de Nível Mundial (Tier S)";
+        feedEl.style.color = "#4ade80";
+      } else if (winRate >= 60) {
+        feedEl.textContent = "🔥 Combatente de Elite (Alta Elite)";
+        feedEl.style.color = "#facc15";
+      } else {
+        feedEl.textContent = "🎯 Lutador Persistente (Evoluindo)";
+        feedEl.style.color = "#9cb1cf";
+      }
+
+      // Preenchimento de combate bar
+      const winsPercent = totalGames > 0 ? (st.wins / totalGames) * 100 : 50;
+      const lossesPercent = totalGames > 0 ? (st.losses / totalGames) * 100 : 50;
+      document.getElementById("combatBarWins").style.width = winsPercent + "%";
+      document.getElementById("combatBarLosses").style.width = lossesPercent + "%";
+
+      // SVG dashboard win-rate circular animation stroke
+      // Raio = 30, Circuferência = 2 * Pi * 30 ≈ 188.4
+      const strokeOffset = 188.4 - (188.4 * winsPercent) / 100;
+      document.getElementById("winRateCircleProgress").style.strokeDashoffset = strokeOffset;
+
+      // 5) Renderizar Jogos Favoritos
+      const gamesContainer = document.getElementById("gamesListPublic");
+      gamesContainer.innerHTML = "";
+      if (activeProfile.jogosFavoritos && activeProfile.jogosFavoritos.length > 0) {
+        activeProfile.jogosFavoritos.forEach(game => {
+          const badge = document.createElement("div");
+          badge.className = "game-badge-public";
+          badge.innerHTML = `
+            <i class="fa-solid fa-fire-flame-simple"></i>
+            <span>${game}</span>
+          `;
+          gamesContainer.appendChild(badge);
+        });
+      } else {
+        gamesContainer.innerHTML = `<span style="font-size: 13px; color: #9ca3af;">Nenhum jogo listado na coleção de favoritos.</span>`;
+      }
+
+      // 6) Renderizar Equipes do Jogador
+      const teamsContainer = document.getElementById("teamsPublicGrid");
+      teamsContainer.innerHTML = "";
+      if (activeProfile.teams && activeProfile.teams.length > 0) {
+        activeProfile.teams.forEach(t => {
+          const card = document.createElement("div");
+          card.className = "team-badge-card";
+          card.innerHTML = `
+            <div class="team-badge-left">
+              <div class="team-logo-wrapper">
+                <img referrerpolicy="no-referrer" src="${t.logo || '/image/logo.png'}" alt="${t.nome}">
+              </div>
+              <div class="team-logo-text">
+                <a href="${t.link || '#'}" style="text-decoration: none; color: inherit;">
+                  <h4>${t.nome}</h4>
+                  <p>${t.desc}</p>
+                </a>
+              </div>
+            </div>
+            <div class="team-status-role">
+              <i class="fa-solid fa-ranking-star"></i> ${t.role}
+            </div>
+          `;
+          teamsContainer.appendChild(card);
+        });
+      } else {
+        teamsContainer.innerHTML = `<div class="bento-card" style="grid-column: 1/-1; text-align: center; color: #9ca3af; font-size: 14px;">Jogador Solo - Nenhuma equipe registrada.</div>`;
+      }
+
+      // 7) Renderizar Conquistas
+      const achContainer = document.getElementById("achievementsGrid");
+      achContainer.innerHTML = "";
+      if (activeProfile.conquistas && activeProfile.conquistas.length > 0) {
+        activeProfile.conquistas.forEach((ach, index) => {
+          const item = document.createElement("div");
+          item.className = "achievement-item";
+          
+          const isSpecial = index % 2 === 1;
+          const iconClass = isSpecial ? "achievement-icon special" : "achievement-icon";
+          const iconMarkup = isSpecial ? `<i class="fa-solid fa-award"></i>` : `<i class="fa-solid fa-trophy"></i>`;
+          
+          item.innerHTML = `
+            <div class="${iconClass}">${iconMarkup}</div>
+            <div class="achievement-details">
+              <h4>${ach.titulo}</h4>
+              <p>${ach.desc}</p>
+              <div class="achievement-unlocked-date">
+                <i class="fa-solid fa-clock-rotate-left"></i> ${ach.data}
+              </div>
+            </div>
+          `;
+          achContainer.appendChild(item);
+        });
+      } else {
+        achContainer.innerHTML = `<div class="bento-card" style="grid-column: 1/-1; text-align: center; color: #9ca3af; font-size: 14px;">Troféus de campeonatos ainda não inseridos na coleção pública.</div>`;
+      }
+
+    });
+  </script>
+</body>
+</html>

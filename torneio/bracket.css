@@ -1,0 +1,236 @@
+/* /torneio/bracket.css */
+
+.bracket-scroll-container {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 10px 0 25px;
+  scrollbar-width: thin;
+  scrollbar-color: #2a2a38 #111015;
+}
+
+.bracket-scroll-container::-webkit-scrollbar {
+  height: 8px;
+}
+
+.bracket-scroll-container::-webkit-scrollbar-track {
+  background: #111015;
+  border-radius: 999px;
+}
+
+.bracket-scroll-container::-webkit-scrollbar-thumb {
+  background-color: #2a2a38;
+  border-radius: 999px;
+  border: 2px solid #111015;
+}
+
+.bracket-scroll-container::-webkit-scrollbar-thumb:hover {
+  background-color: #ff7300;
+}
+
+/* Bracket wrapper */
+.bracket-tree-wrapper {
+  display: flex;
+  gap: 48px;
+  min-width: max-content;
+  align-items: stretch;
+  justify-content: space-between;
+  padding: 15px 10px;
+}
+
+/* Bracket rounds column */
+.bracket-round {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  min-width: 220px;
+}
+
+.bracket-round-header {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #ff7300;
+  letter-spacing: 1.5px;
+  margin-bottom: 20px;
+  border-bottom: 1.5px solid rgba(255, 255, 255, 0.05);
+  padding-bottom: 8px;
+}
+
+/* Individual match boxes */
+.bracket-match {
+  width: 100%;
+  background: #111015;
+  border: 1.5px solid #2d2a38;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
+  display: flex;
+  flex-direction: column;
+  margin: 14px 0;
+}
+
+.bracket-match:hover {
+  border-color: #ff7300;
+  box-shadow: 0 6px 20px rgba(255, 115, 0, 0.15);
+}
+
+.match-status {
+  background: #18171d;
+  padding: 5px 10px;
+  font-size: 9px;
+  text-transform: uppercase;
+  font-weight: 800;
+  color: #9cb1cf;
+  border-bottom: 1.5px solid #1c1a24;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.match-status.active {
+  color: #ff7300;
+}
+
+.match-team {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  cursor: pointer;
+  background: #141318;
+  transition: all 0.15s ease-in-out;
+  user-select: none;
+}
+
+.match-team:first-of-type {
+  border-bottom: 1.5px solid #1c1a24;
+}
+
+.match-team:hover {
+  background: rgba(255, 115, 0, 0.06);
+}
+
+.match-team.team-winner {
+  background: rgba(74, 222, 128, 0.04);
+}
+
+.match-team.team-winner .team-name {
+  color: #4ade80;
+  font-weight: 700;
+}
+
+.match-team.team-winner .team-score {
+  color: #4ade80;
+  font-weight: 800;
+}
+
+.match-team.team-loser {
+  opacity: 0.45;
+}
+
+.team-identity {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.team-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  border: 1.5px solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+
+.team-name {
+  font-size: 13px;
+  color: #e2e8f0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
+}
+
+.team-score {
+  font-size: 14px;
+  font-weight: 700;
+  color: #cbd5e1;
+  padding-left: 10px;
+}
+
+/* CHAMPION PLATFORM */
+.bracket-champion-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  align-self: center;
+  min-width: 220px;
+  background: radial-gradient(circle at center, rgba(255, 115, 0, 0.1) 0%, rgba(20, 19, 24, 0.7) 100%);
+  border: 2px dashed #ff7300;
+  border-radius: 12px;
+  padding: 30px 20px;
+  box-shadow: 0 0 25px rgba(255, 115, 0, 0.12);
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.bracket-champion-box::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.champion-crown {
+  font-size: 40px;
+  color: #ffb700;
+  margin-bottom: 12px;
+  filter: drop-shadow(0 0 12px rgba(255, 183, 0, 0.5));
+  animation: floatCrown 3s ease-in-out infinite;
+}
+
+@keyframes floatCrown {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.champion-title {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #ff7300;
+  letter-spacing: 2px;
+  margin-bottom: 6px;
+}
+
+.champion-name {
+  font-size: 16px;
+  font-weight: 800;
+  color: #fff;
+  word-break: break-word;
+}
+
+/* Interactive instructions hint */
+.bracket-hint {
+  font-size: 11px;
+  color: #9cb1cf;
+  text-align: center;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}

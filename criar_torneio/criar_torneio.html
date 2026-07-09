@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- estilos globais -->
+  <link rel="stylesheet" href="/pagina_inicial/css/estilos.css" />
+  <!-- estilos específicos desta página -->
+  <link rel="stylesheet" href="/criar_torneio/css/criar.css" />
+  <link rel="icon" href="/image/logo.png" sizes="32x32"> 
+  <title>Criar Torneio - VersusHub</title>
+</head>
+<body>
+
+  <!-- ========= HEADER ========= -->
+  <header>
+    <nav class="navbar">
+
+      <div class="header-left">
+        <button id="menuToggle" class="menu-button">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="menu-svg"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+
+        <div class="logo_header">
+          <a href="/pagina_inicial/index.html">
+            <img referrerpolicy="no-referrer" src="/image/logo%20plus%20tipo%20textura.png" alt="VersusHub">
+          </a>
+        </div>
+      </div>
+
+      <div class="botoes_header">
+        <a href="/aovivo/aovivo.html"><button id="aovivo_header">Ao Vivo</button></a>
+        <a href="/criar_torneio/criar_torneio.html"> <button id="criar_header">Criar Torneio</button>
+      </a>
+       <a href="/equipes/equipes.html"> <button id="equipes_header">Equipes</button> </a>
+      </div>
+
+      <div class="header-right">
+        <form class="search-header" action="#" onsubmit="return false">
+          <input
+            type="text"
+            placeholder="Buscar torneios, jogos..."
+            id="searchInput"
+          >
+          <button type="submit" id="searchBtn" aria-label="Buscar"><i class="fa-solid fa-magnifying-glass"></i></button>
+        </form>
+
+        <a href="/login/login.html" id="btentrar">Entrar</a>
+        <a href="/cadastro/cadastro.html" id="btcadastrar">Cadastrar-se</a>
+
+        <div class="user-icon">
+          <img referrerpolicy="no-referrer" src="/image/boneco_logo_ofc.png" alt="Usuário" id="userBtn">
+          <ul id="menuUser" class="hidden"></ul>
+        </div>
+      </div>
+
+    </nav>
+  </header>
+  <!-- ========= FIM HEADER ========= -->
+
+<!-- SIDEBAR -->
+<aside id="sidebar" class="sidebar">
+  <h2 class="sidebar-title"></h2>
+  <nav class="sidebar-nav">
+    <a href="/pagina_inicial/index.html"><i class="fa-solid fa-house" style="margin-right: 10px; width: 16px; text-align: center;"></i>Início</a>
+    <a href="/pagina_inicial/torneios.html"><i class="fa-solid fa-trophy" style="margin-right: 10px; width: 16px; text-align: center;"></i>Todos os torneios</a>
+    <a href="/criar_torneio/criar_torneio.html"><i class="fa-solid fa-award" style="margin-right: 10px; width: 16px; text-align: center;"></i>Criar Torneio</a>
+    <a href="/equipes/equipes.html"><i class="fa-solid fa-users" style="margin-right: 10px; width: 16px; text-align: center;"></i>Equipes</a>
+    <a href="/ranking.html">📊 Ranking Global</a>
+    <a href="/gerenciartorneios/gerentornindex.html"><i class="fa-solid fa-file-invoice" style="margin-right: 10px; width: 16px; text-align: center;"></i>Gerenciar torneios</a>
+    <a href="/termos/termos.html"><i class="fa-solid fa-briefcase" style="margin-right: 10px; width: 16px; text-align: center;"></i>Termos de Uso</a>
+    <a href="/feedback/feedback.html"><i class="fa-solid fa-star" style="margin-right: 10px; width: 16px; text-align: center;"></i>Enviar feedback / Sugestão</a>
+  </nav>
+</aside>
+
+  <!-- efeito da tela ficar escura no fundo -->
+
+<div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+<!-- FIM SIDEBAR -->
+
+
+  <!-- ========= CONTEÚDO: FORMULÁRIO DE CRIAÇÃO ========= -->
+  <main class="criar-torneio-page">
+
+    <section class="criar-header">
+      <h1>Criar Novo Torneio</h1>
+      <p>Organize competições incríveis em poucos minutos. Os torneios criados serão gerenciados por você e exibidos na aba de competições do VersusHub.</p>
+    </section>
+
+    <!-- STEPPER INDICATORS -->
+    <div class="stepper">
+      <div class="stepper-progress" id="stepperProgress"></div>
+      
+      <div class="step active" data-step="1" id="stepIndicator1">
+        <div class="step-icon">1</div>
+        <div class="step-label">Informações</div>
+      </div>
+      
+      <div class="step" data-step="2" id="stepIndicator2">
+        <div class="step-icon">2</div>
+        <div class="step-label">Agendamento</div>
+      </div>
+      
+      <div class="step" data-step="3" id="stepIndicator3">
+        <div class="step-icon">3</div>
+        <div class="step-label">Regulamento</div>
+      </div>
+    </div>
+
+    <!-- MAIN FORM CARD -->
+    <section class="torneio-form-card">
+      <form id="formCriarTorneio" novalidate>
+
+        <!-- PANEL 1: INFORMAÇÕES BÁSICAS -->
+        <div class="step-panel active" id="stepPanel1">
+          <h2 class="section-title"><span><i class="fa-solid fa-gamepad" style="color: #ff3e3e; margin-right: 8px;"></i></span> Passo 1: Detalhes do Jogo</h2>
+          
+          <!-- BANNER UPLOAD -->
+          <div class="form-block full-row">
+            <label>Banner de Destaque</label>
+            <p class="hint">Adicione uma bela capa widescreen para representar o torneio nos cards da página inicial (Recomendado 16:9).</p>
+            
+            <div class="upload-container" id="uploadContainer">
+              <input type="file" id="bannerInput" accept="image/*">
+              <span class="upload-icon"><i class="fa-solid fa-camera" style="color: #ff3e3e;"></i></span>
+              <div class="upload-text">Arraste uma imagem ou clique para selecionar</div>
+              <div class="upload-subtext">Arquivos suportados: JPG, PNG, WEBP (Máx: 5MB)</div>
+            </div>
+            
+            <div class="banner-preview-wrapper" id="bannerPreviewWrapper">
+              <img id="bannerImagePreview" src="" alt="Preview do Banner">
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <!-- Nome -->
+            <div class="form-block">
+              <label for="nomeTorneio">Nome do Torneio</label>
+              <input
+                type="text"
+                id="nomeTorneio"
+                placeholder="Ex: VersusHub Championship 2026"
+                required
+              >
+            </div>
+
+            <!-- Jogo -->
+            <div class="form-block">
+              <label for="jogoNome">Título do Jogo</label>
+              <input
+                type="text"
+                id="jogoNome"
+                list="listaJogos"
+                placeholder="Digite ou escolha o jogo..."
+                required
+              >
+            </div>
+          </div>
+
+          <datalist id="listaJogos">
+            <option value="CS:GO">
+            <option value="Counter-Strike 2">
+            <option value="Valorant">
+            <option value="Free Fire">
+            <option value="League of Legends">
+            <option value="Wild Rift">
+            <option value="FIFA 25">
+            <option value="EA SPORTS FC 25">
+            <option value="Fortnite">
+            <option value="PUBG">
+            <option value="Apex Legends">
+            <option value="Rocket League">
+            <option value="Rainbow Six Siege">
+            <option value="Dota 2">
+            <option value="Clash Royale">
+            <option value="Brawl Stars">
+          </datalist>
+
+          <!-- CATEGORIA TILES (FPS, MOBA, etc) -->
+          <div class="form-block full-row">
+            <label>Categoria do Jogo</label>
+            <input type="hidden" id="categoria" value="" required>
+            <div class="tile-selector" id="categoriaSelector">
+              <div class="tile-option" data-value="fps">
+                <span class="tile-icon"><i class="fa-solid fa-crosshairs" style="color: #ff3e3e;"></i></span>
+                <span class="tile-label">FPS / Tiro</span>
+              </div>
+              <div class="tile-option" data-value="moba">
+                <span class="tile-icon"><i class="fa-solid fa-shield-halved" style="color: #ff3e3e;"></i></span>
+                <span class="tile-label">MOBA</span>
+              </div>
+              <div class="tile-option" data-value="battle-royale">
+                <span class="tile-icon"><i class="fa-solid fa-parachute-box" style="color: #ff3e3e;"></i></span>
+                <span class="tile-label">Battle Royale</span>
+              </div>
+              <div class="tile-option" data-value="esportes">
+                <span class="tile-icon"><i class="fa-solid fa-futbol" style="color: #ff3e3e;"></i></span>
+                <span class="tile-label">Esportes</span>
+              </div>
+              <div class="tile-option" data-value="luta">
+                <span class="tile-icon"><i class="fa-solid fa-hand-fist" style="color: #ff3e3e;"></i></span>
+                <span class="tile-label">Jogos de Luta</span>
+              </div>
+              <div class="tile-option" data-value="cartas">
+                <span class="tile-icon"><i class="fa-solid fa-layer-group" style="color: #ff3e3e;"></i></span>
+                <span class="tile-label">Card Game</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- PLATAFORMA TILES (PC, Console, etc) -->
+          <div class="form-block full-row">
+            <label>Plataforma Principal</label>
+            <input type="hidden" id="plataforma" value="" required>
+            <div class="tile-selector" id="plataformaSelector">
+              <div class="tile-option" data-value="pc">
+                <span class="tile-icon"><i class="fa-solid fa-desktop" style="color: #ff3e3e;"></i></span>
+                <span class="tile-label">Computador</span>
+              </div>
+              <div class="tile-option" data-value="console">
+                <span class="tile-icon"><i class="fa-solid fa-gamepad" style="color: #ff3e3e;"></i></span>
+                <span class="tile-label">Console</span>
+              </div>
+              <div class="tile-option" data-value="mobile">
+                <span class="tile-icon"><i class="fa-solid fa-mobile-screen-button" style="color: #ff3e3e;"></i></span>
+                <span class="tile-label">Dispositivo Móvel</span>
+              </div>
+              <div class="tile-option" data-value="multi">
+                <span class="tile-icon"><i class="fa-solid fa-earth-americas" style="color: #ff3e3e;"></i></span>
+                <span class="tile-label">Multiplataforma</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANEL 2: AGENDAMENTO & FORMATO -->
+        <div class="step-panel" id="stepPanel2">
+          <h2 class="section-title"><span><i class="fa-solid fa-calendar-days" style="color: #ff3e3e; margin-right: 8px;"></i></span> Passo 2: Calendário & Formato</h2>
+          
+          <div class="form-grid triple">
+            <div class="form-block">
+              <label for="inicioData">Data do Torneio</label>
+              <input type="date" id="inicioData" required>
+            </div>
+
+            <div class="form-block">
+              <label for="inicioHora">Horário de Início</label>
+              <input type="time" id="inicioHora" required>
+            </div>
+
+            <div class="form-block">
+              <label for="status">Status Inicial</label>
+              <select id="status" required>
+                <option value="aberto">Inscrições abertas</option>
+                <option value="andamento">Em andamento</option>
+                <option value="encerrado">Encerrado</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Descrição -->
+          <div class="form-block full-row">
+            <label for="descricao">Descrição / Detalhes Gerais</label>
+            <textarea
+              id="descricao"
+              rows="4"
+              placeholder="Descreva brevemente o torneio, as fases principais e a atmosfera da competição..."
+            ></textarea>
+          </div>
+
+          <!-- MODALIDADE TILES (Online / Presencial) -->
+          <div class="form-block full-row">
+            <label>Modalidade de Partida</label>
+            <input type="hidden" id="modalidade" value="online" required>
+            <div class="tile-selector double" id="modalidadeSelector">
+              <div class="tile-option selected" data-value="online">
+                <span class="tile-icon"><i class="fa-solid fa-cloud" style="color: #ff3e3e;"></i></span>
+                <span class="tile-label">Totalmente Online</span>
+              </div>
+              <div class="tile-option" data-value="presencial">
+                <span class="tile-icon"><i class="fa-solid fa-building" style="color: #ff3e3e;"></i></span>
+                <span class="tile-label">Presencial / LAN</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- LOCALIZAÇÃO CONDICIONAL -->
+          <div class="form-block full-row conditional-block" id="localizacaoBlock">
+            <label for="localizacao">Endereço Presencial ou Detalhes do Local</label>
+            <input 
+              type="text" 
+              id="localizacao" 
+              placeholder="Ex: Arena TG - Contagem, MG ou Avenida Paulista, 1000 - SP"
+            >
+          </div>
+
+          <!-- Requisitos -->
+          <div class="form-block full-row">
+            <label for="requisitos">Requisitos de Inscrição</label>
+            <textarea 
+              id="requisitos" 
+              rows="3" 
+              placeholder="Ex: Idade mínima de 16 anos, nível de conta 30, Discord obrigatório para comunicação do time..."
+            ></textarea>
+          </div>
+        </div>
+
+        <!-- PANEL 3: REGULAMENTO, TAXAS & PRÊMIOS -->
+        <div class="step-panel" id="stepPanel3">
+          <h2 class="section-title"><span><i class="fa-solid fa-trophy" style="color: #ffd700; margin-right: 8px;"></i></span> Passo 3: Regulamento & Prêmios</h2>
+
+          <!-- Regras -->
+          <div class="form-block full-row">
+            <label for="regras">Regras Principais do Torneio</label>
+            <textarea 
+              id="regras" 
+              rows="4" 
+              placeholder="Explique detalhadamente as regras de conduta, critérios de desempate, tolerância de atrasos..."
+            ></textarea>
+          </div>
+
+          <!-- TAXA DE INSCRIÇÃO TILES (Gratuito / Pago) -->
+          <div class="form-block full-row">
+            <label>Taxa de Participação</label>
+            <input type="hidden" id="taxaTipo" value="gratis" required>
+            <div class="tile-selector double" id="taxaTipoSelector">
+              <div class="tile-option selected" data-value="gratis">
+                <span class="tile-icon"><i class="fa-solid fa-gift" style="color: #ff3e3e;"></i></span>
+                <span class="tile-label">Inscrição Gratuita</span>
+              </div>
+              <div class="tile-option" data-value="pago">
+                <span class="tile-icon"><i class="fa-solid fa-credit-card" style="color: #ff3e3e;"></i></span>
+                <span class="tile-label">Inscrição Paga</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- VALOR DA TAXA CONDICIONAL -->
+          <div class="form-block conditional-block" id="taxaValorBlock">
+            <label for="taxaValor">Valor da Taxa de Inscrição (R$)</label>
+            <input
+              type="number"
+              id="taxaValor"
+              min="0"
+              step="0.01"
+              placeholder="Ex: 15.00"
+            >
+          </div>
+
+          <!-- TIPO DE PREMIAÇÃO TILES -->
+          <div class="form-block full-row">
+            <label>Tipo de Premiação Oferecida</label>
+            <input type="hidden" id="tipoPremio" value="nenhuma" required>
+            <div class="tile-selector" id="tipoPremioSelector">
+              <div class="tile-option selected" data-value="nenhuma">
+                <span class="tile-icon"><i class="fa-solid fa-circle-xmark" style="color: #ef4444;"></i></span>
+                <span class="tile-label">Sem Prêmio</span>
+              </div>
+              <div class="tile-option" data-value="dinheiro">
+                <span class="tile-icon"><i class="fa-solid fa-money-bill-1-wave" style="color: #ff3e3e;"></i></span>
+                <span class="tile-label">Em Dinheiro</span>
+              </div>
+              <div class="tile-option" data-value="itens">
+                <span class="tile-icon"><i class="fa-solid fa-shield-halved" style="color: #ff3e3e;"></i></span>
+                <span class="tile-label">Itens / Skins</span>
+              </div>
+              <div class="tile-option" data-value="dinheiro-itens">
+                <span class="tile-icon"><i class="fa-solid fa-crown" style="color: #ff3e3e;"></i></span>
+                <span class="tile-label">Misto (Ambos)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- CAMPOS DE PREMIAÇÃO VALOR CONDICIONAL -->
+          <div id="premiacaoCampos" class="conditional-block">
+            <div class="form-grid">
+              <div class="form-block">
+                <label for="premio1">1º Lugar (Campeão)</label>
+                <input id="premio1" type="text" placeholder="Ex: R$ 1.500,00 + Troféu">
+              </div>
+
+              <div class="form-block">
+                <label for="premio2">2º Lugar (Vice-Campeão)</label>
+                <input id="premio2" type="text" placeholder="Ex: R$ 500,00">
+              </div>
+            </div>
+
+            <div class="form-grid">
+              <div class="form-block">
+                <label for="premio3">3º Lugar</label>
+                <input id="premio3" type="text" placeholder="Ex: R$ 200,00 ou Skins">
+              </div>
+
+              <div class="form-block">
+                <label for="premiacaoExtra">Premiações Adicionais (MVP, etc)</label>
+                <input id="premiacaoExtra" type="text" placeholder="Ex: MVP ganha fone gamer">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- NAVIGATION ACTIONS ROW -->
+        <div class="navigation-row">
+          <button type="button" class="btn-secondary-criar" id="btnPrevStep" disabled>
+            Anterior
+          </button>
+          
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <span class="feedback-msg" id="feedbackMsg"></span>
+            <button type="button" class="btn-principal-criar" id="btnNextStep">
+              <span>Próximo</span> ➜
+            </button>
+          </div>
+        </div>
+
+      </form>
+    </section>
+
+  </main>
+
+  <!-- ========= FOOTER ========= -->
+  <footer>
+    <div id="footer_content">
+      <div id="footer_logo">
+        <img referrerpolicy="no-referrer" src="/image/logo.png" alt="" id="logofooter">
+      </div>
+
+      <div id="footer_sobrenos">
+        <h1>Sobre Nós</h1>
+        <br>
+        <p>O Versus Hub é uma plataforma criada para conectar jogadores, organizadores e fãs de e-sports em um só lugar. Oferecemos torneios competitivos, rankings dinâmicos e recompensas exclusivas.</p>
+      </div>
+
+      <div id="footer_versushub">
+        <h1>Versus Hub</h1>
+        <br>
+        <p>
+          Torneios e Rankings atualizados <br><br>
+          Sistema seguro e fácil de participar <br><br>
+          Suporte ativo todos os dias
+        </p>
+      </div>
+
+      <div id="footer_politicas">
+        <h1>Políticas</h1><br>
+        <li>Termos de uso</li><br>
+        <li>Política de Privacidade</li><br>
+        <li>Política de Reembolso (para eventos pagos)</li><br>
+       </div>
+    </div>
+  </footer>
+  <!-- ========= FIM FOOTER ========= -->
+
+  <!-- JS global + JS desta página -->
+  <script src="/pagina_inicial/js/scrip.js"></script>
+  <script src="/criar_torneio/js/criar.js"></script>
+</body>
+</html>

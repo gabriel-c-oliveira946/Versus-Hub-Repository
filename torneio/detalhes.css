@@ -1,0 +1,215 @@
+/* ================================
+   PÁGINA DE DETALHES DO TORNEIO
+   ================================ */
+
+.torneio-page {
+  max-width: 1200px;
+  margin: 90px auto 40px; /* 90px por causa do header fixo */
+  padding: 0 16px 40px;
+  color: #ffffff;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* HERO: banner + infos principais */
+.torneio-hero {
+  display: grid;
+  grid-template-columns: 2fr 1.4fr;
+  gap: 20px;
+  margin-bottom: 30px;
+  
+}
+
+.torneio-banner {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 3px solid #2c2c3b;
+  background: #111;
+  height: 280px;
+  width: 100%;
+}
+
+.torneio-banner img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.torneio-status-badge {
+  position: absolute;
+  left: 14px;
+  bottom: 14px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  background: rgba(0,0,0,0.85);
+}
+
+/* usa as cores dos status que você já tem */
+.torneio-status-badge.status-aberto {
+  color: #4ade80;
+}
+
+.torneio-status-badge.status-andamento {
+  color: #facc15;
+}
+
+.torneio-status-badge.status-encerrado {
+  color: #f97373;
+}
+
+.torneio-hero-info h1 {
+  font-size: 26px;
+  margin-bottom: 6px;
+}
+
+.torneio-meta {
+  color: #b1b1cf;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.torneio-data {
+  color: #e5e5ff;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.torneio-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.torneio-tags span {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #1e1b2e;
+  border: 1px solid #2c2c3b;
+  font-size: 12px;
+  color: #d4d4ff;
+}
+
+/* Layout 2 colunas: info + lateral */
+.torneio-layout {
+  display: grid;
+  grid-template-columns: 2fr 1.1fr;
+  gap: 22px;
+}
+
+/* cards genéricos da página */
+.torneio-card-box {
+  background: #141419;
+  border-radius: 12px;
+  border: 2px solid #2c2c3b;
+  padding: 16px 18px 18px;
+  margin-bottom: 18px;
+}
+
+.torneio-card-box h2 {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.torneio-card-box p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #d1d1e6;
+}
+
+.torneio-card-box ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.torneio-card-box li {
+  font-size: 14px;
+  color: #d1d1e6;
+  margin-bottom: 6px;
+}
+
+/* coluna lateral */
+.torneio-col-side .torneio-card-box {
+  margin-bottom: 16px;
+}
+
+/* destaque da área de inscrição */
+.destaque-inscricao {
+  border-color: #d41111;
+  box-shadow: 0 0 18px rgba(212, 17, 17, 0.4);
+}
+
+/* lista de info chave/valor */
+.info-list li span {
+  font-weight: 600;
+  color: #ffffff;
+}
+
+/* botão principal de inscrição */
+.btn-principal {
+  width: 100%;
+  margin-top: 14px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 2px solid #d41111;
+  background: #d41111;
+  color: #ffffff;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s ease-in-out;
+  font-size: 14px;
+}
+
+.btn-principal:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+/* ===================== RESPONSIVO ===================== */
+
+@media (max-width: 900px) {
+  .torneio-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .torneio-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===== LIKE DO TORNEIO (detalhes) ===== */
+
+.torneio-like-box {
+  margin: 10px 0 14px;
+}
+
+.like-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid #444;
+  background: #1f2933;
+  color: #e5e7eb;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.15s ease-in-out;
+}
+
+.like-btn .like-icon {
+  font-size: 16px;
+}
+
+/* estado curtido */
+.like-btn.liked {
+  background: #d41111;
+  border-color: #d41111;
+  color: #fff;
+}
+
+.like-btn.liked .like-icon {
+  transform: scale(1.12);
+}
+

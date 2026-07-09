@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shadow Foxes - Detalhes da Equipe | VersusHub</title>
+
+  <!-- CSS Global -->
+  <link rel="stylesheet" href="/pagina_inicial/css/estilos.css">
+  <link rel="icon" href="/image/logo.png" sizes="32x32"> 
+  <!-- CSS Exclusivo da Página -->
+  <style>
+    body {
+      background: #0b0b0d;
+      color: #fff;
+      font-family: system-ui, sans-serif;
+    }
+
+    .team-page {
+      max-width: 1100px;
+      margin: 13px auto 40px;
+      padding: 0 20px;
+    }
+
+    /* HERO */
+
+    .team-hero {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      background: #141419;
+      padding: 20px;
+      border-radius: 14px;
+      border: 2px solid #282833;
+    }
+
+    .team-hero img {
+      width: 210px;
+      height: 210px;
+      border-radius: 14px;
+      object-fit: cover;
+      border: 2px solid #d41111;
+    }
+
+    .team-header-line {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .team-info h1 {
+      margin: 0;
+      font-size: 32px;
+      color: #ff2c2c;
+    }
+
+    .btn-join-team {
+      padding: 8px 16px;
+      border-radius: 999px;
+      border: 2px solid #d41111;
+      background: #d41111;
+      color: #fff;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      transition: 0.2s ease-in-out;
+    }
+
+    .btn-join-team:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+    }
+
+    .team-info p {
+      margin: 4px 0;
+      color: #dcdcdc;
+    }
+
+    .tags {
+      margin-top: 8px;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 4px 10px;
+      background: #222230;
+      border-radius: 999px;
+      font-size: 13px;
+      margin-right: 6px;
+      border: 1px solid #353545;
+    }
+
+    /* SEÇÕES GENÉRICAS */
+
+    .section-box {
+      background: #141419;
+      border-radius: 12px;
+      border: 2px solid #2a2a38;
+      padding: 20px;
+      margin-top: 25px;
+    }
+
+    .section-box h2 {
+      color: #ff2c2c;
+      margin-bottom: 12px;
+    }
+
+    /* INTEGRANTES */
+
+    .member-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .member {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      background: #1b1b26;
+      border-radius: 10px;
+      border: 1px solid #32323f;
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .member img {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #d41111;
+    }
+
+    .member span {
+      font-size: 14px;
+    }
+
+    /* GRID DE TORNEIOS */
+
+    .team-tournaments-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 16px;
+      margin-top: 10px;
+    }
+
+    .team-tournament-card {
+      background: #191921;
+      border-radius: 10px;
+      border: 2px solid #2c2c3b;
+      padding: 12px 14px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: 0.2s ease-in-out;
+    }
+
+    .team-tournament-card h3 {
+      font-size: 15px;
+      margin-bottom: 2px;
+      color: #ffffff;
+    }
+
+    .team-tournament-card p {
+      font-size: 13px;
+      color: #c7c7e0;
+      margin: 0;
+    }
+
+    .team-tournament-card .badge {
+      display: inline-block;
+      margin-top: 4px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      background: #1e1b2e;
+      border: 1px solid #3b3b77;
+      color: #d4d4ff;
+    }
+
+    .team-tournament-card:hover {
+      transform: translateY(-3px);
+      border-color: #d41111;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.7);
+    }
+
+    @media (max-width: 768px) {
+      .team-hero {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .team-hero img {
+        width: 180px;
+        height: 180px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <nav class="navbar">
+      <div class="header-left">
+        <button id="menuToggle" class="menu-button">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="menu-svg"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+
+        <div class="logo_header">
+          <a href="/pagina_inicial/index.html">
+            <img referrerpolicy="no-referrer" src="/image/logo%20plus%20tipo%20textura.png" alt="VersusHub">
+          </a>
+        </div>
+      </div>
+
+      <div class="botoes_header">
+        <a href="/aovivo/aovivo.html"><button id="aovivo_header">Ao Vivo</button></a>
+        <a href="/criar_torneio/criar_torneio.html"><button id="criar_header">Criar Torneio</button></a>
+        <a href="/equipes/equipes.html"><button id="equipes_header">Equipes</button></a>
+      </div>
+
+      <div class="header-right">
+        <form class="search-header" onsubmit="return false">
+          <input type="text" placeholder="Buscar torneios, equipes..." id="searchInput">
+          <button type="submit" id="searchBtn" aria-label="Buscar"><i class="fa-solid fa-magnifying-glass"></i></button>
+        </form>
+
+        <a href="/login/login.html" id="btentrar">Entrar</a>
+        <a href="/cadastro/cadastro.html" id="btcadastrar">Cadastrar-se</a>
+
+        <div class="user-icon">
+          <img referrerpolicy="no-referrer" src="/image/boneco_logo_ofc.png" alt="Usuário" id="userBtn">
+          <ul id="menuUser" class="hidden"></ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar" class="sidebar">
+    <h2 class="sidebar-title"></h2>
+    <nav class="sidebar-nav">
+      <a href="/pagina_inicial/index.html"><i class="fa-solid fa-house" style="margin-right: 10px; width: 16px; text-align: center;"></i>Início</a>
+      <a href="/pagina_inicial/torneios.html"><i class="fa-solid fa-trophy" style="margin-right: 10px; width: 16px; text-align: center;"></i>Todos os torneios</a>
+      <a href="/criar_torneio/criar_torneio.html"><i class="fa-solid fa-award" style="margin-right: 10px; width: 16px; text-align: center;"></i>Criar Torneio</a>
+      <a href="/equipes/equipes.html"><i class="fa-solid fa-users" style="margin-right: 10px; width: 16px; text-align: center;"></i>Equipes</a>
+      <a href="/gerenciartorneios/gerentornindex.html"><i class="fa-solid fa-file-invoice" style="margin-right: 10px; width: 16px; text-align: center;"></i>Gerenciar torneios</a>
+      <a href="/termos/termos.html"><i class="fa-solid fa-briefcase" style="margin-right: 10px; width: 16px; text-align: center;"></i>Termos de Uso</a>
+      <a href="/feedback/feedback.html"><i class="fa-solid fa-star" style="margin-right: 10px; width: 16px; text-align: center;"></i>Enviar feedback / Sugestão</a>
+    </nav>
+  </aside>
+
+  <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+  <!-- CONTEÚDO -->
+  <main class="team-page">
+
+    <!-- HERO -->
+    <section class="team-hero">
+      <img referrerpolicy="no-referrer" src="/equipes/image/shadowfoxes.png" alt="Shadow Foxes">
+
+      <div class="team-info">
+        <div class="team-header-line">
+          <h1>Shadow Foxes</h1>
+          <button class="btn-join-team" type="button">
+            Pedir para entrar
+          </button>
+        </div>
+        <p><strong>Líder:</strong> Kael_Fox</p>
+        <p><strong>Integrantes:</strong> 3 / 5</p>
+        <p><strong>Jogo principal:</strong> Valorant</p>
+        <p><strong>Plataforma:</strong> PC</p>
+        <p><strong>Região:</strong> Brasil</p>
+
+        <div class="tags">
+          <span class="tag">Competitivo</span>
+          <span class="tag">Valorant</span>
+          <span class="tag">Recrutando</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- SOBRE A EQUIPE -->
+    <section class="section-box">
+      <h2>Sobre a equipe</h2>
+      <p>
+        Os <strong>Shadow Foxes</strong> são conhecidos pela furtividade, precisão cirúrgica e reviravoltas impressionantes em Valorant. Com um estilo de jogo flexível, nossa missão é dominar campeonatos online e buscar o topo da comunidade nacional.
+      </p>
+    </section>
+
+    <!-- INTEGRANTES -->
+    <section class="section-box">
+      <h2>Integrantes</h2>
+
+      <div class="member-list">
+        <div class="member">
+          <img referrerpolicy="no-referrer" src="/images/pngtree-avatar-icon-profile-icon-member-login-vector-isolated-png-image_1978396.jpg" alt="Kael">
+          <span>Kael_Fox <strong>(Líder)</strong></span>
+        </div>
+
+        <div class="member">
+          <img referrerpolicy="no-referrer" src="/images/pngtree-avatar-icon-profile-icon-member-login-vector-isolated-png-image_1978396.jpg" alt="Luna">
+          <span><strong>LunaFox_</strong></span>
+        </div>
+
+        <div class="member">
+          <img referrerpolicy="no-referrer" src="/images/pngtree-avatar-icon-profile-icon-member-login-vector-isolated-png-image_1978396.jpg" alt="Swift">
+          <span><strong>SwiftShadow</strong></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- TORNEIOS CONQUISTADOS -->
+    <section class="section-box">
+      <h2>Torneios conquistados</h2>
+
+      <div class="team-tournaments-grid">
+        <div class="team-tournament-card">
+          <img referrerpolicy="no-referrer" class="imagesversustorn" src="/images/cerradocup.jpg" alt="">
+          <h3>Cerrado Cup Valorant</h3>
+          <p><strong>Posição:</strong> 1º lugar</p>
+          <p><strong>Ano:</strong> 2025</p>
+          <p><strong>Formato:</strong> MD3 • Playoffs</p>
+          <span class="badge">Campeão</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- TORNEIOS PARTICIPANDO -->
+    <section class="section-box">
+      <h2>Torneios em que está participando</h2>
+
+      <div class="team-tournaments-grid">
+        <div class="team-tournament-card">
+          <img referrerpolicy="no-referrer" class="imagesversustorn" src="/images/fifa_torneiofile1.jpg" alt="">
+          <h3>Ranked Clash Series</h3>
+          <p><strong>Status:</strong> Fase de grupos</p>
+          <p><strong>Times:</strong> 32 equipes</p>
+          <p><strong>Plataforma:</strong> Online</p>
+          <span class="badge">Liga semanal</span>
+        </div>
+      </div>
+    </section>
+
+    <style>
+      .imagesversustorn {
+        object-fit: cover;
+        width: 100%;
+        height: 140px;
+      }
+    </style>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div id="footer_content">
+      <div id="footer_logo">
+        <img referrerpolicy="no-referrer" src="/image/logo.png" alt="VersusHub" id="logofooter">
+      </div>
+
+      <div id="footer_sobrenos">
+        <h1>Sobre Nós</h1>
+        <p>O VersusHub conecta jogadores, equipes e organizadores em um ambiente competitivo completo.</p>
+      </div>
+
+      <div id="footer_versushub">
+        <h1>Versus Hub</h1>
+        <p><br>Torneios | Equipes | Rankings <br> Suporte ativo todos os dias</p>
+      </div>
+
+      <div id="footer_politicas">
+        <h1>Políticas</h1>
+        <li>Termos de uso</li>
+        <li>Política de Privacidade</li>
+        <li>Política de Reembolso (para eventos pagos)</li>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/pagina_inicial/js/scrip.js"></script>
+</body>
+</html>

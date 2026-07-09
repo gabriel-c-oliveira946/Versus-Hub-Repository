@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <!-- estilos globais -->
+  <link rel="stylesheet" href="/pagina_inicial/css/estilos.css" />
+  <!-- estilos específicos desta página -->
+  <link rel="stylesheet" href="/cria_equipe/css/criar_equipe.css" />
+  <title>Criar Equipe - VersusHub</title>
+</head>
+<body>
+
+  <!-- ========= HEADER ========= -->
+  <header>
+    <nav class="navbar">
+
+      <div class="header-left">
+        <button id="menuToggle" class="menu-button">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="menu-svg"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+
+        <div class="logo_header">
+          <a href="/pagina_inicial/index.html">
+            <img referrerpolicy="no-referrer" src="/image/logo%20plus%20tipo%20textura.png" alt="VersusHub">
+          </a>
+        </div>
+      </div>
+
+      <div class="botoes_header">
+        <a href="/aovivo/aovivo.html"><button id="aovivo_header">Ao Vivo</button></a>
+        <a href="/criar_torneio/criar_torneio.html"><button id="criar_header">Criar Torneio</button></a>
+        <a href="/equipes/equipes.html"><button id="equipes_header">Equipes</button></a>
+      </div>
+
+      <div class="header-right">
+        <form class="search-header" action="#" onsubmit="return false">
+          <input type="text" placeholder="Buscar torneios, jogos..." id="searchInput">
+          <button type="submit" id="searchBtn" aria-label="Buscar"><i class="fa-solid fa-magnifying-glass"></i></button>
+        </form>
+
+        <a href="/login/login.html" id="btentrar">Entrar</a>
+        <a href="/cadastro/cadastro.html" id="btcadastrar">Cadastrar-se</a>
+
+        <div class="user-icon">
+          <img referrerpolicy="no-referrer" src="/image/boneco_logo_ofc.png" alt="Usuário" id="userBtn">
+          <ul id="menuUser" class="hidden"></ul>
+        </div>
+      </div>
+
+    </nav>
+  </header>
+  <!-- ========= FIM HEADER ========= -->
+
+<!-- SIDEBAR -->
+<aside id="sidebar" class="sidebar">
+  <h2 class="sidebar-title"></h2>
+  <nav class="sidebar-nav">
+    <a href="/pagina_inicial/index.html"><i class="fa-solid fa-house" style="margin-right: 10px; width: 16px; text-align: center;"></i>Início</a>
+    <a href="/pagina_inicial/torneios.html"><i class="fa-solid fa-trophy" style="margin-right: 10px; width: 16px; text-align: center;"></i>Todos os torneios</a>
+    <a href="/criar_torneio/criar_torneio.html"><i class="fa-solid fa-award" style="margin-right: 10px; width: 16px; text-align: center;"></i>Criar Torneio</a>
+    <a href="/equipes/equipes.html"><i class="fa-solid fa-users" style="margin-right: 10px; width: 16px; text-align: center;"></i>Equipes</a>
+    <a href="/gerenciartorneios/gerentornindex.html"><i class="fa-solid fa-file-invoice" style="margin-right: 10px; width: 16px; text-align: center;"></i>Gerenciar torneios</a>
+    <a href="/termos/termos.html"><i class="fa-solid fa-briefcase" style="margin-right: 10px; width: 16px; text-align: center;"></i>Termos de Uso</a>
+    <a href="/feedback/feedback.html"><i class="fa-solid fa-star" style="margin-right: 10px; width: 16px; text-align: center;"></i>Enviar feedback / Sugestão</a>
+  </nav>
+</aside>
+
+  <!-- efeito da tela ficar escura no fundo -->
+
+<div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+<!-- FIM SIDEBAR -->
+
+  <!-- ========= CONTEÚDO: FORMULÁRIO DE CRIAÇÃO ========= -->
+  <main class="criar-equipe-page">
+
+    <section class="criar-header">
+      <h1>Criar nova equipe</h1>
+      <p>Preencha os dados abaixo. A sua equipe aparecerá na parte de <strong>Equipes</strong> do seu perfil.</p>
+    </section>
+
+    <section class="equipe-form-card">
+      <form id="formCriarEquipe">
+
+        <!-- LOGO + preview -->
+        <div class="form-block full-row">
+          <label for="logoInput">Logo da equipe</label>
+          <p class="hint">Recomendado: imagem quadrada ou 1:1.</p>
+          <input type="file" id="logoInput" accept="image/*">
+          <div class="logo-preview" id="logoPreview">
+            <span>Nenhuma imagem selecionada</span>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-block">
+            <label for="nomeEquipe">Nome da equipe</label>
+            <input
+              type="text"
+              id="nomeEquipe"
+              placeholder="Ex: NÃO_CHORAX TEAM"
+              required
+            >
+          </div>
+
+          <div class="form-block">
+  <label for="tagEquipe">Tags da equipe</label>
+  <input
+    type="text"
+    id="tagEquipe"
+    placeholder="Ex: Competitivo, FPS, Amistoso... (separe por vírgula)"
+  >
+</div>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-block">
+  <label for="jogosEquipe">Jogos principais</label>
+  <input
+    list="listaJogosEquipe"
+    type="text"
+    id="jogosEquipe"
+    placeholder="Ex: Valorant, CS2, Free Fire..."
+  >
+  <!-- Sugestões de jogos -->
+  <datalist id="listaJogosEquipe">
+    <option value="League of Legends">
+    <option value="Valorant">
+    <option value="CS2">
+    <option value="CS:GO">
+    <option value="Free Fire">
+    <option value="FIFA / EA FC">
+    <option value="Fortnite">
+    <option value="COD Mobile">
+    <option value="PUBG Mobile">
+    <option value="Rocket League">
+  </datalist>
+</div>
+
+          <div class="form-block">
+            <label for="plataformaEquipe">Plataformas</label>
+            <select id="plataformaEquipe">
+              <option value="">Selecione...</option>
+              <option value="pc">PC</option>
+              <option value="console">Console</option>
+              <option value="mobile">Mobile</option>
+              <option value="multi">Multi-plataforma</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-block">
+  <label for="regiaoEquipe">Região</label>
+  <input
+    list="listaRegioesEquipe"
+    type="text"
+    id="regiaoEquipe"
+    placeholder="Ex: Brasil - Nordeste"
+  >
+  <!-- Sugestões de região -->
+  <datalist id="listaRegioesEquipe">
+    <option value="Brasil">
+    <option value="Brasil - Norte">
+    <option value="Brasil - Nordeste">
+    <option value="Brasil - Centro-Oeste">
+    <option value="Brasil - Sudeste">
+    <option value="Brasil - Sul">
+    <option value="América do Sul">
+    <option value="Global">
+  </datalist>
+</div>
+
+
+          <div class="form-block">
+            <label for="limiteMembros">Limite de integrantes</label>
+            <input
+              type="number"
+              id="limiteMembros"
+              min="1"
+              max="50"
+              placeholder="Ex: 5, 10..."
+            >
+          </div>
+        </div>
+
+        <!-- SOBRE A EQUIPE -->
+        <div class="form-block full-row">
+          <label for="sobreEquipe">Sobre a equipe</label>
+          <textarea
+            id="sobreEquipe"
+            rows="4"
+            placeholder="Fale sobre a sua equipe, objetivos, estilo de jogo..."
+          ></textarea>
+        </div>
+
+        <div class="actions-row">
+          <button type="submit" class="btn-principal-criar-equipe">
+            <i class="fa-solid fa-users-gear" style="margin-right: 8px;"></i>Criar Equipe
+          </button>
+          <span class="feedback-msg" id="feedbackMsgEquipe"></span>
+        </div>
+
+      </form>
+    </section>
+
+  </main>
+
+  <!-- ========= FOOTER ========= -->
+  <footer>
+    <div id="footer_content">
+      <div id="footer_logo">
+        <img referrerpolicy="no-referrer" src="/image/logo.png" alt="" id="logofooter">
+      </div>
+
+      <div id="footer_sobrenos">
+        <h1>Sobre Nós</h1>
+        <br>
+        <p>O Versus Hub é uma plataforma criada para conectar jogadores, organizadores e fãs de e-sports em um só lugar. Oferecemos torneios competitivos, rankings dinâmicos e recompensas exclusivas.</p>
+      </div>
+
+      <div id="footer_versushub">
+        <h1>Versus Hub</h1>
+        <br>
+        <p>
+          Torneios e Rankings atualizados <br><br>
+          Sistema seguro e fácil de participar <br><br>
+          Suporte ativo todos os dias
+        </p>
+      </div>
+
+      <div id="footer_politicas">
+        <h1>Políticas</h1><br>
+        <li>Termos de uso</li><br>
+        <li>Política de Privacidade</li><br>
+        <li>Política de Reembolso (para eventos pagos)</li><br>
+       </div>
+    </div>
+  </footer>
+  <!-- ========= FIM FOOTER ========= -->
+
+  <!-- JS global + JS desta página -->
+  <script src="/pagina_inicial/js/scrip.js"></script>
+  <script src="/cria_equipe/js/criar_equipe.js"></script>
+</body>
+</html>

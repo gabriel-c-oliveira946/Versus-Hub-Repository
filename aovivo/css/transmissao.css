@@ -1,0 +1,274 @@
+/* ===== BODY ESPECÍFICO DESSA PÁGINA ===== */
+.transmissao-body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: #050407; /* mesmo fundo das outras páginas */
+}
+
+/* MAIN ocupa o espaço entre header e footer */
+.live-page {
+  max-width: 1200px;
+  margin: 30px auto 40px;   /* era 110px, reduzi pra 80 */
+  padding: 0 16px 40px;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  flex: 1;
+}
+
+
+/* ===== HERO (banner + infos principais) ===== */
+.live-hero {
+
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: stretch;
+  margin-bottom: 26px;
+}
+
+.live-hero-banner {
+    
+   border-radius: 18px;
+  overflow: hidden;
+  border: 3px solid #2c2c3b;
+  position: relative;
+  background: #111116;
+}
+
+.live-hero-banner img {
+  width: 750px;
+  height: 311px;
+  object-fit: fill;
+  display: block;
+}
+
+.live-hero-status {
+  position: absolute;
+  left: 14px;
+  top: 14px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fef2f2;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.live-hero-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 8px #22c55e;
+}
+
+.live-hero-info {
+  flex: 1 1 260px;
+  padding: 10px 4px;
+  color: #f5f5f5;
+}
+
+.live-hero-info h1 {
+  font-size: 26px;
+  margin-bottom: 6px;
+}
+
+.live-meta {
+  font-size: 14px;
+  color: #b1b1cf;
+  margin-bottom: 4px;
+}
+
+.live-start {
+  font-size: 14px;
+  color: #e5e7eb;
+  margin-bottom: 10px;
+}
+
+.live-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.live-tags span {
+  font-size: 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #1f2933;
+  color: #e5e7eb;
+}
+
+/* ===== LAYOUT 2 COLUNAS ===== */
+.live-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 20px;
+}
+
+@media (max-width: 900px) {
+  .live-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===== CARDS GENÉRICOS ===== */
+.live-card {
+  background: #111116;
+  border-radius: 18px;
+  padding: 18px 20px 20px;
+  border: 2px solid #2c2c3b;
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.7);
+  color: #f5f5f5;
+}
+
+.info-card h2 {
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+
+.info-card p,
+.info-card ul {
+  font-size: 14px;
+  color: #e5e7eb;
+}
+
+.info-card ul {
+  margin-left: 18px;
+  margin-top: 4px;
+}
+
+.info-card li {
+  margin-bottom: 4px;
+}
+
+/* ===== COLUNA DIREITA – TRANSMISSÃO ===== */
+.live-col-side .live-card {
+  position: sticky;
+  top: 100px; /* fica “grudado” enquanto a pessoa rola, se a tela for alta */
+}
+
+/* Cabeçalho da transmissão */
+.live-header {
+  margin-bottom: 12px;
+}
+
+.live-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #b91c1c;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+}
+
+.live-header h2 {
+  font-size: 18px;
+  margin-bottom: 4px;
+}
+
+.live-subtitle {
+  font-size: 13px;
+  color: #b1b1cf;
+  margin-bottom: 20px;
+}
+
+/* Infos da transmissão (dentro da coluna direita) */
+.live-info {
+  margin-top: 8px;
+  margin-bottom: 16px;
+  border-radius: 12px;
+  background: #181820;
+  padding: 12px 14px;
+}
+
+.live-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+
+.live-label {
+  color: #9ca3af;
+  min-width: 90px;
+}
+
+.live-value {
+  color: #f9fafb;
+}
+
+.live-platform {
+  font-weight: 700;
+  color: #22c55e;
+}
+
+/* Botões */
+.live-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.btn-live {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 18px;
+  border-radius: 999px;
+  border: 2px solid #d41111;
+  background: #d41111;
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: 0.2s ease-in-out;
+}
+
+.btn-live:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.btn-voltar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid #4b5563;
+  background: transparent;
+  color: #e5e7eb;
+  font-size: 13px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: 0.2s ease-in-out;
+}
+
+.btn-voltar:hover {
+  background: #1f2933;
+}
+
+/* Observação */
+.live-note {
+    margin-bottom: 30px;
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+/* ===== AJUSTE DE FOOTER NESTA PÁGINA ===== */
+/* Aqui a gente sobrescreve o footer grandão do estilos.css só pra essa página */
+footer {
+  height: auto;
+  margin-top: 0;
+}

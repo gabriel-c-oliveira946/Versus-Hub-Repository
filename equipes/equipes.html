@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Equipes - VersusHub</title>
+
+  <!-- estilos globais -->
+  <link rel="stylesheet" href="/pagina_inicial/css/estilos.css">
+    <link rel="stylesheet" href="/pagina_inicial/css/torneios.css"> 
+      <link rel="icon" href="/image/logo.png" sizes="32x32"> 
+  <!-- estilos específicos -->
+  <link rel="stylesheet" href="/equipes/css/equipes.css">
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <nav class="navbar">
+
+    <!-- ESQUERDA: menu + logo -->
+    <div class="header-left">
+
+      <!-- Botão do menu lateral (hambúrguer) -->
+      <button id="menuToggle" class="menu-button">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="menu-svg"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+
+      <!-- LOGO -->
+      <div class="logo_header">
+        <a href="/pagina_inicial/index.html">
+          <img referrerpolicy="no-referrer" src="/image/logo%20plus%20tipo%20textura.png" alt="VersusHub">
+        </a>
+      </div>
+
+    </div>
+
+    <!-- CENTRO: botões principais -->
+    <div class="botoes_header">
+     <a href="/aovivo/aovivo.html"> <button id="aovivo_header">Ao Vivo</button></a>
+     <a href="/criar_torneio/criar_torneio.html"> <button id="criar_header">Criar Torneio</button> <a href="/equipes/equipes.html"> <button id="equipes_header">Equipes</button> </a>
+    </div>
+
+    <!-- DIREITA: pesquisa + entrar + cadastrar + usuário -->
+    <div class="header-right">
+
+      <!-- BARRA DE PESQUISA NO HEADER -->
+      <form class="search-header" action="#" onsubmit="return false">
+        <input
+          type="text"
+          placeholder="Buscar torneios, jogos..."
+          id="searchInput"
+        >
+        <button type="submit" id="searchBtn" aria-label="Buscar"><i class="fa-solid fa-magnifying-glass"></i></button>
+      </form>
+
+      <!-- BOTÕES À DIREITA -->
+      <a href="/login/login.html" id="btentrar">Entrar</a>
+      <a href="/cadastro/cadastro.html" id="btcadastrar">Cadastrar-se</a>
+
+      <!-- ÍCONE DO USUÁRIO -->
+      <div class="user-icon">
+        <img referrerpolicy="no-referrer" src="/image/boneco_logo_ofc.png" alt="Usuário" id="userBtn">
+
+        <ul id="menuUser" class="hidden">
+          <li>
+            <a href="/login/login.html">
+              Login
+            </a>
+          </li>
+          <hr>
+          <li><a href="/cadastro/cadastro.html">Cadastro</a></li>
+        </ul>
+      </div>
+
+    </div>
+
+  </nav>
+</header>
+<!-- FIM HEADER -->
+
+<!-- SIDEBAR -->
+<aside id="sidebar" class="sidebar">
+  <h2 class="sidebar-title"></h2>
+  <nav class="sidebar-nav">
+    <a href="/pagina_inicial/index.html"><i class="fa-solid fa-house" style="margin-right: 10px; width: 16px; text-align: center;"></i>Início</a>
+    <a href="/pagina_inicial/torneios.html"><i class="fa-solid fa-trophy" style="margin-right: 10px; width: 16px; text-align: center;"></i>Todos os torneios</a>
+    <a href="/criar_torneio/criar_torneio.html"><i class="fa-solid fa-award" style="margin-right: 10px; width: 16px; text-align: center;"></i>Criar Torneio</a>
+    <a href="/equipes/equipes.html"><i class="fa-solid fa-users" style="margin-right: 10px; width: 16px; text-align: center;"></i>Equipes</a>
+    <a href="/ranking.html">📊 Ranking Global</a>
+    <a href="/gerenciartorneios/gerentornindex.html"><i class="fa-solid fa-file-invoice" style="margin-right: 10px; width: 16px; text-align: center;"></i>Gerenciar torneios</a>
+    <a href="/termos/termos.html"><i class="fa-solid fa-briefcase" style="margin-right: 10px; width: 16px; text-align: center;"></i>Termos de Uso</a>
+    <a href="/feedback/feedback.html"><i class="fa-solid fa-star" style="margin-right: 10px; width: 16px; text-align: center;"></i>Enviar feedback / Sugestão</a>
+  </nav>
+</aside>
+
+  <!-- efeito da tela ficar escura no fundo -->
+
+<div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+<!-- FIM SIDEBAR -->
+
+
+<!-- CONTEÚDO -->
+ 
+<main class="equipes-page">
+
+  <!-- FILTROS DE EQUIPES (igual ao de torneios, adaptado) -->
+    <a href="/cria_equipe/criar_equipe.html"> <button class="btn-criar">
+        <i class="fa-solid fa-plus" style="margin-right: 8px;"></i>Criar equipe
+      </button> </a>
+  <section class="filtros-torneios">
+    <div class="top-bar-equipes">
+      <h1>Equipes</h1>
+    
+    </div>
+
+    <div class="linha-filtros">
+      <!-- Buscar -->
+      <div class="campo-filtro">
+        <label for="filtroBuscaEquipe">Buscar</label>
+        <input
+          type="text"
+          id="filtroBuscaEquipe"
+          placeholder="Nome da equipe, jogo..."
+        >
+      </div>
+
+      <!-- Jogo -->
+      <div class="campo-filtro">
+        <label for="filtroJogoEquipe">Jogo principal</label>
+        <select id="filtroJogoEquipe">
+          <option value="todos">Todos</option>
+          <option value="valorant">Valorant</option>
+          <option value="cs2">CS2</option>
+          <option value="freefire">Free Fire</option>
+          <option value="fortnite">Fortnite</option>
+        </select>
+      </div>
+
+      <!-- Plataforma -->
+      <div class="campo-filtro">
+        <label for="filtroPlataformaEquipe">Plataforma</label>
+        <select id="filtroPlataformaEquipe">
+          <option value="todas">Todas</option>
+          <option value="pc">PC</option>
+          <option value="console">Console</option>
+          <option value="mobile">Mobile</option>
+        </select>
+      </div>
+
+      <!-- Status da equipe -->
+      <div class="campo-filtro">
+        <label for="filtroStatusEquipe">Status</label>
+        <select id="filtroStatusEquipe">
+          <option value="todos">Todos</option>
+          <option value="recrutando">Recrutando</option>
+          <option value="completa">Equipe completa</option>
+        </select>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- LISTA DE EQUIPES -->
+  <section class="lista-equipes" id="listaEquipes">
+
+    <!-- VILTRUMITAS -->
+    <article class="card-equipe"
+      data-nome="viltrumitas"
+      data-jogo="valorant"
+      data-plataforma="pc"
+      data-status="recrutando">
+      
+      <img referrerpolicy="no-referrer" src="/equipes/image/Viltrumitas.jpg" alt="Viltrumitas">
+      <div class="card-info">
+        <h2>Viltrumitas</h2>
+        <p>Jogadores: 5 / 6</p>
+        <p>Jogo principal: Valorant</p>
+        <p>Status: Recrutando</p>
+       <a href="/equipes/detalhes-viltrumitas.html"> <button class="btn-detalhes">
+          Ver detalhes
+        </button> </a>
+      </div>
+    </article>
+
+    <!-- THE CARAS -->
+    <article class="card-equipe"
+      data-nome="the caras"
+      data-jogo="cs2"
+      data-plataforma="pc"
+      data-status="completa">
+      
+      <img referrerpolicy="no-referrer" src="/equipes/image/the%20caras.png" alt="The Caras">
+      <div class="card-info">
+        <h2>The Caras</h2>
+        <p>Jogadores: 4 / 4</p>
+        <p>Jogo principal: CS2</p>
+        <p>Status: Equipe completa</p>
+       <a href="/equipes/detalhes-thecaras.html"> <button class="btn-detalhes"">
+          Ver detalhes
+        </button></a>
+      </div>
+    </article>
+
+    <!-- THE JACKSONS -->
+    <article class="card-equipe"
+      data-nome="the jacksons"
+      data-jogo="freefire"
+      data-plataforma="mobile"
+      data-status="recrutando">
+      
+      <img referrerpolicy="no-referrer" src="/equipes/image/jacksons.png" alt="The Jacksons">
+      <div class="card-info">
+        <h2>The Jacksons</h2>
+        <p>Jogadores: 7 / 10</p>
+        <p>Jogo principal: Free Fire</p>
+        <p>Status: Recrutando</p>
+       <a href="/equipes/detalhes-thejacksons.html"> <button class="btn-detalhes">
+          Ver detalhes
+        </button> </a>
+      </div>
+    </article>
+
+    <!-- OS VAGALUMES -->
+    <article class="card-equipe"
+      data-nome="os vagalumes"
+      data-jogo="fortnite"
+      data-plataforma="console"
+      data-status="completa">
+      
+      <img referrerpolicy="no-referrer" src="/equipes/image/vagalumes.png" alt="Os Vagalumes">
+      <div class="card-info">
+        <h2>Os Vagalumes</h2>
+        <p>Jogadores: 5 / 5</p>
+        <p>Jogo principal: Fortnite</p>
+        <p>Status: Equipe completa</p>
+       <a href="/equipes/detalhes-vagalumes.html"> <button class="btn-detalhes" onclick="location.href='/equipes/osvagalumes.html'">
+          Ver detalhes
+        </button> </a>
+      </div>
+    </article>
+
+<!-- SHADOW FOXES -->
+<article class="card-equipe"
+  data-nome="shadow foxes"
+  data-jogo="valorant"
+  data-plataforma="pc"
+  data-status="recrutando">
+
+  <img referrerpolicy="no-referrer" src="/equipes/image/shadowfoxes.png" alt="Shadow Foxes">
+  <div class="card-info">
+    <h2>Shadow Foxes</h2>
+    <p>Jogadores: 3 / 5</p>
+    <p>Jogo principal: Valorant</p>
+    <p>Status: Recrutando</p>
+    <a href="/equipes/detalhes-shadowfoxes.html"> <button class="btn-detalhes">Ver detalhes</button> </a>
+  </div>
+</article>
+
+<!-- DARK WOLVES -->
+<article class="card-equipe"
+  data-nome="dark wolves"
+  data-jogo="cs2"
+  data-plataforma="pc"
+  data-status="completa">
+
+  <img referrerpolicy="no-referrer" src="/equipes/image/dark%20wolves.png" alt="Dark Wolves">
+  <div class="card-info">
+    <h2>Dark Wolves</h2>
+    <p>Jogadores: 5 / 5</p>
+    <p>Jogo principal: CS2</p>
+    <p>Status: Equipe completa</p>
+    <a href="/equipes/detalhes-darkwolves.html"> <button class="btn-detalhes">Ver detalhes</button> </a>
+  </div>
+</article>
+
+<!-- ROYAL DRAGONS -->
+<article class="card-equipe"
+  data-nome="royal dragons"
+  data-jogo="freefire"
+  data-plataforma="mobile"
+  data-status="recrutando">
+
+  <img referrerpolicy="no-referrer" src="/equipes/image/royaldragon.png" alt="Royal Dragons">
+  <div class="card-info">
+    <h2>Royal Dragons</h2>
+    <p>Jogadores: 8 / 12</p>
+    <p>Jogo principal: Cod Mobile, Free Fire</p>
+    <p>Status: Recrutando</p>
+    <a href="/equipes/detalhes-royaldragons.html"> <button class="btn-detalhes">Ver detalhes</button> </a>
+  </div>
+</article>
+
+<!-- SKY TITANS -->
+<article class="card-equipe"
+  data-nome="sky titans"
+  data-jogo="fortnite"
+  data-plataforma="console"
+  data-status="recrutando">
+
+  <img referrerpolicy="no-referrer" src="/equipes/image/skytitans.png" alt="Sky Titans">
+  <div class="card-info">
+    <h2>Sky Titans</h2>
+    <p>Jogadores: 4 / 8</p>
+    <p>Jogo principal: Fortnite</p>
+    <p>Status: Recrutando</p>
+    <a href="/equipes/detalhes-skytitans.html"> <button class="btn-detalhes">Ver detalhes</button> </a>
+  </div>
+</article>
+
+<!-- RED VIPERS -->
+<article class="card-equipe"
+  data-nome="red vipers"
+  data-jogo="valorant"
+  data-plataforma="pc"
+  data-status="completa">
+
+  <img referrerpolicy="no-referrer" src="/equipes/image/redvipers.png" alt="Red Vipers">
+  <div class="card-info">
+    <h2>Red Vipers</h2>
+    <p>Jogadores: 5 / 5</p>
+    <p>Jogo principal: Valorant</p>
+    <p>Status: Completa</p>
+    <a href="/equipes/detalhes-redvipers.html"> <button class="btn-detalhes">Ver detalhes</button> </a>
+  </div>
+</article>
+
+<!-- STORM RIDERS -->
+<article class="card-equipe"
+  data-nome="storm riders"
+  data-jogo="cs2"
+  data-plataforma="pc"
+  data-status="recrutando">
+
+  <img referrerpolicy="no-referrer" src="/equipes/image/stormriders.png" alt="Storm Riders">
+  <div class="card-info">
+    <h2>Storm Riders</h2>
+    <p>Jogadores: 2 / 5</p>
+    <p>Jogo principal: CS2</p>
+    <p>Status: Recrutando</p>
+    <a href="/equipes/detalhes-stormriders.html"> <button class="btn-detalhes">Ver detalhes</button> </a>
+  </div>
+</article>
+
+
+
+  </section>
+
+</main>
+
+
+<!-- PARTE DE BAIXO DO SITE< CHAMADA DE FOOTER -->
+
+    <footer>
+
+      <div id="footer_content">
+        <div id="footer_logo">
+          <img referrerpolicy="no-referrer" src="/image/logo.png" alt="" id="logofooter">
+
+        </div>
+      
+      <div id="footer_sobrenos">
+
+         <h1>Sobre Nós</h1>
+        <br>
+         <p>O Versus Hub é uma plataforma criada para conectar jogadores, organizadores e fãs de e-sports em um só lugar. Oferecemos torneios competitivos, rankings dinâmicos e recompensas exclusivas para quem ama competir. Nosso objetivo é tornar a experiência gamer mais acessível, divertida e profissional — seja você um iniciante ou um pro player.</p>
+
+      </div>
+
+      <div id="footer_versushub">
+
+         <h1>Versus Hub</h1>
+        <br>
+          <p>
+              Torneios e Rankings atualizados 
+              <br><br> 
+              Sistema seguro e fácil de participar 
+              <br><br>
+              Suporte ativo todos os dias
+          </p>
+
+
+      </div>
+      
+      <div id="footer_politicas">
+
+          <h1>Políticas</h1><br>
+          <li>
+              Termos de uso  </li><br>
+<li>
+  Política de Privacidade  </li><br>
+   <li>
+  Política de Reembolso (para eventos pagos) </li>
+
+ </div>
+    </div>
+
+  </div>
+
+    </footer>
+
+<script src="/pagina_inicial/js/scrip.js"></script>
+<script src="/equipes/js/equipes.js"></script>
+
+</body>
+</html>

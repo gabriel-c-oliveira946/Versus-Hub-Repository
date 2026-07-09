@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- estilos globais do site -->
+  <link rel="stylesheet" href="/pagina_inicial/css/estilos.css" />
+  <link rel="icon" href="/image/logo.png" sizes="32x32"> 
+  <!-- estilos específicos da página Ao Vivo -->
+  <link rel="stylesheet" href="/aovivo/css/aovivo.css" />
+  <title>Torneios Ao Vivo - VersusHub</title>
+</head>
+<body>
+
+  <!-- ===== HEADER GLOBAL (MESMO DE SEMPRE) ===== -->
+  <header>
+    <nav class="navbar">
+
+      <!-- ESQUERDA: menu + logo -->
+      <div class="header-left">
+        <button id="menuToggle" class="menu-button">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="menu-svg"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+
+        <div class="logo_header">
+          <a href="/pagina_inicial/index.html">
+            <img referrerpolicy="no-referrer" src="/image/logo%20plus%20tipo%20textura.png" alt="VersusHub">
+          </a>
+        </div>
+      </div>
+
+      <!-- CENTRO: botões principais -->
+      <div class="botoes_header">
+        <!-- se quiser, depois podemos deixar esse botão com estilo "ativo" -->
+        <button id="aovivo_header">Ao Vivo</button>
+        <a href="/criar_torneio/criar_torneio.html"> <button id="criar_header">Criar Torneio</button>
+      </a>
+        <a href="/equipes/equipes.html"> <button id="equipes_header">Equipes</button> </a>
+      </div>
+
+      <!-- DIREITA -->
+      <div class="header-right">
+
+        <!-- busca -->
+        <form class="search-header" action="#" onsubmit="return false">
+          <input
+            type="text"
+            placeholder="Buscar torneios, jogos..."
+            id="searchInput"
+          >
+          <button type="submit" id="searchBtn" aria-label="Buscar"><i class="fa-solid fa-magnifying-glass"></i></button>
+        </form>
+
+        <!-- entrar / cadastrar -->
+        <a href="/login/login.html" id="btentrar">Entrar</a>
+        <a href="/cadastro/cadastro.html" id="btcadastrar">Cadastrar-se</a>
+
+        <!-- usuário -->
+        <div class="user-icon">
+          <img referrerpolicy="no-referrer" src="/image/boneco_logo_ofc.png" alt="Usuário" id="userBtn">
+
+          <ul id="menuUser" class="hidden">
+            <!-- conteúdo é montado via JS (login fake) -->
+          </ul>
+        </div>
+      </div>
+
+    </nav>
+  </header>
+  <!-- ===== FIM HEADER ===== -->
+
+<!-- SIDEBAR -->
+<aside id="sidebar" class="sidebar">
+  <h2 class="sidebar-title"></h2>
+  <nav class="sidebar-nav">
+    <a href="/pagina_inicial/index.html"><i class="fa-solid fa-house" style="margin-right: 10px; width: 16px; text-align: center;"></i>Início</a>
+    <a href="/pagina_inicial/torneios.html"><i class="fa-solid fa-trophy" style="margin-right: 10px; width: 16px; text-align: center;"></i>Todos os torneios</a>
+    <a href="/criar_torneio/criar_torneio.html"><i class="fa-solid fa-award" style="margin-right: 10px; width: 16px; text-align: center;"></i>Criar Torneio</a>
+    <a href="/equipes/equipes.html"><i class="fa-solid fa-users" style="margin-right: 10px; width: 16px; text-align: center;"></i>Equipes</a>
+    <a href="/gerenciartorneios/gerentornindex.html"><i class="fa-solid fa-file-invoice" style="margin-right: 10px; width: 16px; text-align: center;"></i>Gerenciar torneios</a>
+    <a href="/termos/termos.html"><i class="fa-solid fa-briefcase" style="margin-right: 10px; width: 16px; text-align: center;"></i>Termos de Uso</a>
+    <a href="/feedback/feedback.html"><i class="fa-solid fa-star" style="margin-right: 10px; width: 16px; text-align: center;"></i>Enviar feedback / Sugestão</a>
+  </nav>
+</aside>
+
+  <!-- efeito da tela ficar escura no fundo -->
+
+<div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+<!-- FIM SIDEBAR -->
+
+  <!-- ===== CONTEÚDO DA PÁGINA AO VIVO ===== -->
+  <main class="pagina-aovivo">
+
+    <section class="topo-aovivo">
+      <h1>Torneios Ao Vivo</h1>
+      <p>Veja os torneios que estão acontecendo agora mesmo.</p>
+    </section>
+
+    <!-- Lista de torneios AO VIVO -->
+    <section class="lista-aovivo">
+
+      <!-- 1 -->
+      <article class="card-torneio ao-vivo"
+        data-nome="Cerrado Cup CS:GO"
+        data-jogo="csgo"
+        data-categoria="fps"
+        data-plataforma="pc"
+        data-status="ao-vivo">
+
+        <div class="badge-ao-vivo">
+          <span class="dot"></span> Ao vivo
+        </div>
+
+        <img referrerpolicy="no-referrer" src="/images/cerradocup.jpg" alt="Cerrado Cup CS:GO">
+
+        <div class="card-info">
+          <h2>Cerrado Cup CS:GO</h2>
+          <p class="jogo">Jogo: CS:GO • FPS • PC</p>
+          <p class="data">Iniciado às 19:00</p>
+          <p class="viewers">👁 3.240 espectadores</p>
+         <a href="/aovivo/cerrado-transmissao.html"> <button class="btn-detalhes btn-assistir">Assistir agora</button></a> 
+        </div>
+      </article>
+
+      <!-- 2 -->
+      <article class="card-torneio ao-vivo"
+        data-nome="Liga FF Brasil - Final"
+        data-jogo="freefire"
+        data-categoria="battle-royale"
+        data-plataforma="mobile"
+        data-status="ao-vivo">
+
+        <div class="badge-ao-vivo">
+          <span class="dot"></span> Ao vivo
+        </div>
+
+        <img referrerpolicy="no-referrer" src="/images/liga-ff-brasil.jpeg" alt="Liga FF Brasil">
+
+        <div class="card-info">
+          <h2>Liga FF Brasil - Final</h2>
+          <p class="jogo">Jogo: Free Fire • Battle Royale • Mobile</p>
+          <p class="data">Iniciado às 20:30</p>
+          <p class="viewers">👁 12.800 espectadores</p>
+          <button class="btn-detalhes btn-assistir">Assistir agora</button>
+        </div>
+      </article>
+
+      <!-- 3 -->
+      <article class="card-torneio ao-vivo"
+        data-nome="FIFA Global Series - Playoffs"
+        data-jogo="fifa"
+        data-categoria="esportes"
+        data-plataforma="console"
+        data-status="ao-vivo">
+
+        <div class="badge-ao-vivo">
+          <span class="dot"></span> Ao vivo
+        </div>
+
+        <img referrerpolicy="no-referrer" src="/aovivo/image/fifa25_torneio.jpeg" alt="FIFA Global Series">
+
+        <div class="card-info">
+          <h2>FIFA Global Series - Playoffs</h2>
+          <p class="jogo">Jogo: FIFA • Esportes • Console</p>
+          <p class="data">Iniciado às 18:15</p>
+          <p class="viewers">👁 5.430 espectadores</p>
+          <button class="btn-detalhes btn-assistir">Assistir agora</button>
+        </div>
+      </article>
+
+      <!-- 4 -->
+<article class="card-torneio ao-vivo"
+  data-nome="Valorant Challengers BR"
+  data-jogo="valorant"
+  data-categoria="fps-tático"
+  data-plataforma="pc"
+  data-status="ao-vivo">
+
+  <div class="badge-ao-vivo">
+    <span class="dot"></span> Ao vivo
+  </div>
+
+  <img referrerpolicy="no-referrer" src="/aovivo/image/Banner-site-torneios-valorant.webp" alt="Valorant Challengers BR">
+
+  <div class="card-info">
+    <h2>Valorant Challengers BR</h2>
+    <p class="jogo">Jogo: Valorant • FPS Tático • PC</p>
+    <p class="data">Iniciado às 18:50</p>
+    <p class="viewers">👁 9.420 espectadores</p>
+    <button class="btn-detalhes btn-assistir">Assistir agora</button>
+  </div>
+</article>
+
+<!-- 5 -->
+<article class="card-torneio ao-vivo"
+  data-nome="Mobile Legends Brasil Cup"
+  data-jogo="mobilelegends"
+  data-categoria="moba"
+  data-plataforma="mobile"
+  data-status="ao-vivo">
+
+  <div class="badge-ao-vivo">
+    <span class="dot"></span> Ao vivo
+  </div>
+
+  <img referrerpolicy="no-referrer" src="/aovivo/image/mobile_legends.webp" alt="Mobile Legends Brasil Cup">
+
+  <div class="card-info">
+    <h2>Mobile Legends Brasil Cup</h2>
+    <p class="jogo">Jogo: Mobile Legends • MOBA • Mobile</p>
+    <p class="data">Iniciado às 21:10</p>
+    <p class="viewers">👁 6.230 espectadores</p>
+    <button class="btn-detalhes btn-assistir">Assistir agora</button>
+  </div>
+</article>
+
+<!-- 6 -->
+<article class="card-torneio ao-vivo"
+  data-nome="CS2 Premier League"
+  data-jogo="cs2"
+  data-categoria="fps"
+  data-plataforma="pc"
+  data-status="ao-vivo">
+
+  <div class="badge-ao-vivo">
+    <span class="dot"></span> Ao vivo
+  </div>
+
+  <img referrerpolicy="no-referrer" src="/aovivo/image/cs2_torneio.png" alt="CS2 Premier League">
+
+  <div class="card-info">
+    <h2>CS2 Premier League</h2>
+    <p class="jogo">Jogo: CS2 • FPS • PC</p>
+    <p class="data">Iniciado às 17:40</p>
+    <p class="viewers">👁 14.920 espectadores</p>
+    <button class="btn-detalhes btn-assistir">Assistir agora</button>
+  </div>
+</article>
+
+<!-- 7 -->
+<article class="card-torneio ao-vivo"
+  data-nome="Fortnite Battle Cup"
+  data-jogo="fortnite"
+  data-categoria="battle-royale"
+  data-plataforma="multi"
+  data-status="ao-vivo">
+
+  <div class="badge-ao-vivo">
+    <span class="dot"></span> Ao vivo
+  </div>
+
+  <img referrerpolicy="no-referrer" src="/aovivo/image/fortnite_torneio.jpg" alt="Fortnite Battle Cup">
+
+  <div class="card-info">
+    <h2>Fortnite Battle Cup</h2>
+    <p class="jogo">Jogo: Fortnite • Battle Royale • Multi</p>
+    <p class="data">Iniciado às 16:20</p>
+    <p class="viewers">👁 22.300 espectadores</p>
+   <a href="/aovivo/fortnite-battlecup.html"> <button class="btn-detalhes btn-assistir">Assistir agora</button></a>
+  </div>
+</article>
+
+<!-- 8 -->
+<article class="card-torneio ao-vivo"
+  data-nome="FC25 Ultimate Open"
+  data-jogo="fc25"
+  data-categoria="esportes"
+  data-plataforma="console"
+  data-status="ao-vivo">
+
+  <div class="badge-ao-vivo">
+    <span class="dot"></span> Ao vivo
+  </div>
+
+  <img referrerpolicy="no-referrer" src="/aovivo/image/fc25_torneio.jpg" alt="FC25 Ultimate Open">
+
+  <div class="card-info">
+    <h2>FC25 Ultimate Open</h2>
+    <p class="jogo">Jogo: FC25 • Esportes • Console</p>
+    <p class="data">Iniciado às 20:00</p>
+    <p class="viewers">👁 4.780 espectadores</p>
+    <button class="btn-detalhes btn-assistir">Assistir agora</button>
+  </div>
+</article>
+
+<!-- 9 -->
+<article class="card-torneio ao-vivo"
+  data-nome="Clash Royale Kings Cup"
+  data-jogo="clashroyale"
+  data-categoria="estratégia"
+  data-plataforma="mobile"
+  data-status="ao-vivo">
+
+  <div class="badge-ao-vivo">
+    <span class="dot"></span> Ao vivo
+  </div>
+
+  <img referrerpolicy="no-referrer" src="/aovivo/image/clash_royale.avif" alt="Clash Royale Kings Cup">
+
+  <div class="card-info">
+    <h2>Clash Royale Kings Cup</h2>
+    <p class="jogo">Jogo: Clash Royale • Estratégia • Mobile</p>
+    <p class="data">Iniciado às 22:10</p>
+    <p class="viewers">👁 7.150 espectadores</p>
+    <a href="/aovivo/clash-royale-kingscup.html"> <button class="btn-detalhes btn-assistir">Assistir agora</button> </a>
+  </div>
+</article>
+
+
+        
+      <!-- adicione mais cards seguindo o mesmo padrão -->
+
+    </section>
+  </main>
+  <!-- ===== FIM CONTEÚDO ===== -->
+
+  <!-- ===== FOOTER GLOBAL ===== -->
+  <footer>
+    <div id="footer_content">
+      <div id="footer_logo">
+        <img referrerpolicy="no-referrer" src="/image/logo.png" alt="" id="logofooter">
+      </div>
+
+      <div id="footer_sobrenos">
+        <h1>Sobre Nós</h1>
+        <br>
+        <p>O Versus Hub é uma plataforma criada para conectar jogadores, organizadores e fãs de e-sports em um só lugar. Oferecemos torneios competitivos, rankings dinâmicos e recompensas exclusivas para quem ama competir. Nosso objetivo é tornar a experiência gamer mais acessível, divertida e profissional — seja você um iniciante ou um pro player.</p>
+      </div>
+
+      <div id="footer_versushub">
+        <h1>Versus Hub</h1>
+        <br>
+        <p>
+          Torneios e Rankings atualizados
+          <br><br>
+          Sistema seguro e fácil de participar
+          <br><br>
+          Suporte ativo todos os dias
+        </p>
+      </div>
+
+      <div id="footer_politicas">
+        <h1>Políticas</h1><br>
+                    <a href="/termos/termos.html">Termos de uso  </li></a><br>
+<li><br>
+        <li>Política de Privacidade</li><br>
+        <li>Política de Reembolso (para eventos pagos)</li>
+      </div>
+    </div>
+  </footer>
+  <!-- ===== FIM FOOTER ===== -->
+
+  <!-- JS (pode reaproveitar o mesmo usado em torneios, com login fake + sidebar + busca) -->
+   <script src="/pagina_inicial/js/scrip.js"></script>
+</body>
+</html>

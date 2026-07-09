@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Perfil de Marcuzcuz | VersusHub</title>
+
+<link rel="stylesheet" href="/pagina_inicial/css/estilos.css">
+<link rel="icon" href="/image/logo.png" sizes="32x32">
+
+<style>
+body {
+  background: #0b0b0d;
+  color: #fff;
+  font-family: system-ui, sans-serif;
+}
+main {
+  max-width: 1100px;
+  margin: 20px auto 40px;
+  padding: 0 20px;
+}
+
+/* ===== HEADER DO PERFIL ===== */
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 25px;
+  background: #141419;
+  padding: 25px;
+  border-radius: 16px;
+  border: 2px solid #282833;
+}
+.profile-header img {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  border: 3px solid #d41111;
+  object-fit: cover;
+}
+.profile-info h1 {
+  font-size: 32px;
+  color: #ff2c2c;
+  margin-bottom: 5px;
+}
+.profile-info p {
+  color: #ccc;
+  margin: 4px 0;
+}
+
+/* ===== SEÇÕES ===== */
+.section-box {
+  background: #141419;
+  border-radius: 12px;
+  border: 2px solid #2a2a38;
+  padding: 20px;
+  margin-top: 25px;
+}
+.section-box h2 {
+  color: #ff2c2c;
+  margin-bottom: 10px;
+}
+
+/* ===== JOGOS FAVORITOS (tags) ===== */
+.games-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+.game-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #2e2a2a;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+}
+
+/* ===== GRID DE ITENS ===== */
+.item-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 16px;
+  margin-top: 10px;
+}
+
+/* ===== CARD PADRÃO ===== */
+.card {
+  background: #191921;
+  border-radius: 10px;
+  border: 2px solid #2c2c3b;
+  padding: 12px;
+  transition: 0.2s ease-in-out;
+}
+.card:hover {
+  border-color: #d41111;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
+}
+.card img {
+  width: 100%;
+  height: 140px;
+  border-radius: 8px;
+  object-fit: fill;
+}
+.card h3 {
+  margin-top: 8px;
+  font-size: 16px;
+  color: #fff;
+}
+.card p {
+  font-size: 13px;
+  color: #c7c7e0;
+  margin: 2px 0;
+}
+.badge {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  background: #1e1b2e;
+  border: 1px solid #3b3b77;
+  color: #d4d4ff;
+}
+
+/* ===== RESPONSIVO ===== */
+@media (max-width: 768px) {
+  .profile-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .profile-header img {
+    width: 150px;
+    height: 150px;
+  }
+}
+</style>
+</head>
+
+<body>
+<!-- HEADER padrão -->
+<header>
+  <nav class="navbar">
+    <div class="header-left">
+      <button id="menuToggle" class="menu-button">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="menu-svg"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+      <div class="logo_header">
+        <a href="/pagina_inicial/index.html">
+          <img referrerpolicy="no-referrer" src="/image/logo%20plus%20tipo%20textura.png" alt="VersusHub">
+        </a>
+      </div>
+    </div>
+
+    <div class="botoes_header">
+      <a href="/aovivo/aovivo.html"><button id="aovivo_header">Ao Vivo</button></a>
+      <a href="/criar_torneio/criar_torneio.html"><button id="criar_header">Criar Torneio</button></a>
+      <a href="/equipes/equipes.html"><button id="equipes_header">Equipes</button></a>
+    </div>
+
+    <div class="header-right">
+      <form class="search-header" onsubmit="return false">
+        <input type="text" placeholder="Buscar torneios, equipes..." id="searchInput">
+        <button type="submit">🔍</button>
+      </form>
+      <a href="/login/login.html" id="btentrar">Entrar</a>
+      <a href="/cadastro/cadastro.html" id="btcadastrar">Cadastrar-se</a>
+      <div class="user-icon">
+        <img referrerpolicy="no-referrer" src="/image/boneco_logo_ofc.png" alt="Usuário" id="userBtn">
+        <ul id="menuUser" class="hidden"></ul>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<!-- SIDEBAR -->
+<aside id="sidebar" class="sidebar">
+  <h2 class="sidebar-title"></h2>
+  <nav class="sidebar-nav">
+    <a href="/pagina_inicial/index.html"><i class="fa-solid fa-house" style="margin-right: 10px; width: 16px; text-align: center;"></i>Início</a>
+    <a href="/pagina_inicial/torneios.html"><i class="fa-solid fa-trophy" style="margin-right: 10px; width: 16px; text-align: center;"></i>Todos os torneios</a>
+    <a href="/criar_torneio/criar_torneio.html"><i class="fa-solid fa-award" style="margin-right: 10px; width: 16px; text-align: center;"></i>Criar Torneio</a>
+    <a href="/equipes/equipes.html"><i class="fa-solid fa-users" style="margin-right: 10px; width: 16px; text-align: center;"></i>Equipes</a>
+    <a href="/gerenciartorneios/gerentornindex.html"><i class="fa-solid fa-file-invoice" style="margin-right: 10px; width: 16px; text-align: center;"></i>Gerenciar torneios</a>
+    <a href="/termos/termos.html"><i class="fa-solid fa-briefcase" style="margin-right: 10px; width: 16px; text-align: center;"></i>Termos de Uso</a>
+    <a href="/feedback/feedback.html"><i class="fa-solid fa-star" style="margin-right: 10px; width: 16px; text-align: center;"></i>Enviar feedback / Sugestão</a>
+  </nav>
+</aside>
+
+  <!-- efeito da tela ficar escura no fundo -->
+
+<div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+<!-- FIM SIDEBAR -->
+
+<main>
+  <!-- PERFIL DO MARCUZCUZ -->
+  <section class="profile-header">
+    <!-- coloca aqui a foto dele -->
+    <img referrerpolicy="no-referrer" src="/equipes/images/marcuzcuz.jpg" alt="Marcuzcuz">
+    <div class="profile-info">
+      <h1>Marcuzcuz</h1>
+      <p><strong>Região:</strong> Brasil</p>
+      <p><strong>Plataforma:</strong> PC • Mobile</p>
+    </div>
+  </section>
+
+  <!-- SOBRE MIM -->
+  <section class="section-box">
+    <h2>Sobre mim</h2>
+    <p>
+      Eu sou o <strong>Marcuzcuz</strong>, gosto de Cuzcuz, galinhas e do Vasco.
+    </p>
+  </section>
+
+  <!-- JOGOS FAVORITOS -->
+  <section class="section-box">
+    <h2>Jogos favoritos</h2>
+    <div class="games-tags">
+      <div class="game-tag">Valorant</div>
+      <div class="game-tag">CS2</div>
+      <div class="game-tag">Fortnite</div>
+      <div class="game-tag">Apex Legends</div>
+    </div>
+  </section>
+
+  <!-- MINHAS EQUIPES -->
+  <section class="section-box">
+    <h2>Minhas equipes</h2>
+    <div class="item-grid">
+      <div class="card">
+        <a href="/equipes/viltrumitas.html" style="text-decoration:none; color:inherit;">
+          <h3>Viltrumitas</h3>
+          <p>Line competitiva focada em Valorant e FPS tático.</p>
+          <span class="badge">Equipe atual</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- TORNEIOS -->
+  <section class="section-box">
+    <h2>Torneios</h2>
+    <div class="item-grid">
+      <div class="card">
+        <img referrerpolicy="no-referrer" src="/images/cerradocup.jpg" alt="Cerrado Cup Valorant">
+        <h3>Cerrado Cup Valorant</h3>
+        <p><strong>Status:</strong> Em andamento</p>
+        <p><strong>Equipe:</strong> Viltrumitas</p>
+        <span class="badge">Fase de grupos</span>
+      </div>
+
+      <div class="card">
+        <img referrerpolicy="no-referrer" src="/images/fifa_torneiofile1.jpg" alt="Brasil Tactical League">
+        <h3>Brasil Tactical League</h3>
+        <p><strong>Status:</strong> Finalizado</p>
+        <p><strong>Resultado:</strong> Top 3</p>
+        <span class="badge">Semi-finalista</span>
+      </div>
+
+      <div class="card">
+        <img referrerpolicy="no-referrer" src="/images/ff_championsbrasil.jpg" alt="Community Clash FPS">
+        <h3>Community Clash FPS</h3>
+        <p><strong>Status:</strong> Finalizado</p>
+        <p><strong>Resultado:</strong> Campeão com os Viltrumitas</p>
+        <span class="badge">🏆 Título da comunidade</span>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div id="footer_content">
+    <div id="footer_logo">
+      <img referrerpolicy="no-referrer" src="/image/logo.png" alt="VersusHub" id="logofooter">
+    </div>
+    <div id="footer_sobrenos">
+      <h1>Sobre Nós</h1>
+      <p>O Versus Hub conecta jogadores, equipes e organizadores em um ambiente competitivo completo.</p>
+    </div>
+    <div id="footer_versushub">
+      <h1>Versus Hub</h1>
+      <p><br>Torneios | Equipes | Rankings <br>Suporte ativo todos os dias</p>
+    </div>
+    <div id="footer_politicas">
+      <h1>Políticas</h1>
+      <li>Termos de uso</li>
+      <li>Política de Privacidade</li>
+      <li>Política de Reembolso (para eventos pagos)</li>
+    </div>
+  </div>
+</footer>
+
+<script src="/pagina_inicial/js/scrip.js"></script>
+</body>
+</html>
