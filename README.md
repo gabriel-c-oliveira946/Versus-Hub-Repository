@@ -61,18 +61,15 @@ A aplicação foi estruturada utilizando uma arquitetura baseada em componentes 
 
 1. Clone este repositório:
    ```bash
-   git clone [https://github.com/SEU_USUARIO/SEU_REPOSITORIO.git](https://github.com/SEU_USUARIO/SEU_REPOSITORIO.git)
+   git clone [https://github.com/gabriel-c-oliveira946/Versus-Hub-Repository.git](https://github.com/gabriel-c-oliveira946/Versus-Hub-Repository.git)
 Acesse a pasta do projeto:
 
-Bash
-cd SEU_REPOSITORIO
+cd Versus-Hub-Repository
 Instale as dependências:
 
-Bash
 npm install
 Inicie o servidor de desenvolvimento:
 
-Bash
 npm run dev
 # ou npm start para inicializar o servidor Express (porta 3000)
 Acesse no seu navegador:
