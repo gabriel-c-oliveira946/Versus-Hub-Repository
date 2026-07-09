@@ -63,7 +63,7 @@ Para visualizar a interface da plataforma corretamente e garantir o funcionament
 
 1. Clone este repositório:
    ```bash
-   git clone [https://github.com/gabriel-c-oliveira946/Versus-Hub-Repository.git](https://github.com/gabriel-c-oliveira946/Versus-Hub-Repository.git)
+   git clone git clone https://github.com/gabriel-c-oliveira946/Versus-Hub-Repository.git
 
 Abra a pasta do projeto clonado no seu editor de código (ex: VS Code).
 
