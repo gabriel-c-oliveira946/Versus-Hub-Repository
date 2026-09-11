@@ -8,6 +8,8 @@
 
 <br>
 
+**🌍 Acesso ao site:** [Clique aqui para acessar o projeto online](https://versus-hub-repository-jyb7.vercel.app/pagina_inicial/index.html)
+
 > **A plataforma definitiva para organizar, gerenciar e vivenciar torneios de e-sports amadores e independentes.**
 
 O **VersusHub** é uma plataforma web para criar, gerenciar e participar de torneios on-line ou presenciais[cite: 2]. Ele foi pensado para centralizar todas as etapas de uma competição em um ambiente moderno, confiável e gratuito para eventos de e-sports[cite: 2].
