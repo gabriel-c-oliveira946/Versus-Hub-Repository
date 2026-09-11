@@ -52,12 +52,14 @@ Este projeto foi construído utilizando uma arquitetura *Serverless*, focando em
 
 ---
 
-##  Desenvolvimento e Autoria
+## Desenvolvimento e Autoria
 
-Este projeto faz parte do escopo acadêmico do curso técnico de Desenvolvimento de Sistemas (SENAI Dendezeiros - 4º Semestre). 
+Este projeto faz parte do TCC (Trabalho de Conclusão de Curso) acadêmico do curso de Técnico em Desenvolvimento de Sistemas do SENAI Dendezeiros.
 
- **Nota de Desenvolvimento Técnico:**
-Gostaria de destacar que **100% do desenvolvimento prático e técnico da plataforma** — incluindo a criação da interface (Front-end), a estruturação e modelagem do banco de dados (PostgreSQL/Supabase), a escrita da lógica de negócio em JavaScript, a integração de APIs e o *deploy* final na Vercel — **foi realizado exclusivamente por mim (Gabriel Costa de Oliveira)**.
+**Liderança Técnica e Desenvolvimento:**
+Toda a arquitetura do VersusHub, desde a construção da interface (Vanilla JS/HTML/CSS) até a modelagem do banco de dados relacional (PostgreSQL/Supabase) e a infraestrutura de deploy (Vercel), foi idealizada, codificada e mantida por **Gabriel Costa de Oliveira** (Líder Técnico & Desenvolvedor Full-Stack).
+
+**Equipe do Projeto:** Caíque Brandão, Gabriel Costa de Oliveira, João Pedro, João Vitor Nascimento Santos e Lucas Vinicius Pereira Rodrigues[cite: 4].
 
 ---
 <div align="center">
