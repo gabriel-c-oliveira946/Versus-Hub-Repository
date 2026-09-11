@@ -14,7 +14,7 @@ O **VersusHub** é uma plataforma web para criar, gerenciar e participar de torn
 
 ---
 
-## 🚨 O Problema
+##  O Problema
 
 O cenário de games e e-sports cresce exponencialmente a cada ano, mas a organização de torneios independentes parou no tempo[cite: 2]. Hoje, organizar um campeonato amador significa lidar com:
 * **Improviso:** Uso de planilhas confusas, grupos lotados de mensagens e formulários soltos[cite: 2].
@@ -22,7 +22,7 @@ O cenário de games e e-sports cresce exponencialmente a cada ano, mas a organiz
 * **Falta de Transparência:** Nenhuma clareza na atualização de resultados, chaves e pontuações[cite: 2].
 * **Invisibilidade:** Pouca visibilidade para torneios locais, organizadores independentes e jogadores amadores[cite: 2].
 
-## 💡 A Solução
+##  A Solução
 
 O sistema centraliza a divulgação, as inscrições e o acompanhamento do torneio em um único lugar[cite: 2], trazendo ferramentas de nível profissional para o cenário amador:
 
@@ -32,7 +32,7 @@ O sistema centraliza a divulgação, as inscrições e o acompanhamento do torne
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
+##  Tecnologias Utilizadas
 
 Este projeto foi construído utilizando uma arquitetura *Serverless*, focando em performance, baixo custo de infraestrutura e carregamento ultrarrápido.
 
@@ -52,13 +52,11 @@ Este projeto foi construído utilizando uma arquitetura *Serverless*, focando em
 
 ---
 
-## 👨‍💻 Desenvolvimento e Autoria
+##  Desenvolvimento e Autoria
 
 Este projeto faz parte do escopo acadêmico do curso técnico de Desenvolvimento de Sistemas (SENAI Dendezeiros - 4º Semestre). 
 
-A equipe formal do projeto é composta por: **Caíque Brandão, Gabriel Oliveira, João Pedro, João Vitor e Lucas Vinicius**[cite: 4, 8].
-
-⚠️ **Nota de Desenvolvimento Técnico:**
+ **Nota de Desenvolvimento Técnico:**
 Gostaria de destacar que **100% do desenvolvimento prático e técnico da plataforma** — incluindo a criação da interface (Front-end), a estruturação e modelagem do banco de dados (PostgreSQL/Supabase), a escrita da lógica de negócio em JavaScript, a integração de APIs e o *deploy* final na Vercel — **foi realizado exclusivamente por mim (Gabriel Costa de Oliveira)**.
 
 ---
