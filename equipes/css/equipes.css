@@ -1,0 +1,148 @@
+.equipes-page {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 0 20px;
+  font-family: system-ui, sans-serif;
+  color: #fff;
+}
+
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+
+
+.btn-criar {
+  padding: 10px 18px;
+  background: #2f2d2d;
+  border: 2px solid #ff0000;
+  border-radius: 999px;
+  color: #fff;
+  cursor: pointer;
+  font-weight: bold;
+  float: right;
+transition: 0.7s;
+}
+
+.btn-criar:hover {
+
+  background: #dc0b0bd1;
+  border: 2px solid #e6e4ec83;
+  border-radius: 999px;
+  color: #ffffff;
+  filter: brightness(1.2);
+  cursor: pointer;
+  font-weight: bold;
+transition: 0.7s;
+}
+
+
+
+
+.lista-equipes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.card-equipe {
+  background: #141419;
+  border: 2px solid #2c2c3b;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: .2s;
+}
+
+.card-equipe:hover {
+  border-color: #d41111;
+  transform: translateY(-4px);
+}
+
+.card-equipe img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+}
+
+.card-info {
+  padding: 12px;
+}
+
+.btn-detalhes {
+  background: #d41111;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-weight: bold;
+  color: #fff;
+  cursor: pointer;
+  margin-top: 8px;
+}
+
+/* ==========================================================================
+   RESPONSIVIDADE GERAL (DISPOSITIVOS MÓVEIS <= 768px)
+   ========================================================================== */
+@media (max-width: 768px) {
+  .equipes-page {
+    width: 95%;
+    margin: 15px auto 40px;
+    padding: 0 6px;
+  }
+
+  .equipes-grid,
+  .lista-equipes {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+    width: 100%;
+  }
+
+  .card-equipe {
+    display: flex;
+    flex-direction: column !important;
+    width: 100% !important;
+    border-radius: 10px !important;
+    border-width: 1.5px !important;
+    overflow: hidden !important;
+  }
+
+  .card-equipe img {
+    width: 100% !important;
+    height: 80px !important;
+    object-fit: cover;
+  }
+
+  .card-equipe .card-info {
+    padding: 5px 5px 7px !important;
+  }
+
+  .card-equipe h2 {
+    font-size: 11px !important;
+    margin-bottom: 2px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .card-equipe p {
+    font-size: 9px !important;
+    margin-bottom: 3px !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .card-equipe button {
+    font-size: 10px !important;
+    padding: 3px 5px !important;
+    margin-top: 4px !important;
+  }
+
+  .linha-filtros {
+    flex-direction: column;
+    gap: 12px;
+  }
+}
+

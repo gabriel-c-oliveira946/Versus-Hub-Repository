@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Equipes - VersusHub</title>
+
+  <!-- estilos globais -->
+  <link rel="stylesheet" href="/pagina_inicial/css/estilos.css">
+    <link rel="stylesheet" href="/pagina_inicial/css/torneios.css"> 
+      <link rel="icon" href="/image/logo.png" sizes="32x32"> 
+  <!-- estilos específicos -->
+  <link rel="stylesheet" href="/equipes/css/equipes.css">
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <nav class="navbar">
+
+    <!-- ESQUERDA: menu + logo -->
+    <div class="header-left">
+
+      <!-- Botão do menu lateral (hambúrguer) -->
+      <button id="menuToggle" class="menu-button">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="menu-svg"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+
+      <!-- LOGO -->
+      <div class="logo_header">
+        <a href="/pagina_inicial/index.html">
+          <img referrerpolicy="no-referrer" src="/image/logo%20plus%20tipo%20textura.png" alt="VersusHub">
+        </a>
+      </div>
+
+    </div>
+
+    <!-- CENTRO: botões principais -->
+    <div class="botoes_header">
+     <a href="/aovivo/aovivo.html"> <button id="aovivo_header">Ao Vivo</button></a>
+     <a href="/criar_torneio/criar_torneio.html"> <button id="criar_header">Criar Torneio</button> <a href="/equipes/equipes.html"> <button id="equipes_header">Equipes</button> </a>
+    </div>
+
+    <!-- DIREITA: pesquisa + entrar + cadastrar + usuário -->
+    <div class="header-right">
+
+      <!-- BARRA DE PESQUISA NO HEADER -->
+      <form class="search-header" action="#" onsubmit="return false">
+        <input
+          type="text"
+          placeholder="Buscar torneios, jogos..."
+          id="searchInput"
+        >
+        <button type="submit" id="searchBtn" aria-label="Buscar"><i class="fa-solid fa-magnifying-glass"></i></button>
+      </form>
+
+      <!-- BOTÕES À DIREITA -->
+      <a href="/login/login.html" id="btentrar">Entrar</a>
+      <a href="/cadastro/cadastro.html" id="btcadastrar">Cadastrar-se</a>
+
+      <!-- ÍCONE DO USUÁRIO -->
+      <div class="user-icon">
+        <img referrerpolicy="no-referrer" src="/image/boneco_logo_ofc.png" alt="Usuário" id="userBtn">
+
+        <ul id="menuUser" class="hidden">
+          <li>
+            <a href="/login/login.html">
+              Login
+            </a>
+          </li>
+          <hr>
+          <li><a href="/cadastro/cadastro.html">Cadastro</a></li>
+        </ul>
+      </div>
+
+    </div>
+
+  </nav>
+</header>
+<!-- FIM HEADER -->
+
+<!-- SIDEBAR -->
+<aside id="sidebar" class="sidebar">
+  <h2 class="sidebar-title"></h2>
+  <nav class="sidebar-nav">
+    <a href="/pagina_inicial/index.html"><i class="fa-solid fa-house" style="margin-right: 10px; width: 16px; text-align: center;"></i>Início</a>
+    <a href="/pagina_inicial/torneios.html"><i class="fa-solid fa-trophy" style="margin-right: 10px; width: 16px; text-align: center;"></i>Todos os torneios</a>
+    <a href="/aovivo/aovivo.html"><i class="fa-solid fa-tower-broadcast" style="margin-right: 10px; width: 16px; text-align: center;"></i>Torneios ao vivo</a>
+    <a href="/criar_torneio/criar_torneio.html"><i class="fa-solid fa-award" style="margin-right: 10px; width: 16px; text-align: center;"></i>Criar Torneio</a>
+    <a href="/equipes/equipes.html"><i class="fa-solid fa-users" style="margin-right: 10px; width: 16px; text-align: center;"></i>Equipes</a>
+    <a href="/ranking.html"><i class="fa-solid fa-users-viewfinder" style="margin-right: 10px; width: 16px; text-align: center;"></i>Jogadores e Ranking</a>
+    <a href="/gerenciartorneios/gerentornindex.html"><i class="fa-solid fa-file-invoice" style="margin-right: 10px; width: 16px; text-align: center;"></i>Gerenciar torneios</a>
+    <a href="/equipes/gerenciar_equipes.html"><i class="fa-solid fa-list-check" style="margin-right: 10px; width: 16px; text-align: center;"></i>Gerenciar Equipes</a>
+    <a href="/termos/termos.html"><i class="fa-solid fa-briefcase" style="margin-right: 10px; width: 16px; text-align: center;"></i>Termos de Uso</a>
+    <a href="/feedback/feedback.html"><i class="fa-solid fa-star" style="margin-right: 10px; width: 16px; text-align: center;"></i>Enviar feedback / Sugestão</a>
+  </nav>
+</aside>
+
+  <!-- efeito da tela ficar escura no fundo -->
+
+<div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+<!-- FIM SIDEBAR -->
+
+
+<!-- CONTEÚDO -->
+ 
+<main class="equipes-page">
+
+  <!-- FILTROS DE EQUIPES (igual ao de torneios, adaptado) -->
+    <a href="/cria_equipe/criar_equipe.html"> <button class="btn-criar">
+        <i class="fa-solid fa-plus" style="margin-right: 8px;"></i>Criar equipe
+      </button> </a>
+  <section class="filtros-torneios">
+    <div class="top-bar-equipes">
+      <h1>Equipes</h1>
+    
+    </div>
+
+    <div class="linha-filtros">
+      <!-- Buscar -->
+      <div class="campo-filtro">
+        <label for="filtroBuscaEquipe">Buscar</label>
+        <input
+          type="text"
+          id="filtroBuscaEquipe"
+          placeholder="Nome da equipe, jogo..."
+        >
+      </div>
+
+      <!-- Jogo -->
+      <div class="campo-filtro">
+        <label for="filtroJogoEquipe">Jogo principal</label>
+        <select id="filtroJogoEquipe">
+          <option value="todos">Todos</option>
+          <option value="valorant">Valorant</option>
+          <option value="cs2">CS2</option>
+          <option value="freefire">Free Fire</option>
+          <option value="fortnite">Fortnite</option>
+        </select>
+      </div>
+
+      <!-- Plataforma -->
+      <div class="campo-filtro">
+        <label for="filtroPlataformaEquipe">Plataforma</label>
+        <select id="filtroPlataformaEquipe">
+          <option value="todas">Todas</option>
+          <option value="pc">PC</option>
+          <option value="console">Console</option>
+          <option value="mobile">Mobile</option>
+        </select>
+      </div>
+
+      <!-- Status da equipe -->
+      <div class="campo-filtro">
+        <label for="filtroStatusEquipe">Status</label>
+        <select id="filtroStatusEquipe">
+          <option value="todos">Todos</option>
+          <option value="recrutando">Recrutando</option>
+          <option value="completa">Equipe completa</option>
+        </select>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- LISTA DE EQUIPES -->
+  <section class="lista-equipes" id="listaEquipes">
+    <div style="grid-column: 1 / -1; text-align: center; padding: 48px 20px; color: #9ca3af;">
+      <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 32px; color: #ff7300; margin-bottom: 12px; display: block;"></i>
+      Carregando equipes...
+    </div>
+  </section>
+
+</main>
+
+
+<!-- PARTE DE BAIXO DO SITE< CHAMADA DE FOOTER -->
+
+    <footer>
+
+      <div id="footer_content">
+        <div id="footer_logo">
+          <img referrerpolicy="no-referrer" src="/image/logo.png" alt="" id="logofooter">
+
+        </div>
+      
+      <div id="footer_sobrenos">
+
+         <h1>Sobre Nós</h1>
+        <br>
+         <p>O Versus Hub é uma plataforma criada para conectar jogadores, organizadores e fãs de e-sports em um só lugar. Oferecemos torneios competitivos, rankings dinâmicos e recompensas exclusivas para quem ama competir. Nosso objetivo é tornar a experiência gamer mais acessível, divertida e profissional — seja você um iniciante ou um pro player.</p>
+
+      </div>
+
+      <div id="footer_versushub">
+
+         <h1>Versus Hub</h1>
+        <br>
+          <p>
+              Torneios e Rankings atualizados 
+              <br><br> 
+              Sistema seguro e fácil de participar 
+              <br><br>
+              Suporte ativo todos os dias
+          </p>
+
+
+      </div>
+      
+      <div id="footer_politicas">
+
+          <h1>Políticas</h1><br>
+          <li>
+              Termos de uso  </li><br>
+<li>
+  Política de Privacidade  </li><br>
+   <li>
+  Política de Reembolso (para eventos pagos) </li>
+
+ </div>
+    </div>
+
+  </div>
+
+    </footer>
+
+<script src="/pagina_inicial/js/scrip.js"></script>
+<script type="module" src="/equipes/js/equipes.js"></script>
+
+</body>
+</html>

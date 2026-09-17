@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- estilos globais do site -->
+  <link rel="stylesheet" href="/pagina_inicial/css/estilos.css" />
+  <link rel="icon" href="/image/logo.png" sizes="32x32"> 
+  <!-- estilos específicos da página Ao Vivo -->
+  <link rel="stylesheet" href="/aovivo/css/aovivo.css" />
+  <title>Torneios Ao Vivo - VersusHub</title>
+</head>
+<body>
+
+  <!-- ===== HEADER GLOBAL (MESMO DE SEMPRE) ===== -->
+  <header>
+    <nav class="navbar">
+
+      <!-- ESQUERDA: menu + logo -->
+      <div class="header-left">
+        <button id="menuToggle" class="menu-button">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="menu-svg"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+
+        <div class="logo_header">
+          <a href="/pagina_inicial/index.html">
+            <img referrerpolicy="no-referrer" src="/image/logo%20plus%20tipo%20textura.png" alt="VersusHub">
+          </a>
+        </div>
+      </div>
+
+      <!-- CENTRO: botões principais -->
+      <div class="botoes_header">
+        <!-- se quiser, depois podemos deixar esse botão com estilo "ativo" -->
+        <button id="aovivo_header">Ao Vivo</button>
+        <a href="/criar_torneio/criar_torneio.html"> <button id="criar_header">Criar Torneio</button>
+      </a>
+        <a href="/equipes/equipes.html"> <button id="equipes_header">Equipes</button> </a>
+      </div>
+
+      <!-- DIREITA -->
+      <div class="header-right">
+
+        <!-- busca -->
+        <form class="search-header" action="#" onsubmit="return false">
+          <input
+            type="text"
+            placeholder="Buscar torneios, jogos..."
+            id="searchInput"
+          >
+          <button type="submit" id="searchBtn" aria-label="Buscar"><i class="fa-solid fa-magnifying-glass"></i></button>
+        </form>
+
+        <!-- entrar / cadastrar -->
+        <a href="/login/login.html" id="btentrar">Entrar</a>
+        <a href="/cadastro/cadastro.html" id="btcadastrar">Cadastrar-se</a>
+
+        <!-- usuário -->
+        <div class="user-icon">
+          <img referrerpolicy="no-referrer" src="/image/boneco_logo_ofc.png" alt="Usuário" id="userBtn">
+
+          <ul id="menuUser" class="hidden">
+            <!-- conteúdo é montado via JS (login fake) -->
+          </ul>
+        </div>
+      </div>
+
+    </nav>
+  </header>
+  <!-- ===== FIM HEADER ===== -->
+
+<!-- SIDEBAR -->
+<aside id="sidebar" class="sidebar">
+  <h2 class="sidebar-title"></h2>
+  <nav class="sidebar-nav">
+    <a href="/pagina_inicial/index.html"><i class="fa-solid fa-house" style="margin-right: 10px; width: 16px; text-align: center;"></i>Início</a>
+    <a href="/pagina_inicial/torneios.html"><i class="fa-solid fa-trophy" style="margin-right: 10px; width: 16px; text-align: center;"></i>Todos os torneios</a>
+    <a href="/aovivo/aovivo.html"><i class="fa-solid fa-tower-broadcast" style="margin-right: 10px; width: 16px; text-align: center;"></i>Torneios ao vivo</a>
+    <a href="/criar_torneio/criar_torneio.html"><i class="fa-solid fa-award" style="margin-right: 10px; width: 16px; text-align: center;"></i>Criar Torneio</a>
+    <a href="/equipes/equipes.html"><i class="fa-solid fa-users" style="margin-right: 10px; width: 16px; text-align: center;"></i>Equipes</a>
+    <a href="/ranking.html"><i class="fa-solid fa-users-viewfinder" style="margin-right: 10px; width: 16px; text-align: center;"></i>Jogadores e Ranking</a>
+    <a href="/gerenciartorneios/gerentornindex.html"><i class="fa-solid fa-file-invoice" style="margin-right: 10px; width: 16px; text-align: center;"></i>Gerenciar torneios</a>
+    <a href="/equipes/gerenciar_equipes.html"><i class="fa-solid fa-list-check" style="margin-right: 10px; width: 16px; text-align: center;"></i>Gerenciar Equipes</a>
+    <a href="/termos/termos.html"><i class="fa-solid fa-briefcase" style="margin-right: 10px; width: 16px; text-align: center;"></i>Termos de Uso</a>
+    <a href="/feedback/feedback.html"><i class="fa-solid fa-star" style="margin-right: 10px; width: 16px; text-align: center;"></i>Enviar feedback / Sugestão</a>
+  </nav>
+</aside>
+
+  <!-- efeito da tela ficar escura no fundo -->
+
+<div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+<!-- FIM SIDEBAR -->
+
+  <!-- ===== CONTEÚDO DA PÁGINA AO VIVO ===== -->
+  <main class="pagina-aovivo">
+
+    <section class="topo-aovivo">
+      <h1>Torneios Ao Vivo</h1>
+      <p>Veja os torneios que estão acontecendo agora mesmo.</p>
+    </section>
+
+    <!-- Loader de carregamento da página Ao Vivo -->
+    <div id="aovivoLoader" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; color: #9ca3af; text-align: center;">
+      <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 38px; color: #ff3b30; margin-bottom: 16px; display: block;"></i>
+      <span style="font-size: 16px; font-weight: 700; color: #f3f4f6;">Carregando transmissões ao vivo...</span>
+      <span style="font-size: 13px; color: #6b7280; margin-top: 6px;">Sincronizando com os servidores VersusHub</span>
+    </div>
+
+    <!-- Container principal dos torneios ao vivo (vazio para controle total do JavaScript) -->
+    <section class="lista-aovivo" id="listaAoVivo"></section>
+  </main>
+  <!-- ===== FIM CONTEÚDO ===== -->
+
+  <!-- ===== FOOTER GLOBAL ===== -->
+  <footer>
+    <div id="footer_content">
+      <div id="footer_logo">
+        <img referrerpolicy="no-referrer" src="/image/logo.png" alt="" id="logofooter">
+      </div>
+
+      <div id="footer_sobrenos">
+        <h1>Sobre Nós</h1>
+        <br>
+        <p>O Versus Hub é uma plataforma criada para conectar jogadores, organizadores e fãs de e-sports em um só lugar. Oferecemos torneios competitivos, rankings dinâmicos e recompensas exclusivas para quem ama competir. Nosso objetivo é tornar a experiência gamer mais acessível, divertida e profissional — seja você um iniciante ou um pro player.</p>
+      </div>
+
+      <div id="footer_versushub">
+        <h1>Versus Hub</h1>
+        <br>
+        <p>
+          Torneios e Rankings atualizados
+          <br><br>
+          Sistema seguro e fácil de participar
+          <br><br>
+          Suporte ativo todos os dias
+        </p>
+      </div>
+
+      <div id="footer_politicas">
+        <h1>Políticas</h1><br>
+        <li><a href="/termos/termos.html" style="color: inherit;">Termos de uso</a></li><br>
+        <li>Política de Privacidade</li><br>
+        <li>Política de Reembolso (para eventos pagos)</li>
+      </div>
+    </div>
+  </footer>
+  <!-- ===== FIM FOOTER ===== -->
+
+  <!-- JS -->
+  <script src="/pagina_inicial/js/scrip.js"></script>
+  <script type="module" src="/aovivo/js/aovivo.js"></script>
+</body>
+</html>

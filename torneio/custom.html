@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- estilos globais -->
+  <link rel="stylesheet" href="/pagina_inicial/css/estilos.css" />
+  <!-- estilos específicos de detalhes -->
+  <link rel="stylesheet" href="/torneio/detalhes.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="icon" href="/image/logo.png" sizes="32x32"> 
+  <title>Detalhes do Torneio - VersusHub</title>
+</head>
+<body>
+
+  <!-- Tela de Carregamento em Detalhes -->
+  <div id="loaderDetalhes" class="loader-overlay" style="display: flex;"><i class="fa-solid fa-spinner fa-spin"></i></div>
+
+  <!-- ========= HEADER ========= -->
+  <header>
+    <nav class="navbar">
+
+      <div class="header-left">
+        <button id="menuToggle" class="menu-button">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="menu-svg"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      </button>
+
+        <div class="logo_header">
+          <a href="/pagina_inicial/index.html">
+            <img referrerpolicy="no-referrer" src="/image/logo%20plus%20tipo%20textura.png" alt="VersusHub">
+          </a>
+        </div>
+      </div>
+
+      <div class="botoes_header">
+        <a href="/aovivo/aovivo.html"><button id="aovivo_header">Ao Vivo</button></a>
+        <a href="/criar_torneio/criar_torneio.html"><button id="criar_header">Criar Torneio</button></a>
+        <a href="/equipes/equipes.html"> <button id="equipes_header">Equipes</button> </a>
+      </div>
+
+      <div class="header-right">
+        <form class="search-header" action="#" onsubmit="return false">
+          <input type="text" placeholder="Buscar torneios, jogos..." id="searchInput">
+          <button type="submit" id="searchBtn" aria-label="Buscar"><i class="fa-solid fa-magnifying-glass"></i></button>
+        </form>
+
+        <a href="/login/login.html" id="btentrar">Entrar</a>
+        <a href="/cadastro/cadastro.html" id="btcadastrar">Cadastrar-se</a>
+
+        <div class="user-icon">
+          <img referrerpolicy="no-referrer" src="/image/boneco_logo_ofc.png" alt="Usuário" id="userBtn">
+          <ul id="menuUser" class="hidden"></ul>
+        </div>
+      </div>
+
+    </nav>
+  </header>
+  <!-- ========= FIM HEADER ========= -->
+
+<!-- SIDEBAR -->
+<aside id="sidebar" class="sidebar">
+  <h2 class="sidebar-title"></h2>
+  <nav class="sidebar-nav">
+    <a href="/pagina_inicial/index.html"><i class="fa-solid fa-house" style="margin-right: 10px; width: 16px; text-align: center;"></i>Início</a>
+    <a href="/pagina_inicial/torneios.html"><i class="fa-solid fa-trophy" style="margin-right: 10px; width: 16px; text-align: center;"></i>Todos os torneios</a>
+    <a href="/aovivo/aovivo.html"><i class="fa-solid fa-tower-broadcast" style="margin-right: 10px; width: 16px; text-align: center;"></i>Torneios ao vivo</a>
+    <a href="/criar_torneio/criar_torneio.html"><i class="fa-solid fa-award" style="margin-right: 10px; width: 16px; text-align: center;"></i>Criar Torneio</a>
+    <a href="/equipes/equipes.html"><i class="fa-solid fa-users" style="margin-right: 10px; width: 16px; text-align: center;"></i>Equipes</a>
+    <a href="/ranking.html"><i class="fa-solid fa-users-viewfinder" style="margin-right: 10px; width: 16px; text-align: center;"></i>Jogadores e Ranking</a>
+    <a href="/gerenciartorneios/gerentornindex.html"><i class="fa-solid fa-file-invoice" style="margin-right: 10px; width: 16px; text-align: center;"></i>Gerenciar torneios</a>
+    <a href="/equipes/gerenciar_equipes.html"><i class="fa-solid fa-list-check" style="margin-right: 10px; width: 16px; text-align: center;"></i>Gerenciar Equipes</a>
+    <a href="/termos/termos.html"><i class="fa-solid fa-briefcase" style="margin-right: 10px; width: 16px; text-align: center;"></i>Termos de Uso</a>
+    <a href="/feedback/feedback.html"><i class="fa-solid fa-star" style="margin-right: 10px; width: 16px; text-align: center;"></i>Enviar feedback / Sugestão</a>
+  </nav>
+</aside>
+
+  <!-- efeito da tela ficar escura no fundo -->
+
+<div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+<!-- FIM SIDEBAR -->
+
+
+  <!-- ========= CONTEÚDO DINÂMICO ========= -->
+  <main class="torneio-page" id="torneioPage" style="display:none;">
+
+    <!-- HERO DO TORNEIO -->
+    <section class="torneio-hero">
+      <div class="torneio-banner">
+        <img referrerpolicy="no-referrer" id="detBanner" src="" alt="Banner do torneio">
+        <div class="torneio-status-badge" id="detStatusBadge">
+          <!-- texto do status aqui -->
+        </div>
+      </div>
+
+      <div class="torneio-hero-info">
+        <h1 id="detNome">Nome do Torneio</h1>
+        <p id="infoOrganizador"></p>
+        <p class="torneio-meta" id="detMeta">Jogo • Categoria • Plataforma</p>
+        <p class="torneio-data" id="detData">Início: --/--/----</p>
+
+        <div class="torneio-tags">
+          <span id="tagCategoria" style="display:none;"></span>
+          <span id="tagPlataforma" style="display:none;"></span>
+          <span id="tagModalidade">Modalidade: --</span>
+          <span id="tagLocalizacao">Localização: --</span>
+          <span id="tagTaxa">Taxa: --</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- LAYOUT EM 2 COLUNAS -->
+    <section class="torneio-layout">
+
+      <!-- COLUNA ESQUERDA -->
+      <div class="torneio-col-info">
+
+        <div class="torneio-card-box">
+          <h2>Sobre o torneio</h2>
+          <p id="detDescricao">
+            Nenhuma descrição informada.
+          </p>
+        </div>
+
+        <div class="torneio-card-box">
+          <h2>Regras principais</h2>
+          <div id="detRegras">
+            <ul id="listaRegras">
+              <!-- regras em <li> -->
+            </ul>
+          </div>
+        </div>
+
+        <div class="torneio-card-box">
+          <h2>Requisitos dos jogadores</h2>
+          <p id="detRequisitos">
+            Nenhum requisito especial informado.
+          </p>
+        </div>
+
+        <!-- Participantes Confirmados -->
+        <div class="torneio-card-box">
+          <h2><i class="fa-solid fa-users" style="color: #ef4444; margin-right: 8px;"></i> Participantes Confirmados</h2>
+          <div id="listaParticipantes" class="grid-participantes">
+            <!-- Renderizado dinamicamente via JS -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- COLUNA DIREITA -->
+      <aside class="torneio-col-side">
+
+        <!-- Área de Transmissão Ao Vivo -->
+        <div id="areaTransmissao"></div>
+
+        <div class="torneio-card-box destaque-inscricao">
+          <h2>Inscrições</h2>
+          <ul class="info-list">
+            <li><span>Status:</span> <span id="textoStatus">--</span></li>
+            <li><span>Plataforma:</span> <span id="textoPlataforma">--</span></li>
+            <li><span>Modalidade:</span> <span id="infoModalidade">--</span></li>
+            <li><span>Local:</span> <span id="infoLocal">--</span></li>
+            <li><span>Taxa:</span> <span id="infoTaxa">--</span></li>
+          </ul>
+          <button class="btn-principal" id="btnInscrever" style="margin-top: 15px; width: 100%;">Inscrever equipe</button>
+        </div>
+
+        <div class="torneio-card-box">
+          <h2>Premiação</h2>
+          <p id="textoSemPremio" style="display:none;">Não há premiação definida para este torneio.</p>
+
+          <div id="detPremiacao">
+            <ul class="info-list" id="listaPremios">
+              <li id="liPremio1" style="display:none;"><span>1º lugar:</span> <span id="premio1Texto"></span></li>
+              <li id="liPremio2" style="display:none;"><span>2º lugar:</span> <span id="premio2Texto"></span></li>
+              <li id="liPremio3" style="display:none;"><span>3º lugar:</span> <span id="premio3Texto"></span></li>
+              <li id="liPremioExtra" style="display:none;"><span>Extras:</span> <span id="premioExtraTexto"></span></li>
+            </ul>
+          </div>
+        </div>
+
+      </aside>
+
+    </section>
+
+  </main>
+
+  <!-- Caso o torneio não seja encontrado -->
+  <main id="erroTorneio" class="torneio-page" style="display:none;">
+    <section class="torneio-card-box">
+      <h2>Torneio não encontrado</h2>
+      <p>Não conseguimos localizar esse torneio no sistema.  
+      Verifique se o endereço do torneio está correto ou navegue por <strong>Todos os torneios</strong>.</p>
+    </section>
+  </main>
+
+  <!-- ========= FOOTER ========= -->
+  <footer>
+    <div id="footer_content">
+      <div id="footer_logo">
+        <img referrerpolicy="no-referrer" src="/image/logo.png" alt="" id="logofooter">
+      </div>
+
+      <div id="footer_sobrenos">
+        <h1>Sobre Nós</h1>
+        <br>
+        <p>O Versus Hub é uma plataforma criada para conectar jogadores, organizadores e fãs de e-sports.</p>
+      </div>
+
+      <div id="footer_versushub">
+        <h1>Versus Hub</h1>
+        <br>
+        <p>
+          Torneios e Rankings atualizados <br><br>
+          Sistema seguro <br><br>
+          Suporte ativo todos os dias
+        </p>
+      </div>
+
+      <div id="footer_politicas">
+        <h1>Políticas</h1><br>
+        <li>Termos de uso</li><br>
+        <li>Política de Privacidade</li><br>
+        <li>Reembolsos</li>
+      </div>
+    </div>
+  </footer>
+  <!-- ========= FIM FOOTER ========= -->
+
+  <!-- ========= SCRIPTS ========= -->
+  <script src="/pagina_inicial/js/scrip.js"></script>
+  <script type="module" src="/torneio/js/custom.js"></script>
+</body>
+</html>

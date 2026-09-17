@@ -1,0 +1,409 @@
+html {
+  zoom: 0.92;
+}
+
+/* =========================================================
+   RESET / BASE
+   ========================================================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* base do body – importante o padding-top por causa do header fixo */
+body {
+  background: linear-gradient(#0e0e0e);
+  height: 120vh;
+  background-size: cover;
+  padding-top: 70px; /* mesma altura do header fixo */
+}
+
+/* =========================================================
+   HEADER GLOBAL VERSUSHUB
+   ========================================================= */
+
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 70px;
+  background: rgb(158, 8, 8);
+  border-bottom: 3.5px solid #d41111;
+  margin-top: 0;
+  overflow: visible;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  z-index: 2000;
+  box-sizing: border-box;
+}
+
+.navbar {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  background-color: rgb(158, 8, 8);
+  box-sizing: border-box;
+}
+
+/* ESQUERDA: menu + logo */
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;              /* ocupa 1 parte do espaço restante */
+}
+
+/* CENTRO: botões */
+.botoes_header {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  border-radius: 24px;
+  padding: 4px 16px;
+  transition: 0.3s ease-in-out;
+  flex: 0;              /* largura só do conteúdo (os botões) */
+}
+
+.botoes_header button {
+  width: 150px;
+  background: none;
+  padding: 5px;
+  color: whitesmoke;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-weight: bolder;
+  border: solid 5px red;
+  border-radius: 9px;
+  transition: 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.botoes_header button:hover {
+  transform: scale(1.1);
+  transition: 0.3s ease-in-out;
+  filter: brightness(1.1);
+}
+
+/* DIREITA: pesquisa + entrar + cadastrar + usuário */
+.header-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  white-space: nowrap;
+  flex: 1;                    /* mesma “força” da esquerda */
+}
+
+/* LOGO */
+.logo_header img {
+  margin-left: 10px;
+  margin-top: 0;
+  width: 160px;
+  height: auto;
+  display: block;
+}
+
+/* LINKS GENÉRICOS */
+a {
+  text-decoration: none;
+  color: white;
+  list-style: none;
+}
+
+/* ===== BARRA DE PESQUISA NO HEADER ===== */
+
+.search-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #252531;
+  padding: 4px 10px;
+  border-radius: 999px;
+  height: 36px;
+}
+
+.search-header input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #ffffff;
+  font-size: 13px;
+  width: 180px;
+}
+
+.search-header input::placeholder {
+  color: #bbbbbb;
+}
+
+.search-header button {
+  border: none;
+  background: #d41111;
+  color: #ffffff;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.2s ease-in-out;
+}
+
+.search-header button:hover {
+  filter: brightness(1.15);
+  transform: scale(1.05);
+}
+
+/* ===== BOTÕES ENTRAR / CADASTRAR ===== */
+
+#btentrar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 16px;
+  height: 40px;
+  font-size: 16px;
+  font-weight: bold;
+  border: 2px solid #000;
+  background: rgb(71, 67, 67);
+  border-radius: 40px;
+  color: #fff;
+  text-decoration: none;
+}
+
+#btcadastrar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 18px;
+  height: 40px;
+  font-size: 16px;
+  font-weight: bold;
+  border: 2px solid #000;
+  background: #d41111;
+  border-radius: 20px;
+  color: #fff;
+  text-decoration: none;
+}
+
+#btentrar:hover,
+#btcadastrar:hover {
+  filter: brightness(1.05);
+  transition: 0.4s ease-in-out;
+}
+
+#btentrar:hover {
+  filter: brightness(1.4);
+}
+
+/* ===== ÍCONE E MENU DO USUÁRIO ===== */
+
+.user-icon {
+  position: relative;
+  display: inline-block;
+  transition: 0.3s ease-in-out;
+}
+
+.user-icon img {
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  transition: 0.3s ease-in-out;
+}
+
+/* menu dropdown */
+#menuUser {
+  list-style: none;
+  margin: 2px;
+  padding: 12px;
+  width: 240px;
+  height: auto;
+  min-height: auto;
+  background: #1c1c1d;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  position: absolute;
+  top: 36px;
+  left: -190px;
+  display: none;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+#menuUser li {
+  position: relative;
+  top: -8px;
+  left: 35px;
+  margin: 15px;
+  margin-bottom: 14px;
+}
+
+#menuUser li a {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  text-decoration: none;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+#menuUser li:hover {
+  position: relative;
+  transition: 0.3s ease-in-out;
+  width: 45%;
+  border-radius: 15px;
+  background: #ff0000;
+}
+
+hr {
+  position: relative;
+  top: -35px;
+}
+
+/* =========================================================
+   SIDEBAR (MENU LATERAL GLOBAL)
+   ========================================================= */
+
+.menu-button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.menu-button img,
+.menu-button svg {
+  height: 32px;
+  width: 32px;
+  display: block;
+}
+
+.menu-button svg {
+  stroke: #ffffff;
+  transition: stroke 0.2s ease, transform 0.2s ease;
+}
+
+.menu-button:hover svg {
+  stroke: #d41111;
+  transform: scale(1.1);
+}
+
+/* Caixa da sidebar */
+.sidebar {
+  position: fixed;
+  top: 70px;                       /* começa logo abaixo do header */
+  left: 0;
+  width: 290px;
+  height: calc(100vh - 70px);
+  background: rgba(10, 9, 14, 0.98);
+  backdrop-filter: blur(12px);
+  border-right: 2px solid rgba(212, 17, 17, 0.4);
+  padding: 24px 16px;
+  color: #f5f5f5;
+  transform: translateX(-100%);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1500;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  box-shadow: 10px 0 30px rgba(0, 0, 0, 0.85);
+}
+
+.sidebar.open {
+  transform: translateX(0);
+}
+
+.sidebar-title {
+  font-size: 16px;
+  margin-bottom: 12px;
+  font-weight: 700;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sidebar-nav a {
+  font-size: 15px;
+  font-weight: 600;
+  padding: 12px 16px;
+  border-radius: 10px;
+  text-decoration: none;
+  color: #cccccc;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.2s ease-in-out;
+  border-left: 3px solid transparent;
+}
+
+.sidebar-nav a:hover {
+  background: rgba(212, 17, 17, 0.15);
+  color: #ffffff;
+  border-left: 3px solid #d41111;
+  padding-left: 20px;
+}
+
+/* Fundo escuro atrás da sidebar */
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease-in-out;
+  z-index: 1400;
+}
+
+.sidebar-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* Travar o scroll quando a sidebar estiver aberta */
+body.sidebar-locked {
+  overflow: hidden;
+  height: 100vh;
+}
+
+/* FIM DO HEADER GLOBAL */
+
+
+
+/* =========================================================
+   FOOTER GLOBAL VERSUSHUB
+   ========================================================= */
+
+footer {
+  position: relative;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  width: 100%;
+  font-size: 15px;
+  font-weight: 600;
+  color: aliceblue;
+  margin-top: 40px;
+}
+
+footer h1 {
+  color: rgb(255, 123, 0);
+}
+
+#footer_content {
+  padding: 30px;
+  padding-bottom: 80px;
+  background-color: rgb(158, 8, 8);
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 100px;
+}
+
+#logofooter {
+  height: 72%;
+  width: 72%;
+  object-fit: cover;
+}
+
+
+/* FIM DO FOOTER GLOBAL */

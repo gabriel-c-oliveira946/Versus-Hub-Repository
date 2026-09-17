@@ -1,0 +1,6 @@
+{
+  "name": "Versus Hub",
+  "description": "Plataforma gamer para gerenciar, criar e participar de torneios competitivos de e-sports.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

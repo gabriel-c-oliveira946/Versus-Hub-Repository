@@ -1,0 +1,1114 @@
+/* BASE DA PÁGINA DE PERFIL */
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: #0b0b0d;
+  color: #fff;
+}
+
+/* CONTAINER PRINCIPAL DO PERFIL */
+.perfil_container {
+  max-width: 1140px;
+  width: 100%;
+  padding: 0 20px;
+  margin: 30px auto 60px;
+  box-sizing: border-box;
+}
+
+/* GRID LAYOUT PRINCIPAL DO PERFIL */
+.perfil-layout {
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr);
+  gap: 30px;
+  align-items: start;
+  width: 100%;
+  min-width: 0;
+}
+
+@media (max-width: 991px) {
+  .perfil-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+}
+
+/* COLUNA LATERAL - SIDEBAR */
+.perfil-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+  width: 100%;
+}
+
+/* PROFILE CARD (LATERAL) */
+.profile-card {
+  background: #121217;
+  padding: 30px 24px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 24px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+}
+
+/* CONTÊINER DA IMAGEM DE PERFIL COM SOBREPOSIÇÃO */
+.profile-image-wrapper {
+  position: relative;
+  width: 140px;
+  height: 140px;
+}
+
+.profile-image {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 3px solid #d41111;
+  background-size: cover;
+  background-position: center;
+  background-color: #1a1a24;
+  box-shadow: 0 4px 20px rgba(212, 17, 17, 0.35);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.profile-image:hover {
+  transform: scale(1.03);
+  border-color: #ff2a2a;
+  box-shadow: 0 6px 24px rgba(212, 17, 17, 0.5);
+}
+
+/* Botão de câmera sobreposto à foto */
+.profile-image-wrapper .btn-photo {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  background: #d41111;
+  color: #ffffff;
+  border: none;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+.profile-image-wrapper .btn-photo:hover {
+  background: #ff2a2a;
+  transform: scale(1.1);
+}
+
+/* Informações principais do usuário */
+.profile-user-info {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.username-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.username {
+  font-size: 22px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.btn-edit {
+  background: none;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.btn-edit:hover {
+  color: #d41111;
+}
+
+/* EMAIL BOX DE VISUALIZAÇÃO */
+.email-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  padding: 8px 12px;
+  width: 100%;
+}
+
+.email-input {
+  background: transparent;
+  border: none;
+  color: #d1d5db;
+  font-size: 13px;
+  text-align: center;
+  width: 100%;
+  min-width: 0;
+  outline: none;
+  text-overflow: ellipsis;
+}
+
+.icon-edit-small {
+  background: none;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.icon-edit-small:hover {
+  color: #ef4444;
+}
+
+/* METADADOS RÁPIDOS */
+.profile-quick-meta {
+  width: 100%;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: left;
+}
+
+.meta-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+}
+
+.meta-label {
+  color: #9ca3af;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.meta-val {
+  color: #f3f4f6;
+  font-weight: 600;
+}
+
+/* BOTÃO DE VISUALIZAR PERFIL PÚBLICO */
+.btn-view-public {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: rgba(212, 17, 17, 0.1);
+  border: 1px solid rgba(212, 17, 17, 0.3);
+  color: #ff4d4d;
+  padding: 14px 20px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 14px;
+  text-decoration: none;
+  width: 100%;
+  transition: all 0.2s ease;
+}
+
+.btn-view-public:hover {
+  background: #d41111;
+  color: #ffffff;
+  box-shadow: 0 4px 15px rgba(212, 17, 17, 0.3);
+  transform: translateY(-2px);
+}
+
+/* CONTEÚDO PRINCIPAL (FORMULÁRIOS) */
+.perfil-content {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  width: 100%;
+}
+
+/* TÍTULOS DE SEÇÕES */
+.section-header-block {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.section-title {
+  font-size: 15px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #9cb1cf;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+/* SEÇÃO - BOX CONTAINER */
+.section {
+  background: #121217;
+  padding: 24px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  margin-bottom: 30px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* BLOCO DE FORMULÁRIO */
+.form-block {
+  margin-bottom: 20px;
+}
+
+.form-block:last-child {
+  margin-bottom: 0;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 640px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #9ca3af;
+}
+
+/* INPUTS E TEXTAREAS */
+.input-box, .textarea-box {
+  background: #171720;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.input-box:focus, .textarea-box:focus {
+  border-color: #d41111;
+  background: #1a1a24;
+  box-shadow: 0 0 0 3px rgba(212, 17, 17, 0.15);
+}
+
+.textarea-box {
+  height: 100px;
+  resize: none;
+}
+
+/* OPÇÕES DE PLATAFORMA */
+.platform-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.platform-options label {
+  background: #171720;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: normal;
+  color: #d1d5db;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+  margin-bottom: 0;
+}
+
+.platform-options label:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.platform-options input[type="checkbox"] {
+  accent-color: #d41111;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+/* ENVELOPE DE UPLOAD DE BANNER */
+.banner-upload-wrapper {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.btn-upload-banner-trigger {
+  background: #171720;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  padding: 12px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.btn-upload-banner-trigger:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* GRID DE ESTATÍSTICAS */
+.stats-form-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+@media (max-width: 640px) {
+  .stats-form-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.input-readonly {
+  background-color: rgba(255, 255, 255, 0.03) !important;
+  color: #94a3b8 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  cursor: not-allowed !important;
+  user-select: none;
+}
+
+.input-readonly:focus {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.badge-readonly {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  padding: 2px 6px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 700;
+}
+
+/* CONQUISTAS E TROFÉUS */
+.conquistas-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.add-conquista-box {
+  background: rgba(0, 0, 0, 0.15);
+  padding: 18px;
+  border-radius: 12px;
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.add-conquista-fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  width: 100%;
+}
+
+.add-conquista-field-title {
+  flex: 1 1 200px;
+  min-width: 0;
+}
+
+.add-conquista-field-desc {
+  flex: 2 1 260px;
+  min-width: 0;
+}
+
+.btn-add-conquista {
+  background: #22c55e;
+  color: #ffffff;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  align-self: flex-start;
+}
+
+.btn-add-conquista:hover {
+  background: #16a34a;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+}
+
+/* LISTA DE EQUIPES */
+.teams-list-profile {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.profile-team-card {
+  background: #171720;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  transition: all 0.25s ease;
+}
+
+.profile-team-card:hover {
+  border-color: rgba(212, 17, 17, 0.4);
+  background: #1b1b26;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.profile-team-main {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.profile-team-logo {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #000;
+  border: 2px solid #d41111;
+}
+
+.profile-team-text h3 {
+  font-size: 15px;
+  font-weight: 700;
+  margin: 0 0 2px 0;
+  color: #ffffff;
+}
+
+.profile-team-text p {
+  font-size: 12px;
+  color: #9ca3af;
+  margin: 0;
+}
+
+.profile-team-card a {
+  font-size: 13px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  background: #d41111;
+  border: none;
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+.profile-team-card a:hover {
+  background: #ff1c1c;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(212, 17, 17, 0.3);
+}
+
+/* JOGOS PREFERIDOS E TAGS */
+.games-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.game-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #171720;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #e5e7eb;
+  transition: all 0.2s ease;
+}
+
+.game-tag:hover {
+  background: rgba(212, 17, 17, 0.1);
+  border-color: rgba(212, 17, 17, 0.3);
+}
+
+.game-tag button {
+  border: none;
+  background: transparent;
+  color: #ef4444;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 0;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s;
+}
+
+.game-tag button:hover {
+  transform: scale(1.2);
+}
+
+/* BOTÃO DE SALVAR ALTERAÇÕES */
+.save-row {
+  margin-top: 30px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-save-profile {
+  background: #d41111;
+  border: none;
+  color: #ffffff;
+  padding: 14px 32px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(212, 17, 17, 0.4);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-save-profile:hover {
+  background: #ff1c1c;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(212, 17, 17, 0.5);
+}
+
+.games-hint {
+  display: block;
+  margin-top: 6px;
+  font-size: 11px;
+  color: #9ca3af;
+}
+
+/* LINHAS SEPARADORAS */
+.separator {
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  margin: 25px 0;
+}
+
+/* ==========================================================================
+   TABS DE NAVEGAÇÃO DO PERFIL E UPLOAD DE ARQUIVOS
+   ========================================================================== */
+.tabs-perfil {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  border-bottom: 2px solid #2a2a38;
+  padding-bottom: 12px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  width: 100%;
+  max-width: 100%;
+}
+
+.tabs-perfil::-webkit-scrollbar {
+  display: none;
+}
+
+.tab-btn-perfil {
+  background: transparent;
+  border: none;
+  color: #9ca3af;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 10px 18px;
+  font-size: 14px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.tab-btn-perfil:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.tab-btn-perfil.active {
+  color: #ffffff;
+  background: #d41111;
+  box-shadow: 0 4px 14px rgba(212, 17, 17, 0.35);
+}
+
+.tab-container-perfil {
+  display: block;
+  animation: fadeInPerfil 0.25s ease-in-out;
+}
+
+@keyframes fadeInPerfil {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* CARDS DE UPLOAD (APARÊNCIA) */
+.file-upload-card {
+  background: #171720;
+  border: 1px dashed rgba(255, 255, 255, 0.16);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  transition: border-color 0.2s ease;
+}
+
+.file-upload-card:hover {
+  border-color: #d41111;
+}
+
+.file-upload-card-banner {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.avatar-preview-box {
+  width: 86px;
+  height: 86px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid #d41111;
+  flex-shrink: 0;
+  background: #0f0f14;
+}
+
+.avatar-preview-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.banner-preview-box {
+  width: 100%;
+  height: 150px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #0f0f14;
+}
+
+.banner-preview-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.banner-placeholder-box {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 8px;
+  color: #9ca3af;
+  font-size: 13px;
+  padding: 12px;
+  box-sizing: border-box;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.file-upload-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+}
+
+.btn-file-select {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #22222e;
+  color: #ffffff;
+  border: 1px solid #3b3b4f;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: fit-content;
+}
+
+.btn-file-select:hover {
+  background: #2e2e3f;
+  border-color: #ff3b30;
+  color: #ffffff;
+}
+
+.file-name-hint {
+  font-size: 12px;
+  color: #9ca3af;
+  margin-top: 4px;
+  word-break: break-word;
+}
+
+/* ==========================================================================
+   RESPONSIVIDADE COMPLETA E ROBUSTA (DISPOSITIVOS MÓVEIS E TABLETS)
+   ========================================================================== */
+
+/* TABLETS E TELAS MÉDIAS (<= 768px) */
+@media (max-width: 768px) {
+  .perfil_container {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 16px auto 36px !important;
+    padding: 0 14px 28px !important;
+    box-sizing: border-box !important;
+  }
+
+  .perfil-layout {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 20px !important;
+    width: 100% !important;
+  }
+
+  .profile-card,
+  .perfil-card {
+    padding: 22px 16px !important;
+    border-radius: 14px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .section {
+    padding: 20px 16px;
+    border-radius: 14px;
+    margin-bottom: 22px;
+    box-sizing: border-box;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .save-row {
+    width: 100%;
+    justify-content: stretch;
+    margin-top: 20px;
+  }
+
+  .btn-save-profile {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 20px;
+    font-size: 15px;
+  }
+
+  .btn-view-public {
+    padding: 13px 16px;
+    font-size: 14px;
+  }
+}
+
+/* SMARTPHONES EM GERAL (<= 640px) */
+@media (max-width: 640px) {
+  .file-upload-card {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 16px 12px;
+    gap: 16px;
+    box-sizing: border-box;
+  }
+
+  .file-upload-info {
+    align-items: center;
+    text-align: center;
+    width: 100%;
+  }
+
+  .btn-file-select {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+    padding: 12px 14px;
+    font-size: 13px;
+    box-sizing: border-box;
+  }
+
+  .banner-preview-box {
+    height: 125px;
+    max-height: 140px;
+  }
+
+  .stats-form-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .add-conquista-box {
+    padding: 14px 12px;
+    gap: 12px;
+    box-sizing: border-box;
+  }
+
+  .add-conquista-fields {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .add-conquista-field-title,
+  .add-conquista-field-desc {
+    width: 100%;
+    flex: 1 1 100%;
+  }
+
+  .btn-add-conquista {
+    width: 100%;
+    justify-content: center;
+    align-self: stretch;
+    padding: 12px 16px;
+  }
+
+  .profile-team-card {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 14px 12px;
+    box-sizing: border-box;
+  }
+
+  .profile-team-main {
+    width: 100%;
+  }
+
+  .profile-team-text {
+    min-width: 0;
+    flex: 1;
+    word-break: break-word;
+  }
+
+  .profile-team-card a {
+    width: 100%;
+    text-align: center;
+    display: block;
+    box-sizing: border-box;
+    padding: 10px 14px;
+  }
+}
+
+/* SMARTPHONES MENORES (<= 480px) */
+@media (max-width: 480px) {
+  .perfil_container {
+    padding: 0 10px 20px !important;
+    margin: 12px auto 30px !important;
+  }
+
+  .section {
+    padding: 16px 12px;
+    border-radius: 12px;
+    margin-bottom: 16px;
+  }
+
+  .section-title {
+    font-size: 14px;
+  }
+
+  .tabs-perfil {
+    gap: 6px;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+  }
+
+  .tab-btn-perfil {
+    padding: 8px 12px;
+    font-size: 13px;
+    gap: 6px;
+  }
+
+  .platform-options {
+    gap: 8px;
+  }
+
+  .platform-options label {
+    flex: 1 1 calc(50% - 6px);
+    min-width: 80px;
+    padding: 9px 8px;
+    font-size: 12px;
+    justify-content: center;
+    box-sizing: border-box;
+  }
+
+  .profile-card {
+    padding: 18px 12px !important;
+    border-radius: 12px;
+    gap: 18px;
+  }
+
+  .profile-image-wrapper {
+    width: 120px;
+    height: 120px;
+  }
+
+  .profile-image-wrapper .btn-photo {
+    width: 34px;
+    height: 34px;
+    font-size: 13px;
+  }
+
+  .username {
+    font-size: 18px;
+  }
+
+  .input-box,
+  .textarea-box,
+  select.input-box {
+    padding: 11px 12px;
+    font-size: 14px;
+  }
+
+  .textarea-box {
+    height: 85px;
+  }
+
+  .stats-form-grid {
+    gap: 8px;
+  }
+
+  .stats-form-grid label {
+    font-size: 10px;
+    letter-spacing: normal;
+  }
+
+  .game-tag {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .banner-placeholder-box {
+    font-size: 12px;
+    padding: 10px;
+  }
+}
+
+/* SMARTPHONES ULTRA COMPACTOS (<= 360px - ex: iPhone SE 1ª geração / Fold fechado) */
+@media (max-width: 360px) {
+  .perfil_container {
+    padding: 0 8px 16px !important;
+  }
+
+  .section {
+    padding: 14px 10px;
+    border-radius: 10px;
+  }
+
+  .tab-btn-perfil {
+    padding: 7px 9px;
+    font-size: 12px;
+    gap: 4px;
+  }
+
+  .stats-form-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .platform-options label {
+    flex: 1 1 100%;
+  }
+
+  .banner-placeholder-box {
+    font-size: 11px;
+    padding: 8px;
+  }
+}
+

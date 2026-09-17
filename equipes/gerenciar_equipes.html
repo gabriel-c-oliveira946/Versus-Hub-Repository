@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Gerenciar Equipes - VersusHub</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="/pagina_inicial/css/estilos.css">
+  <link rel="icon" href="/image/logo.png" sizes="32x32">
+  <style>
+    body {
+      background: #09090c;
+      color: #ffffff;
+      font-family: system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .manage-teams-page {
+      max-width: 1200px;
+      margin: 30px auto 60px;
+      padding: 0 20px;
+      flex: 1;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .manage-teams-header {
+      margin-bottom: 28px;
+    }
+
+    .manage-teams-header h1 {
+      font-size: 28px;
+      font-weight: 800;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .manage-teams-header h1 i {
+      color: #ff3b30;
+    }
+
+    .manage-teams-header p {
+      font-size: 15px;
+      color: #9ca3af;
+    }
+
+    .manage-grid {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    @media (max-width: 900px) {
+      .manage-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .teams-sidebar-panel {
+      background: #121217;
+      border: 1px solid #23232e;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    }
+
+    .teams-section-title {
+      font-size: 15px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 700;
+      color: #9ca3af;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .teams-section-title i {
+      color: #ff3b30;
+    }
+
+    .team-select-card {
+      background: #181820;
+      border: 1px solid #272735;
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .team-select-card:hover {
+      border-color: #3b3b4f;
+      background: #1e1e28;
+      transform: translateY(-1px);
+    }
+
+    .team-select-card.active {
+      border-color: #ff3b30;
+      background: rgba(255, 59, 48, 0.08);
+      box-shadow: 0 0 15px rgba(255, 59, 48, 0.15);
+    }
+
+    .team-select-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .team-select-logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 8px;
+      object-fit: cover;
+      background: #252533;
+      border: 1px solid #323242;
+      flex-shrink: 0;
+    }
+
+    .team-select-text {
+      min-width: 0;
+    }
+
+    .team-select-text h4 {
+      font-size: 15px;
+      font-weight: 700;
+      color: #f3f4f6;
+      margin: 0 0 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .team-select-text p {
+      font-size: 12px;
+      color: #9ca3af;
+      margin: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .btn-team-delete {
+      background: rgba(239, 68, 68, 0.12);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      padding: 7px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .btn-team-delete:hover {
+      background: #ef4444;
+      color: #ffffff;
+      border-color: #ef4444;
+      transform: scale(1.03);
+    }
+
+    .btn-team-leave {
+      background: rgba(245, 158, 11, 0.12);
+      color: #f59e0b;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      padding: 7px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .btn-team-leave:hover {
+      background: #f59e0b;
+      color: #ffffff;
+      border-color: #f59e0b;
+    }
+
+    .btn-create-new-team {
+      width: 100%;
+      background: #1f1f2a;
+      border: 1px dashed #3a3a4d;
+      color: #e5e7eb;
+      padding: 12px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 14px;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .btn-create-new-team:hover {
+      background: #272735;
+      border-color: #ff3b30;
+      color: #ffffff;
+    }
+
+    /* Painel Detalhado */
+    .team-details-panel {
+      background: #121217;
+      border: 1px solid #23232e;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      min-height: 400px;
+    }
+
+    .team-details-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #23232e;
+      margin-bottom: 24px;
+    }
+
+    .team-details-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .team-banner-img {
+      width: 64px;
+      height: 64px;
+      border-radius: 12px;
+      object-fit: cover;
+      border: 2px solid #2d2d3a;
+      background: #1a1a24;
+    }
+
+    .team-details-text h2 {
+      font-size: 22px;
+      font-weight: 800;
+      color: #ffffff;
+      margin: 0 0 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .team-details-text p {
+      font-size: 14px;
+      color: #9ca3af;
+      margin: 0;
+    }
+
+    .team-actions-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn-edit-team {
+      background: #222230;
+      border: 1px solid #363649;
+      color: #e5e7eb;
+      padding: 9px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-edit-team:hover {
+      background: #ff3b30;
+      border-color: #ff3b30;
+      color: #ffffff;
+    }
+
+    .btn-view-public {
+      background: transparent;
+      border: 1px solid #2e2e3f;
+      color: #9ca3af;
+      padding: 9px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-view-public:hover {
+      color: #ffffff;
+      border-color: #4b5563;
+    }
+
+    /* Subseções do painel */
+    .panel-sub-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      margin-top: 24px;
+    }
+
+    .panel-sub-header h3 {
+      font-size: 17px;
+      font-weight: 700;
+      color: #f3f4f6;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .count-badge {
+      background: #252533;
+      color: #9ca3af;
+      font-size: 12px;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-weight: 600;
+    }
+
+    .members-list, .requests-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .member-item-card {
+      background: #181820;
+      border: 1px solid #272735;
+      border-radius: 10px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      transition: border-color 0.2s;
+    }
+
+    .member-item-card:hover {
+      border-color: #38384d;
+    }
+
+    .member-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .member-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1px solid #3a3a4c;
+    }
+
+    .member-info h4 {
+      font-size: 14px;
+      font-weight: 700;
+      color: #f3f4f6;
+      margin: 0 0 2px;
+    }
+
+    .member-info p {
+      font-size: 12px;
+      color: #9ca3af;
+      margin: 0;
+    }
+
+    .role-badge {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-left: 6px;
+    }
+
+    .role-leader {
+      background: rgba(239, 68, 68, 0.15);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .role-member {
+      background: rgba(59, 130, 246, 0.15);
+      color: #60a5fa;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+
+    .member-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-kick-member {
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .btn-kick-member:hover {
+      background: #ef4444;
+      color: #ffffff;
+      border-color: #ef4444;
+    }
+
+    .btn-accept-request {
+      background: #10b981;
+      color: #ffffff;
+      border: none;
+      padding: 7px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .btn-accept-request:hover {
+      background: #059669;
+    }
+
+    .btn-refuse-request {
+      background: #252533;
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      padding: 7px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .btn-refuse-request:hover {
+      background: #ef4444;
+      color: #ffffff;
+    }
+
+    .empty-state-box {
+      text-align: center;
+      padding: 30px 16px;
+      color: #9ca3af;
+      font-size: 14px;
+      background: #181820;
+      border-radius: 10px;
+      border: 1px dashed #2d2d3d;
+    }
+
+    .empty-state-box i {
+      font-size: 28px;
+      color: #4b5563;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    /* Modal de Edição */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+      padding: 20px;
+    }
+
+    .modal-card {
+      background: #14141a;
+      border: 1px solid #2d2d3d;
+      border-radius: 16px;
+      max-width: 520px;
+      width: 100%;
+      padding: 24px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #242433;
+      padding-bottom: 14px;
+    }
+
+    .modal-header h3 {
+      font-size: 18px;
+      font-weight: 800;
+      color: #ffffff;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modal-close {
+      background: transparent;
+      border: none;
+      color: #9ca3af;
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    .modal-close:hover {
+      color: #ffffff;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #d1d5db;
+      margin-bottom: 6px;
+    }
+
+    .form-group input, .form-group textarea, .form-group select {
+      width: 100%;
+      background: #1a1a24;
+      border: 1px solid #2b2b3a;
+      color: #ffffff;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 14px;
+      box-sizing: border-box;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+      border-color: #ff3b30;
+    }
+
+    .modal-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 24px;
+    }
+
+    .btn-cancel {
+      background: #20202a;
+      color: #9ca3af;
+      border: 1px solid #2e2e3d;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-cancel:hover {
+      color: #ffffff;
+    }
+
+    .btn-save {
+      background: #ff3b30;
+      color: #ffffff;
+      border: none;
+      padding: 10px 22px;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-save:hover {
+      background: #e03126;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== HEADER GLOBAL ===== -->
+  <header>
+    <nav class="navbar">
+      <div class="header-left">
+        <button id="menuToggle" class="menu-button" aria-label="Abrir menu lateral"><i class="fa-solid fa-bars"></i></button>
+        <div class="logo_header">
+          <a href="/pagina_inicial/index.html">
+            <img referrerpolicy="no-referrer" src="/image/logo%20plus%20tipo%20textura.png" alt="VersusHub">
+          </a>
+        </div>
+      </div>
+
+      <div class="botoes_header">
+        <a href="/pagina_inicial/torneios.html"><button id="torneios_header">Torneios</button></a>
+        <a href="/equipes/equipes.html"><button id="equipes_header">Equipes</button></a>
+
+        <form class="search-header" id="searchHeaderForm">
+          <input type="text" placeholder="Buscar torneios, equipes..." id="searchInput" aria-label="Buscar">
+          <button type="submit" id="searchBtn" aria-label="Buscar"><i class="fa-solid fa-magnifying-glass"></i></button>
+        </form>
+
+        <a href="/login/login.html" id="btentrar">Entrar</a>
+        <a href="/cadastro/cadastro.html" id="btcadastrar">Cadastrar-se</a>
+
+        <div class="user-icon">
+          <img referrerpolicy="no-referrer" src="/image/boneco_logo_ofc.png" alt="Usuário" id="userBtn">
+          <ul id="menuUser" class="hidden">
+            <li><a href="/login/login.html">Login</a></li>
+            <hr>
+            <li><a href="/cadastro/cadastro.html">Cadastro</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+  <!-- FIM HEADER -->
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar" class="sidebar">
+    <h2 class="sidebar-title"></h2>
+    <nav class="sidebar-nav">
+      <a href="/pagina_inicial/index.html"><i class="fa-solid fa-house" style="margin-right: 10px; width: 16px; text-align: center;"></i>Início</a>
+      <a href="/pagina_inicial/torneios.html"><i class="fa-solid fa-trophy" style="margin-right: 10px; width: 16px; text-align: center;"></i>Todos os torneios</a>
+      <a href="/aovivo/aovivo.html"><i class="fa-solid fa-tower-broadcast" style="margin-right: 10px; width: 16px; text-align: center;"></i>Torneios ao vivo</a>
+      <a href="/criar_torneio/criar_torneio.html"><i class="fa-solid fa-award" style="margin-right: 10px; width: 16px; text-align: center;"></i>Criar Torneio</a>
+      <a href="/equipes/equipes.html"><i class="fa-solid fa-users" style="margin-right: 10px; width: 16px; text-align: center;"></i>Equipes</a>
+      <a href="/ranking.html"><i class="fa-solid fa-users-viewfinder" style="margin-right: 10px; width: 16px; text-align: center;"></i>Jogadores e Ranking</a>
+      <a href="/gerenciartorneios/gerentornindex.html"><i class="fa-solid fa-file-invoice" style="margin-right: 10px; width: 16px; text-align: center;"></i>Gerenciar torneios</a>
+      <a href="/equipes/gerenciar_equipes.html"><i class="fa-solid fa-list-check" style="margin-right: 10px; width: 16px; text-align: center;"></i>Gerenciar Equipes</a>
+      <a href="/termos/termos.html"><i class="fa-solid fa-briefcase" style="margin-right: 10px; width: 16px; text-align: center;"></i>Termos de Uso</a>
+      <a href="/feedback/feedback.html"><i class="fa-solid fa-star" style="margin-right: 10px; width: 16px; text-align: center;"></i>Enviar feedback / Sugestão</a>
+    </nav>
+  </aside>
+  <div id="sidebarOverlay" class="sidebar-overlay"></div>
+  <!-- FIM SIDEBAR -->
+
+  <!-- CONTEÚDO PRINCIPAL -->
+  <main class="manage-teams-page">
+    <div class="manage-teams-header">
+      <h1><i class="fa-solid fa-list-check"></i> Gerenciar Equipes</h1>
+      <p>Gerencie as equipes sob sua liderança, edite informações, aprove solicitações ou remova membros.</p>
+    </div>
+
+    <div class="manage-grid">
+      <!-- Coluna Esquerda: Lista de Equipes -->
+      <div class="teams-sidebar-panel">
+        <div class="teams-section-title">
+          <i class="fa-solid fa-crown"></i> Equipes que Lidero
+        </div>
+        <div id="minhasEquipesList">
+          <div class="empty-state-box">
+            <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 24px; color: #ff3b30;"></i>
+            Carregando equipes...
+          </div>
+        </div>
+
+        <a href="/cria_equipe/criar_equipe.html" class="btn-create-new-team">
+          <i class="fa-solid fa-plus"></i> Criar Nova Equipe
+        </a>
+
+        <div class="teams-section-title" style="margin-top: 28px;">
+          <i class="fa-solid fa-users"></i> Equipes que Participo
+        </div>
+        <div id="equipesQueParticipoList">
+          <div class="empty-state-box">
+            <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 24px; color: #ff3b30;"></i>
+            Buscando suas equipes...
+          </div>
+        </div>
+      </div>
+
+      <!-- Coluna Direita: Painel da Equipe Ativa -->
+      <div class="team-details-panel" id="teamDetailsPanel">
+        <div class="empty-state-box" style="padding: 60px 20px;">
+          <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 36px; color: #ff3b30; margin-bottom: 16px;"></i>
+          <h3 style="color: #f3f4f6; font-size: 18px; margin-bottom: 6px;">Carregando painel de gerenciamento...</h3>
+          <p style="color: #9ca3af;">Aguarde enquanto sincronizamos os dados da sua equipe.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal de Edição de Equipe -->
+  <div id="modalEditarEquipe" class="modal-overlay" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-pen-to-square" style="color: #ff3b30;"></i> Editar Informações da Equipe</h3>
+        <button type="button" class="modal-close" id="btnFecharModalEdit">&times;</button>
+      </div>
+      <form id="formEditTeam">
+        <input type="hidden" id="editTeamId">
+        <div class="form-group">
+          <label for="editTeamNome">Nome da Equipe</label>
+          <input type="text" id="editTeamNome" required>
+        </div>
+        <div class="form-group">
+          <label for="editTeamTag">Tag / Sigla</label>
+          <input type="text" id="editTeamTag" placeholder="Ex: VSH">
+        </div>
+        <div class="form-group">
+          <label for="editTeamJogos">Jogos Competitivos</label>
+          <input type="text" id="editTeamJogos" placeholder="Ex: CS2, Valorant, Free Fire" required>
+        </div>
+        <div class="form-group">
+          <label for="editTeamLogo">URL do Logo / Banner</label>
+          <input type="text" id="editTeamLogo" placeholder="https://exemplo.com/logo.png">
+        </div>
+        <div class="form-group">
+          <label for="editTeamRegiao">Região</label>
+          <input type="text" id="editTeamRegiao" placeholder="Ex: Brasil / América Latina">
+        </div>
+        <div class="form-group">
+          <label for="editTeamSobre">Descrição / Sobre</label>
+          <textarea id="editTeamSobre" rows="3" placeholder="Apresentação e objetivos da equipe..."></textarea>
+        </div>
+        <div class="modal-buttons">
+          <button type="button" class="btn-cancel" id="btnCancelarModalEdit">Cancelar</button>
+          <button type="submit" class="btn-save" id="btnSalvarModalEdit">Salvar Alterações</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="/pagina_inicial/js/scrip.js"></script>
+  <script type="module" src="/equipes/js/gerenciar_equipes.js"></script>
+</body>
+</html>
