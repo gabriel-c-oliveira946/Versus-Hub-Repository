@@ -69,3 +69,4 @@ Toda a arquitetura do VersusHub, desde a construção da interface (Vanilla JS/H
 <div align="center">
   <i>"Elevando o cenário amador de e-sports para o próximo nível."</i>
 </div>
+
