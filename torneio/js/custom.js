@@ -1,105 +1,6 @@
 // /torneio/js/custom.js
 import { supabase } from '/supabaseClient.js';
 
-// Lista de apoio para torneios padrão do sistema caso id seja estático
-const predefinedTournaments = {
-  'gamescom-latam': {
-    id: 'gamescom-latam',
-    nome: 'Gamescom Latam CS:GO',
-    jogo: 'CS:GO • FPS • PC',
-    data: 'Início: 06/12/2025 às 19h',
-    status: 'Em andamento',
-    statusClass: 'status-andamento',
-    banner: '/images/torneio_csgo2.webp',
-    descricao: 'O Time To Battle League da Gamescom Latam reúne os maiores talentos de CS:GO da América Latina. Com uma premiação recorde e as melhores equipes disputando ponto a ponto, este campeonato consagra a equipe mais resiliente e tática do continente.',
-    regras: 'Times de 5x5\nEliminação dupla\nServidores locais em SP\nAnti-cheat obrigatório.',
-    requisitos: 'Idade 16+, Conta da Gamers Club verificada, Sem banimentos ativos.',
-    tipoPremio: 'valores',
-    premio1: 'R$ 15.000 + Vaga para o Mundial',
-    premio2: 'R$ 5.000',
-    premio3: 'R$ 2.500',
-    modalidade: 'presencial',
-    localizacao: 'São Paulo Expo, SP',
-    taxaTipo: 'gratis',
-    criadorEmail: 'admin@versushub.com'
-  },
-  'parana-startups': {
-    id: 'parana-startups',
-    nome: 'CS-GO Startups Challenge',
-    jogo: 'CS:GO • FPS • PC',
-    data: 'Início: 04/11/2025 às 18h',
-    status: 'Encerrado',
-    statusClass: 'status-encerrado',
-    banner: '/images/fileiracsgo.jpeg',
-    descricao: 'O Paraná Startups Challenge une o ecossistema de tecnologia e inovação com o mundo dos e-sports. Empresas de tecnologia disputam a supremacia em partidas empolgantes de Counter-Strike.',
-    regras: 'Times compostos por colaboradores ou parceiros das startups inscritas\nFormato suíço\nPartidas MD1 na fase de grupos, MD3 nas finais.',
-    requisitos: 'Vínculo com startup participante, conta Steam válida.',
-    tipoPremio: 'valores',
-    premio1: 'Troféu Startups + R$ 5.000 em créditos de nuvem',
-    premio2: 'Mentorias de negócios + Placas comemorativas',
-    premio3: 'Kit de brindes dos patrocinadores',
-    modalidade: 'online',
-    localizacao: 'Online (Servidor SP)',
-    taxaTipo: 'gratis'
-  },
-  'copa-ff': {
-    id: 'copa-ff',
-    nome: 'C.O.P.A - FREE FIRE',
-    jogo: 'Free Fire • Battle Royale • Mobile',
-    data: 'Início: 23/01/2026 às 18h',
-    status: 'Em andamento',
-    statusClass: 'status-andamento',
-    banner: '/images/ffcopaff.png',
-    descricao: 'A clássica Copa Free Fire traz os squads mais agressivos e estratégicos do cenário mobile. Sobrevivência, rotações precisas e combates de alta velocidade marcam essa emocionante competição oficial.',
-    regras: 'Formato de pontos corridos\nQuedas em Bermuda, Purgatório e Kalahari\n6 quedas por rodada.',
-    requisitos: 'Dispositivo mobile apenas (emulador proibido), nível 50+ na conta.',
-    tipoPremio: 'valores',
-    premio1: 'R$ 10.000 + Troféu C.O.P.A',
-    premio2: 'R$ 4.000',
-    premio3: 'R$ 2.000',
-    modalidade: 'online',
-    localizacao: 'Online (Servidor Mobile)',
-    taxaTipo: 'gratis'
-  },
-  'contra-cup': {
-    id: 'contra-cup',
-    nome: 'Contra Cup Free Fire',
-    jogo: 'Free Fire • Battle Royale • Mobile',
-    data: 'Início: 01/03/2026 às 17h',
-    status: 'Em andamento',
-    statusClass: 'status-andamento',
-    banner: '/images/contracup.jpeg',
-    descricao: 'A Contra Cup é um torneio focado no confronto direto 4v4 contra adversários do mesmo nível, testando a frieza e precisão dos competidores sob extrema pressão.',
-    regras: 'Confronto Contra Squad tradicional\nMD5 até quartas, MD7 nas fases finais\nSem armas apelativas/proibidas.',
-    requisitos: 'Squad de 4 jogadores + 1 reserva.',
-    tipoPremio: 'valores',
-    premio1: 'R$ 3.000 + Medalhas',
-    premio2: 'R$ 1.000',
-    modalidade: 'online',
-    localizacao: 'Online',
-    taxaTipo: 'gratis'
-  },
-  'arena-fc25': {
-    id: 'arena-fc25',
-    nome: 'ARENA - FC25',
-    jogo: 'FIFA • Esportes • Console',
-    data: 'Início: 05/05/2026 às 19h',
-    status: 'Inscrições abertas',
-    statusClass: 'status-aberto',
-    banner: '/pagina_inicial/image/arenafc25.jpg',
-    descricao: 'Entre em campo na nova edição da Copa ARENA FC25! Teste suas novas jogadas ensaiadas, dribles e táticas no simulador de futebol mais jogado do planeta.',
-    regras: 'Modo Ultimate Team (UT)\nLimite de classificação de elenco de até 88\nMD3 nas eliminatórias.',
-    requisitos: 'Jogo EA Sports FC 25 original, conta ativa na PSN ou Xbox Live.',
-    tipoPremio: 'valores',
-    premio1: 'R$ 5.000 + 12.000 FC Points',
-    premio2: 'R$ 2.000 + 5.800 FC Points',
-    premio3: 'R$ 1.000 + 2.800 FC Points',
-    modalidade: 'online',
-    localizacao: 'Online (Crossplay)',
-    taxaTipo: 'gratis'
-  }
-};
-
 function getLoggedUser() {
   const raw = localStorage.getItem('vh_loggedUser');
   if (raw) {
@@ -214,11 +115,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   } catch (err) {
     console.warn('Aviso ao consultar torneio no Supabase:', err);
-  }
-
-  // Fallback caso seja um torneio com chave predefinida do sistema
-  if (!torneio && predefinedTournaments[id]) {
-    torneio = predefinedTournaments[id];
   }
 
   if (!torneio) {
@@ -590,6 +486,248 @@ document.addEventListener('DOMContentLoaded', async () => {
           aplicarEstadoBotaoInscrito(btnInscrever, novaInscricao.status);
           carregarParticipantesConfirmados(torneio.id);
         });
+      });
+    }
+
+    // ==============================================================================
+    // 5. MODAL DE EDIÇÃO DE TORNEIO (Upload de Arquivo + Preview + Update Supabase)
+    // ==============================================================================
+    const modalEditarTorneio = document.getElementById('modalEditarTorneioCustom');
+    const formEditarTorneio = document.getElementById('formEditarTorneioCustom');
+    const btnAbrirModalEdit = document.getElementById('btnAbrirModalEditarTorneio');
+    const btnFecharModalEdit = document.getElementById('btnFecharModalEditarTorneio');
+    const btnCancelarModalEdit = document.getElementById('btnCancelarModalEditarTorneio');
+    const areaAcoesCriador = document.getElementById('areaAcoesCriador');
+
+    const fileInputBanner = document.getElementById('customEditBannerFile');
+    const previewBannerImg = document.getElementById('customEditBannerPreviewImg');
+    let customEditBannerDataUrl = '';
+
+    // Verifica se o usuário logado é o organizador/criador do torneio
+    const isCriador = loggedUser && (
+      (torneio.criadorEmail && loggedUser.email === torneio.criadorEmail) ||
+      (torneio.criador_email && loggedUser.email === torneio.criador_email) ||
+      (torneio.user_email && loggedUser.email === torneio.user_email) ||
+      loggedUser.isAdmin ||
+      loggedUser.cargo === 'admin' ||
+      loggedUser.email === 'admin@versushub.com'
+    );
+
+    const isCriadorLocal = (() => {
+      try {
+        const createdList = JSON.parse(localStorage.getItem('vh_createdTournaments') || '[]');
+        return createdList.some(t => String(t.id) === String(torneio.id));
+      } catch (e) {
+        return false;
+      }
+    })();
+
+    if (areaAcoesCriador && (isCriador || isCriadorLocal)) {
+      areaAcoesCriador.style.display = 'block';
+    }
+
+    if (fileInputBanner) {
+      fileInputBanner.addEventListener('change', (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+
+        if (!file.type.startsWith('image/')) {
+          showToast('Selecione apenas arquivos de imagem.');
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          customEditBannerDataUrl = ev.target.result;
+          if (previewBannerImg) {
+            previewBannerImg.src = customEditBannerDataUrl;
+          }
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function fecharModalEdicaoTorneio() {
+      if (modalEditarTorneio) modalEditarTorneio.style.display = 'none';
+    }
+
+    if (btnFecharModalEdit) btnFecharModalEdit.addEventListener('click', fecharModalEdicaoTorneio);
+    if (btnCancelarModalEdit) btnCancelarModalEdit.addEventListener('click', fecharModalEdicaoTorneio);
+    if (modalEditarTorneio) {
+      modalEditarTorneio.addEventListener('click', (e) => {
+        if (e.target === modalEditarTorneio) fecharModalEdicaoTorneio();
+      });
+    }
+
+    function abrirModalEdicaoTorneio() {
+      if (!modalEditarTorneio) return;
+
+      document.getElementById('customEditId').value = torneio.id;
+      document.getElementById('customEditNome').value = torneio.nome || '';
+      document.getElementById('customEditJogo').value = torneio.jogo || '';
+      document.getElementById('customEditData').value = torneio.data || '';
+      document.getElementById('customEditStatus').value = torneio.status || 'Inscrições abertas';
+      document.getElementById('customEditModalidade').value = torneio.modalidade || 'online';
+      document.getElementById('customEditLocalizacao').value = torneio.localizacao || '';
+      document.getElementById('customEditCategoria').value = (torneio.categoria || 'fps').toLowerCase();
+      document.getElementById('customEditPlataforma').value = torneio.plataforma || 'PC';
+      document.getElementById('customEditLimite').value = torneio.limite || '';
+      document.getElementById('customEditLink').value = torneio.link || '';
+      document.getElementById('customEditDescricao').value = torneio.descricao || '';
+      document.getElementById('customEditRegras').value = torneio.regras || '';
+      document.getElementById('customEditRequisitos').value = torneio.requisitos || '';
+
+      customEditBannerDataUrl = '';
+      if (fileInputBanner) fileInputBanner.value = '';
+      if (previewBannerImg) {
+        previewBannerImg.src = torneio.banner || '/images/cerradocup.jpg';
+        previewBannerImg.onerror = () => { previewBannerImg.src = '/images/cerradocup.jpg'; };
+      }
+
+      modalEditarTorneio.style.display = 'flex';
+    }
+
+    if (btnAbrirModalEdit) {
+      btnAbrirModalEdit.addEventListener('click', abrirModalEdicaoTorneio);
+    }
+
+    if (formEditarTorneio) {
+      formEditarTorneio.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const btnSave = document.getElementById('btnSalvarModalEditarTorneio');
+        if (btnSave) {
+          btnSave.disabled = true;
+          btnSave.textContent = 'Salvando...';
+        }
+
+        const bannerNovo = customEditBannerDataUrl || torneio.banner || '/images/cerradocup.jpg';
+        const statusNovo = document.getElementById('customEditStatus').value;
+        let statusClassNovo = 'status-aberto';
+        if (statusNovo === 'Em andamento' || statusNovo === 'Ao Vivo') statusClassNovo = 'status-andamento';
+        else if (statusNovo === 'Encerrado') statusClassNovo = 'status-encerrado';
+
+        const updatePayload = {
+          nome: document.getElementById('customEditNome').value.trim(),
+          jogo: document.getElementById('customEditJogo').value.trim(),
+          data: document.getElementById('customEditData').value.trim(),
+          status: statusNovo,
+          statusClass: statusClassNovo,
+          modalidade: document.getElementById('customEditModalidade').value,
+          localizacao: document.getElementById('customEditLocalizacao').value.trim(),
+          categoria: document.getElementById('customEditCategoria').value,
+          plataforma: document.getElementById('customEditPlataforma').value,
+          limite: document.getElementById('customEditLimite').value.trim(),
+          link: document.getElementById('customEditLink').value.trim(),
+          descricao: document.getElementById('customEditDescricao').value.trim(),
+          regras: document.getElementById('customEditRegras').value.trim(),
+          requisitos: document.getElementById('customEditRequisitos').value.trim(),
+          banner: bannerNovo
+        };
+
+        try {
+          // 1. Atualização no Supabase
+          const { error } = await supabase
+            .from('torneios')
+            .update(updatePayload)
+            .eq('id', torneio.id);
+
+          if (error) {
+            console.error('Erro ao salvar torneio no Supabase:', error);
+            showToast('Erro ao salvar alterações no banco de dados.');
+            return;
+          }
+
+          // 2. Atualiza objeto em memória
+          Object.assign(torneio, updatePayload);
+
+          // 3. Atualiza cache local vh_createdTournaments
+          try {
+            const allCreated = JSON.parse(localStorage.getItem('vh_createdTournaments') || '[]');
+            const idx = allCreated.findIndex(t => String(t.id) === String(torneio.id));
+            if (idx !== -1) {
+              allCreated[idx] = { ...allCreated[idx], ...updatePayload };
+              localStorage.setItem('vh_createdTournaments', JSON.stringify(allCreated));
+            }
+          } catch (e) {}
+
+          // 4. Atualiza os elementos visuais na página atual
+          if (detBanner) detBanner.src = torneio.banner;
+          if (detNome) detNome.textContent = torneio.nome;
+          document.title = `${torneio.nome || 'Torneio'} - VersusHub`;
+          if (detMeta) detMeta.textContent = torneio.jogo;
+          if (detData) detData.textContent = torneio.data;
+
+          if (detStatusBadge) {
+            detStatusBadge.textContent = torneio.status;
+            detStatusBadge.className = 'torneio-status-badge ' + (torneio.statusClass || 'status-aberto');
+          }
+          if (textoStatus) {
+            textoStatus.textContent = torneio.status;
+          }
+
+          if (detDescricao) {
+            detDescricao.textContent = torneio.descricao || 'Nenhuma descrição informada.';
+          }
+
+          if (listaRegras) {
+            listaRegras.innerHTML = '';
+            if (torneio.regras && torneio.regras.trim()) {
+              torneio.regras.split('\n').forEach(linha => {
+                const texto = linha.trim();
+                if (!texto) return;
+                const li = document.createElement('li');
+                li.textContent = texto;
+                listaRegras.appendChild(li);
+              });
+            } else {
+              const li = document.createElement('li');
+              li.textContent = 'Nenhuma regra específica cadastrada.';
+              listaRegras.appendChild(li);
+            }
+          }
+
+          if (detRequisitos) {
+            detRequisitos.textContent = torneio.requisitos || 'Nenhum requisito especial informado.';
+          }
+
+          if (tagCategoria) {
+            if (torneio.categoria) {
+              tagCategoria.textContent = `Categoria: ${torneio.categoria.toUpperCase()}`;
+              tagCategoria.style.display = 'inline-block';
+            } else {
+              tagCategoria.style.display = 'none';
+            }
+          }
+
+          if (tagPlataforma) {
+            if (torneio.plataforma) {
+              tagPlataforma.textContent = `Plataforma: ${torneio.plataforma.toUpperCase()}`;
+              tagPlataforma.style.display = 'inline-block';
+            } else {
+              tagPlataforma.style.display = 'none';
+            }
+          }
+
+          const modTexto = (torneio.modalidade === 'presencial') ? 'Presencial' : 'Online';
+          if (tagModalidade) tagModalidade.textContent = `Modalidade: ${modTexto}`;
+          if (infoModalidade) infoModalidade.textContent = modTexto;
+
+          const locTexto = torneio.localizacao || 'Online';
+          if (tagLocalizacao) tagLocalizacao.textContent = `Localização: ${locTexto}`;
+          if (infoLocal) infoLocal.textContent = locTexto;
+
+          fecharModalEdicaoTorneio();
+          showToast('Torneio atualizado com sucesso!');
+        } catch (err) {
+          console.error('Erro ao atualizar torneio:', err);
+          showToast('Ocorreu um erro ao atualizar o torneio.');
+        } finally {
+          if (btnSave) {
+            btnSave.disabled = false;
+            btnSave.textContent = 'Salvar Alterações';
+          }
+        }
       });
     }
   }

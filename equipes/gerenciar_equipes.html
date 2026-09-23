@@ -586,6 +586,30 @@
       transition: border-color 0.2s;
     }
 
+    .form-group input[type="file"] {
+      padding: 10px;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .form-group input[type="file"]::file-selector-button {
+      background: #1f1f2b;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-right: 12px;
+      transition: all 0.2s ease;
+    }
+
+    .form-group input[type="file"]::file-selector-button:hover {
+      background: #ff3b30;
+      border-color: #ff3b30;
+    }
+
     .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
       border-color: #ff3b30;
     }
@@ -628,39 +652,76 @@
 </head>
 <body>
 
-  <!-- ===== HEADER GLOBAL ===== -->
+    <!-- HEADER -->
   <header>
     <nav class="navbar">
+
+      <!-- ESQUERDA: menu + logo -->
       <div class="header-left">
-        <button id="menuToggle" class="menu-button" aria-label="Abrir menu lateral"><i class="fa-solid fa-bars"></i></button>
+
+        <!-- Botão do menu lateral (hambúrguer) -->
+        <button id="menuToggle" class="menu-button" aria-label="Abrir menu lateral">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="menu-svg"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+
+        <!-- LOGO -->
         <div class="logo_header">
           <a href="/pagina_inicial/index.html">
             <img referrerpolicy="no-referrer" src="/image/logo%20plus%20tipo%20textura.png" alt="VersusHub">
           </a>
         </div>
+
       </div>
 
+      <!-- CENTRO: botões principais -->
       <div class="botoes_header">
-        <a href="/pagina_inicial/torneios.html"><button id="torneios_header">Torneios</button></a>
+        <a href="/aovivo/aovivo.html"><button id="aovivo_header">Ao Vivo</button></a>
+        <a href="/criar_torneio/criar_torneio.html"><button id="criar_header">Criar Torneio</button></a>
         <a href="/equipes/equipes.html"><button id="equipes_header">Equipes</button></a>
+      </div>
 
-        <form class="search-header" id="searchHeaderForm">
-          <input type="text" placeholder="Buscar torneios, equipes..." id="searchInput" aria-label="Buscar">
+      <!-- DIREITA: pesquisa + entrar + cadastrar + usuário -->
+      <div class="header-right">
+
+        <!-- BARRA DE PESQUISA NO HEADER -->
+        <form class="search-header" id="searchHeaderForm" action="#" onsubmit="return false">
+          <input
+            type="text"
+            placeholder="Buscar torneios, jogos..."
+            id="searchInput"
+            aria-label="Buscar"
+          >
           <button type="submit" id="searchBtn" aria-label="Buscar"><i class="fa-solid fa-magnifying-glass"></i></button>
         </form>
 
+        <!-- BOTÕES À DIREITA -->
         <a href="/login/login.html" id="btentrar">Entrar</a>
         <a href="/cadastro/cadastro.html" id="btcadastrar">Cadastrar-se</a>
 
+        <!-- ÍCONE DO USUÁRIO -->
         <div class="user-icon">
           <img referrerpolicy="no-referrer" src="/image/boneco_logo_ofc.png" alt="Usuário" id="userBtn">
+
           <ul id="menuUser" class="hidden">
-            <li><a href="/login/login.html">Login</a></li>
+            <li>
+              <a href="/login/login.html"><i class="fa-solid fa-right-to-bracket" style="margin-right: 8px;"></i>Login</a>
+            </li>
             <hr>
-            <li><a href="/cadastro/cadastro.html">Cadastro</a></li>
+            <li>
+              <a href="/cadastro/cadastro.html"><i class="fa-solid fa-user-plus" style="margin-right: 8px;"></i>Cadastro</a>
+            </li>
+            <hr>
+            <li>
+              <a href="/gerenciartorneios/gerentornindex.html"><i class="fa-solid fa-file-invoice" style="margin-right: 8px;"></i>Gerenciar Torneios</a>
+            </li>
+            <li>
+              <a href="/equipes/gerenciar_equipes.html"><i class="fa-solid fa-list-check" style="margin-right: 8px;"></i>Gerenciar Equipes</a>
+            </li>
           </ul>
         </div>
+
       </div>
+
     </nav>
   </header>
   <!-- FIM HEADER -->
@@ -681,6 +742,8 @@
       <a href="/feedback/feedback.html"><i class="fa-solid fa-star" style="margin-right: 10px; width: 16px; text-align: center;"></i>Enviar feedback / Sugestão</a>
     </nav>
   </aside>
+
+  <!-- efeito da tela ficar escura no fundo -->
   <div id="sidebarOverlay" class="sidebar-overlay"></div>
   <!-- FIM SIDEBAR -->
 
@@ -752,8 +815,12 @@
           <input type="text" id="editTeamJogos" placeholder="Ex: CS2, Valorant, Free Fire" required>
         </div>
         <div class="form-group">
-          <label for="editTeamLogo">URL do Logo / Banner</label>
-          <input type="text" id="editTeamLogo" placeholder="https://exemplo.com/logo.png">
+          <label for="editTeamLogoFile">Logo da Equipe</label>
+          <p class="hint" style="font-size: 12px; color: #9ca3af; margin-top: -2px; margin-bottom: 8px;">Recomendado: imagem quadrada ou 1:1.</p>
+          <input type="file" id="editTeamLogoFile" accept="image/*">
+          <div class="logo-preview-box" id="editTeamLogoPreview" style="margin-top: 10px; border-radius: 12px; border: 2px dashed rgba(255, 255, 255, 0.15); background: rgba(0, 0, 0, 0.3); min-height: 120px; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 12px;">
+            <img id="editTeamLogoImg" src="/image/logo.png" alt="Preview da Logo" style="width: 90px; height: 90px; object-fit: cover; border-radius: 50%; border: 3px solid #ff3b30; box-shadow: 0 0 12px rgba(255, 59, 48, 0.3);">
+          </div>
         </div>
         <div class="form-group">
           <label for="editTeamRegiao">Região</label>

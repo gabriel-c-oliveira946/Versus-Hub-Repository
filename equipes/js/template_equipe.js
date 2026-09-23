@@ -165,29 +165,52 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 4. Integrantes (Consulta no membros_equipe + cruzamento com usuarios)
     const membersList = document.getElementById('teamMembersList');
-    if (membersList) {
-      membersList.innerHTML = `
-        <div style="color: #9cb1cf; font-size: 14px; padding: 10px 0;">
-          <i class="fa-solid fa-circle-notch fa-spin" style="color: #f83838; margin-right: 8px;"></i>
-          Carregando integrantes...
-        </div>
-      `;
+    let membrosEquipe = [];
 
-      let membrosEquipe = [];
-      try {
-        const { data: membrosData, error: membrosErr } = await supabase
-          .from('membros_equipe')
-          .select('*')
-          .in('equipe_id', [String(equipe.id), String(equipe.nome)])
-          .eq('status', 'Aceito');
+    try {
+      const { data: membrosData, error: membrosErr } = await supabase
+        .from('membros_equipe')
+        .select('*')
+        .in('equipe_id', [String(equipe.id), String(equipe.nome)])
+        .eq('status', 'Aceito');
 
-        if (!membrosErr && membrosData) {
-          membrosEquipe = membrosData;
-        }
-      } catch (err) {
-        console.warn('Erro ao consultar membros da equipe:', err);
+      if (!membrosErr && membrosData) {
+        membrosEquipe = membrosData;
       }
+    } catch (err) {
+      console.warn('Erro ao consultar membros da equipe:', err);
+    }
 
+    const leaderEmailNormalized = (equipe.leaderEmail || '').toLowerCase().trim();
+    const aceitosSemLider = (membrosEquipe || []).filter(m => {
+      const mEmail = (m.user_email || '').toLowerCase().trim();
+      return !leaderEmailNormalized || mEmail !== leaderEmailNormalized;
+    });
+
+    const leaderCount = (equipe.leaderEmail || equipe.leaderName || equipe.lider) ? 1 : 0;
+    const totalMembros = leaderCount + aceitosSemLider.length;
+    const limiteMax = parseInt(equipe.limite, 10) > 0 ? parseInt(equipe.limite, 10) : 5;
+    const isEquipeCheia = totalMembros >= limiteMax;
+
+    // Atualiza metadado de Vagas / Integrantes no Hero
+    let vagasMetaEl = document.getElementById('teamVagasMeta');
+    if (!vagasMetaEl) {
+      vagasMetaEl = document.createElement('p');
+      vagasMetaEl.id = 'teamVagasMeta';
+      vagasMetaEl.className = 'team-meta';
+      const leaderText = document.getElementById('teamLeaderText');
+      if (leaderText && leaderText.parentNode) {
+        leaderText.parentNode.insertBefore(vagasMetaEl, leaderText.nextSibling);
+      }
+    }
+    if (vagasMetaEl) {
+      const statusBadge = isEquipeCheia 
+        ? '<span style="color: #ef4444; font-weight: 700; margin-left: 8px;">(Equipe Cheia)</span>'
+        : '<span style="color: #22c55e; font-weight: 700; margin-left: 8px;">(Vagas Abertas)</span>';
+      vagasMetaEl.innerHTML = `Integrantes: <strong style="color: ${isEquipeCheia ? '#f87171' : '#f4f4f5'};">${totalMembros} / ${limiteMax}</strong> ${statusBadge}`;
+    }
+
+    if (membersList) {
       // Prepara lista de emails para cruzamento com a tabela 'usuarios'
       const emailsParaConsultar = (membrosEquipe || []).map(m => m.user_email).filter(Boolean);
       if (equipe.leaderEmail && !emailsParaConsultar.includes(equipe.leaderEmail)) {
@@ -235,12 +258,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       membersList.appendChild(leaderDiv);
 
       // 4.2 Renderiza os membros Aceitos envolvidos na tag <a class="member-link">
-      if (membrosEquipe && membrosEquipe.length > 0) {
-        membrosEquipe.forEach(m => {
-          if (equipe.leaderEmail && m.user_email && m.user_email.toLowerCase() === equipe.leaderEmail.toLowerCase()) {
-            return;
-          }
-
+      if (aceitosSemLider.length > 0) {
+        aceitosSemLider.forEach(m => {
           const u = m.user_email ? usuariosMap.get(m.user_email.toLowerCase()) : null;
           const membroId = u?.id || m.id;
           const membroNome = u?.nome || (m.user_email ? m.user_email.split('@')[0] : 'Membro');
@@ -259,27 +278,31 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     }
 
-    // 5. Botão de Ingressar / Gerenciar Solicitações
+    // 5. Botão de Ingressar / Gerenciar Solicitações com controle rigoroso de vagas
     const joinBtn = document.querySelector('.btn-join-team') || document.getElementById('btnSolicitacoes');
     if (joinBtn) {
       if (isLider) {
-        // Se for líder, ajusta texto e ação de gestão
-        joinBtn.innerHTML = '<i class="fa-solid fa-list-check" style="margin-right: 8px;"></i>Gerenciar Equipe';
-        joinBtn.style.background = '#4b5563'; // Tom neutro
+        // Se for líder, ação de gerenciamento
+        joinBtn.innerHTML = '<i class="fa-solid fa-list-check" style="margin-right: 8px;"></i>Gerenciar Solicitações';
+        joinBtn.style.background = '#4b5563';
         joinBtn.style.border = 'none';
         joinBtn.style.cursor = 'pointer';
         joinBtn.disabled = false;
         joinBtn.onclick = () => {
           window.location.href = '/equipes/gerenciar_equipes.html';
         };
-      } else {
-        // Se não for líder, força texto "Pedir para entrar" e mantém fluxo de inscrição
-        joinBtn.innerHTML = '<i class="fa-solid fa-user-plus" style="margin-right: 8px;"></i>Pedir para entrar';
-        joinBtn.style.background = '#d41111';
-        joinBtn.style.cursor = 'pointer';
-        joinBtn.disabled = false;
 
+        const btnEdit = document.getElementById('btnAbrirModalEditarEquipe');
+        if (btnEdit) {
+          btnEdit.style.display = 'inline-flex';
+          btnEdit.style.alignItems = 'center';
+          btnEdit.onclick = () => {
+            abrirModalEdicaoTemplate();
+          };
+        }
+      } else {
         let jaSolicitou = false;
+        let isMembroAceito = false;
 
         if (loggedUser && loggedUser.email) {
           try {
@@ -291,19 +314,39 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (userReqs && userReqs.length > 0) {
               const req = userReqs[0];
-              jaSolicitou = true;
               if (req.status === 'Aceito') {
-                joinBtn.innerHTML = '<i class="fa-solid fa-check" style="margin-right: 8px;"></i>Integrante da Equipe';
-                joinBtn.style.background = '#22c55e';
-                joinBtn.disabled = true;
+                isMembroAceito = true;
               } else {
-                joinBtn.innerHTML = '<i class="fa-solid fa-clock" style="margin-right: 8px;"></i>Pendente de Aprovação';
-                joinBtn.style.background = '#eab308';
+                jaSolicitou = true;
               }
             }
           } catch (err) {
             console.warn('Erro ao checar solicitação prévia:', err);
           }
+        }
+
+        // Renderiza estado do botão
+        if (isMembroAceito) {
+          joinBtn.innerHTML = '<i class="fa-solid fa-circle-check" style="margin-right: 8px;"></i>Integrante da Equipe';
+          joinBtn.style.background = '#15803d';
+          joinBtn.style.cursor = 'default';
+          joinBtn.disabled = true;
+        } else if (jaSolicitou) {
+          joinBtn.innerHTML = '<i class="fa-solid fa-clock" style="margin-right: 8px;"></i>Pendente (Clique p/ cancelar)';
+          joinBtn.style.background = '#ca8a04';
+          joinBtn.style.cursor = 'pointer';
+          joinBtn.disabled = false;
+        } else if (isEquipeCheia) {
+          joinBtn.innerHTML = '<i class="fa-solid fa-ban" style="margin-right: 8px;"></i>Equipe Cheia';
+          joinBtn.style.background = '#374151';
+          joinBtn.style.border = '1px solid #4b5563';
+          joinBtn.style.cursor = 'not-allowed';
+          joinBtn.disabled = true;
+        } else {
+          joinBtn.innerHTML = '<i class="fa-solid fa-user-plus" style="margin-right: 8px;"></i>Pedir para entrar';
+          joinBtn.style.background = '#d41111';
+          joinBtn.style.cursor = 'pointer';
+          joinBtn.disabled = false;
         }
 
         joinBtn.onclick = async () => {
@@ -312,7 +355,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
           }
 
+          if (isMembroAceito) return;
+
+          if (isEquipeCheia && !jaSolicitou) {
+            showToast('Esta equipe já atingiu o limite de integrantes e está cheia.');
+            return;
+          }
+
           joinBtn.disabled = true;
+          const originalText = joinBtn.innerHTML;
+          joinBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin" style="margin-right: 8px;"></i>Processando...';
 
           try {
             if (jaSolicitou) {
@@ -326,10 +378,40 @@ document.addEventListener('DOMContentLoaded', async () => {
               if (delErr) throw delErr;
 
               jaSolicitou = false;
-              joinBtn.innerHTML = '<i class="fa-solid fa-user-plus" style="margin-right: 8px;"></i>Pedir para entrar';
-              joinBtn.style.background = '#d41111';
+              if (isEquipeCheia) {
+                joinBtn.innerHTML = '<i class="fa-solid fa-ban" style="margin-right: 8px;"></i>Equipe Cheia';
+                joinBtn.style.background = '#374151';
+                joinBtn.style.cursor = 'not-allowed';
+                joinBtn.disabled = true;
+              } else {
+                joinBtn.innerHTML = '<i class="fa-solid fa-user-plus" style="margin-right: 8px;"></i>Pedir para entrar';
+                joinBtn.style.background = '#d41111';
+                joinBtn.style.cursor = 'pointer';
+                joinBtn.disabled = false;
+              }
               showToast('Solicitação de entrada cancelada.');
             } else {
+              // Verifica se a equipe ainda tem vaga antes de enviar
+              const { data: latestAccepted } = await supabase
+                .from('membros_equipe')
+                .select('id, user_email')
+                .in('equipe_id', [String(equipe.id), String(equipe.nome)])
+                .eq('status', 'Aceito');
+
+              const latestSemLider = (latestAccepted || []).filter(m => {
+                const mEmail = (m.user_email || '').toLowerCase().trim();
+                return !leaderEmailNormalized || mEmail !== leaderEmailNormalized;
+              });
+
+              if (leaderCount + latestSemLider.length >= limiteMax) {
+                showToast(`A equipe atingiu o limite máximo de ${limiteMax} membros.`);
+                joinBtn.innerHTML = '<i class="fa-solid fa-ban" style="margin-right: 8px;"></i>Equipe Cheia';
+                joinBtn.style.background = '#374151';
+                joinBtn.style.cursor = 'not-allowed';
+                joinBtn.disabled = true;
+                return;
+              }
+
               // Envia nova solicitação
               const { error: insErr } = await supabase
                 .from('membros_equipe')
@@ -342,14 +424,16 @@ document.addEventListener('DOMContentLoaded', async () => {
               if (insErr) throw insErr;
 
               jaSolicitou = true;
-              joinBtn.innerHTML = '<i class="fa-solid fa-clock" style="margin-right: 8px;"></i>Pendente de Aprovação';
-              joinBtn.style.background = '#eab308';
+              joinBtn.innerHTML = '<i class="fa-solid fa-clock" style="margin-right: 8px;"></i>Pendente (Clique p/ cancelar)';
+              joinBtn.style.background = '#ca8a04';
+              joinBtn.style.cursor = 'pointer';
+              joinBtn.disabled = false;
               showToast('Solicitação enviada com sucesso!');
             }
           } catch (err) {
             console.error('Erro ao processar solicitação de equipe:', err);
             showToast('Não foi possível processar a solicitação.');
-          } finally {
+            joinBtn.innerHTML = originalText;
             joinBtn.disabled = false;
           }
         };
@@ -418,6 +502,167 @@ document.addEventListener('DOMContentLoaded', async () => {
           atuaisEl.appendChild(card);
         });
       }
+    }
+
+    // ==============================================================================
+    // 6. MODAL DE EDIÇÃO DIRETA DA EQUIPE (Para Líder)
+    // ==============================================================================
+    const modalEditTpl = document.getElementById('modalEditarEquipeTemplate');
+    const formEditTpl = document.getElementById('formEditTeamTemplate');
+    const btnFecharModalTpl = document.getElementById('btnFecharModalTemplateEdit');
+    const btnCancelarModalTpl = document.getElementById('btnCancelarModalTemplateEdit');
+    const fileInputTpl = document.getElementById('tplEditTeamLogoFile');
+    const logoImgTpl = document.getElementById('tplEditTeamLogoImg');
+    let tplEditLogoDataUrl = '';
+
+    if (fileInputTpl) {
+      fileInputTpl.addEventListener('change', (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+
+        if (!file.type.startsWith('image/')) {
+          showToast('Selecione apenas arquivos de imagem.');
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          tplEditLogoDataUrl = ev.target.result;
+          if (logoImgTpl) {
+            logoImgTpl.src = tplEditLogoDataUrl;
+          }
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function fecharModalEdicaoTemplate() {
+      if (modalEditTpl) modalEditTpl.style.display = 'none';
+    }
+
+    if (btnFecharModalTpl) btnFecharModalTpl.addEventListener('click', fecharModalEdicaoTemplate);
+    if (btnCancelarModalTpl) btnCancelarModalTpl.addEventListener('click', fecharModalEdicaoTemplate);
+    if (modalEditTpl) {
+      modalEditTpl.addEventListener('click', (e) => {
+        if (e.target === modalEditTpl) fecharModalEdicaoTemplate();
+      });
+    }
+
+    function abrirModalEdicaoTemplate() {
+      if (!modalEditTpl) return;
+      document.getElementById('tplEditTeamId').value = equipe.id;
+      document.getElementById('tplEditTeamNome').value = equipe.nome || '';
+      document.getElementById('tplEditTeamTag').value = equipe.tag || '';
+      document.getElementById('tplEditTeamJogos').value = equipe.jogos || '';
+      document.getElementById('tplEditTeamRegiao').value = equipe.regiao || '';
+      document.getElementById('tplEditTeamSobre').value = equipe.sobre || '';
+
+      tplEditLogoDataUrl = '';
+      if (fileInputTpl) fileInputTpl.value = '';
+      if (logoImgTpl) {
+        logoImgTpl.src = equipe.logo || '/image/logo.png';
+        logoImgTpl.onerror = () => { logoImgTpl.src = '/image/logo.png'; };
+      }
+
+      modalEditTpl.style.display = 'flex';
+    }
+
+    if (formEditTpl) {
+      formEditTpl.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const novoNome = document.getElementById('tplEditTeamNome').value.trim();
+        const novaTag = document.getElementById('tplEditTeamTag').value.trim();
+        const novosJogos = document.getElementById('tplEditTeamJogos').value.trim();
+        const novaRegiao = document.getElementById('tplEditTeamRegiao').value.trim() || 'Brasil';
+        const novoSobre = document.getElementById('tplEditTeamSobre').value.trim();
+        const novoLogo = tplEditLogoDataUrl || equipe.logo || '/image/logo.png';
+
+        const btnSave = document.getElementById('btnSalvarModalTemplateEdit');
+        if (btnSave) {
+          btnSave.disabled = true;
+          btnSave.textContent = 'Salvando...';
+        }
+
+        const updatePayload = {
+          nome: novoNome,
+          tag: novaTag,
+          jogos: novosJogos,
+          logo: novoLogo,
+          regiao: novaRegiao,
+          sobre: novoSobre
+        };
+
+        try {
+          // 1. Atualiza no Supabase
+          const { error } = await supabase
+            .from('equipes')
+            .update(updatePayload)
+            .eq('id', equipe.id);
+
+          if (error) {
+            console.error('Erro ao atualizar equipe no Supabase:', error);
+            showToast('Erro ao salvar no banco de dados.');
+            return;
+          }
+
+          // 2. Atualiza objeto na memória
+          Object.assign(equipe, updatePayload);
+
+          // 3. Atualiza cache local vh_createdTeams e vh_cachedEquipes
+          try {
+            const allCreated = JSON.parse(localStorage.getItem('vh_createdTeams') || '[]');
+            const idx = allCreated.findIndex(t => String(t.id) === String(equipe.id));
+            if (idx !== -1) {
+              allCreated[idx] = { ...allCreated[idx], ...updatePayload };
+              localStorage.setItem('vh_createdTeams', JSON.stringify(allCreated));
+            }
+          } catch (e) {}
+
+          try {
+            const cached = JSON.parse(localStorage.getItem('vh_cachedEquipes') || '[]');
+            const cIdx = cached.findIndex(t => String(t.id) === String(equipe.id));
+            if (cIdx !== -1) {
+              cached[cIdx] = { ...cached[cIdx], ...updatePayload };
+              localStorage.setItem('vh_cachedEquipes', JSON.stringify(cached));
+            }
+          } catch (e) {}
+
+          // 4. Atualiza elementos visuais na página
+          if (logoEl) logoEl.src = equipe.logo;
+          if (nameEl) nameEl.textContent = equipe.nome;
+          document.title = `${equipe.nome || 'Equipe'} - VersusHub`;
+          if (jogosMetaEl) jogosMetaEl.textContent = 'Jogos principais: ' + (equipe.jogos || '—');
+          if (regiaoMetaEl) regiaoMetaEl.textContent = 'Região: ' + (equipe.regiao || '—');
+          if (sobreEl) sobreEl.textContent = equipe.sobre || 'Nenhuma descrição informada.';
+
+          if (tagsContainer) {
+            tagsContainer.innerHTML = '';
+            if (equipe.tag) {
+              const brutas = Array.isArray(equipe.tag) ? equipe.tag : String(equipe.tag).split(',');
+              brutas.forEach(t => {
+                const limpo = String(t).trim();
+                if (!limpo) return;
+                const pill = document.createElement('span');
+                pill.className = 'team-tag-pill';
+                pill.textContent = limpo;
+                tagsContainer.appendChild(pill);
+              });
+            }
+          }
+
+          fecharModalEdicaoTemplate();
+          showToast('Equipe atualizada com sucesso!');
+        } catch (err) {
+          console.error('Erro geral ao atualizar equipe:', err);
+          showToast('Ocorreu um erro ao atualizar a equipe.');
+        } finally {
+          if (btnSave) {
+            btnSave.disabled = false;
+            btnSave.textContent = 'Salvar Alterações';
+          }
+        }
+      });
     }
 
   } catch (err) {

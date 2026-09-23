@@ -1,13 +1,8 @@
-// =========================
-//  CARROSSEL 
-// =========================
+// ===================================
+//  AUTENTICAÇÃO & ELEMENTOS DO HEADER
+// ===================================
 
-const slides = document.querySelectorAll(".carousel-slide");
-const nextBtn = document.getElementById("nextBtn");
-const prevBtn = document.getElementById("prevBtn");
-const indicatorsContainer = document.getElementById("carouselIndicators");
-
-   const btEntrar = document.getElementById("btentrar");
+const btEntrar = document.getElementById("btentrar");
   const btCadastrar = document.getElementById("btcadastrar");
   const userBtn = document.getElementById("userBtn");
   const menuUser = document.getElementById("menuUser");
@@ -34,12 +29,17 @@ const indicatorsContainer = document.getElementById("carouselIndicators");
     } else if (rota.includes('torneios')) {
       window.location.href = '/pagina_inicial/torneios.html?busca=' + encodeURIComponent(termoDigitado);
     } else {
-      window.location.href = '/pagina_inicial/torneios.html?busca=' + encodeURIComponent(termoDigitado);
+      // Estamos na Homepage: consulta diretamente o Supabase e rola até os resultados
+      if (document.getElementById('gridTorneiosHome') && typeof window.executarBuscaHomeSupabase === 'function') {
+        window.executarBuscaHomeSupabase(termoDigitado, true);
+      } else {
+        window.location.href = '/pagina_inicial/torneios.html?busca=' + encodeURIComponent(termoDigitado);
+      }
     }
   }
   window.executarBuscaHeader = executarBuscaHeader;
 
-  // Se o usuário já estiver na página de equipes, torneios ou ranking, sincroniza a digitação com o filtro local
+  // Se o usuário já estiver na página de equipes, torneios, ranking ou homepage, sincroniza a digitação com o filtro local/supabase
   if (searchInput) {
     searchInput.addEventListener("input", () => {
       const campoEquipe = document.getElementById('filtroBuscaEquipe');
@@ -56,6 +56,13 @@ const indicatorsContainer = document.getElementById("carouselIndicators");
       if (campoRanking && window.location.pathname.includes('ranking')) {
         campoRanking.value = searchInput.value;
         campoRanking.dispatchEvent(new Event('input'));
+      }
+      const gridHome = document.getElementById('gridTorneiosHome');
+      if (gridHome && typeof window.executarBuscaHomeSupabase === 'function') {
+        if (window._debounceHomeSearch) clearTimeout(window._debounceHomeSearch);
+        window._debounceHomeSearch = setTimeout(() => {
+          window.executarBuscaHomeSupabase(searchInput.value.trim(), false);
+        }, 350);
       }
     });
   }
@@ -76,126 +83,194 @@ const indicatorsContainer = document.getElementById("carouselIndicators");
     });
   }
 
-// Só monta o carrossel se a página tiver slides
-if (slides.length && nextBtn && prevBtn && indicatorsContainer) {
-  let index = 0;
-  let autoPlayInterval = null;
+// =========================================================
+//  CARROSSEL DE TORNEIOS (CONSULTA DINÂMICA AO BANCO DE DADOS)
+// =========================================================
+async function inicializarCarrosselTorneios() {
   const carouselEl = document.getElementById("carousel");
+  const slidesContainer = document.getElementById("carouselSlidesContainer") || carouselEl;
+  const nextBtn = document.getElementById("nextBtn");
+  const prevBtn = document.getElementById("prevBtn");
+  const indicatorsContainer = document.getElementById("carouselIndicators");
 
-  // Cria as "bolinhas" (indicadores)
-  slides.forEach((_, i) => {
-    const dot = document.createElement("span");
-    dot.addEventListener("click", () => {
-      goToSlide(i);
-      resetAutoPlay();
+  if (!carouselEl || !nextBtn || !prevBtn || !indicatorsContainer) return;
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  try {
+    const { supabase } = await import('/supabaseClient.js');
+    const { data, error } = await supabase
+      .from('torneios')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Erro ao buscar torneios para o carrossel:', error);
+      const loadingEl = document.getElementById('carouselLoading');
+      if (loadingEl) {
+        loadingEl.innerHTML = `
+          <div style="text-align: center; color: #a1a1aa; padding: 20px;">
+            <p style="font-size: 15px; font-weight: 600; color: #f87171; margin: 0;">Não foi possível carregar os torneios no momento.</p>
+          </div>
+        `;
+      }
+      return;
+    }
+
+    if (!data || data.length === 0) {
+      const loadingEl = document.getElementById('carouselLoading');
+      if (loadingEl) {
+        loadingEl.innerHTML = `
+          <div style="text-align: center; color: #a1a1aa; padding: 20px;">
+            <p style="font-size: 15px; font-weight: 600; color: #e4e4e7; margin: 0;">Nenhum torneio cadastrado.</p>
+          </div>
+        `;
+      }
+      return;
+    }
+
+    // Limpar slides anteriores e indicadores
+    slidesContainer.innerHTML = '';
+    indicatorsContainer.innerHTML = '';
+
+    // Utiliza os torneios cadastrados (exibe até 8 em destaque no carrossel)
+    const torneiosDestaque = data.slice(0, 8);
+
+    torneiosDestaque.forEach((t, i) => {
+      const banner = t.banner || '/images/cerradocup.jpg';
+      const link = (t.link && t.link.startsWith('/') && !t.link.includes('?'))
+        ? t.link
+        : ('/torneio/custom.html?id=' + encodeURIComponent(t.id));
+      const nomeSeguro = escapeHtml(t.nome || 'Torneio');
+      const tagSegura = escapeHtml(t.jogo ? t.jogo.split('•')[0].trim() : (t.categoria || 'Torneio')).toUpperCase();
+
+      const slideDiv = document.createElement('div');
+      slideDiv.className = `carousel-slide ${i === 0 ? 'active' : ''}`;
+      slideDiv.innerHTML = `
+        <a href="${link}" class="carousel-link">
+          <img referrerpolicy="no-referrer" src="${banner}" alt="${nomeSeguro}" onerror="this.onerror=null;this.src='/images/cerradocup.jpg';">
+          <div class="carousel-caption">
+            <span class="carousel-tag">${tagSegura}</span>
+            <h3 class="carousel-slide-title">${nomeSeguro}</h3>
+            <span class="carousel-action-btn">Ver Torneio <i class="fa-solid fa-arrow-right" style="margin-left: 6px;"></i></span>
+          </div>
+        </a>
+      `;
+      slidesContainer.appendChild(slideDiv);
+
+      // Cria a bolinha indicadora
+      const dot = document.createElement('span');
+      if (i === 0) dot.classList.add('active');
+      dot.addEventListener('click', () => {
+        goToSlide(i);
+        resetAutoPlay();
+      });
+      indicatorsContainer.appendChild(dot);
     });
-    indicatorsContainer.appendChild(dot);
-  });
 
-  function updateIndicators() {
-    const dots = document.querySelectorAll("#carouselIndicators span");
-    dots.forEach((d) => d.classList.remove("active"));
-    if (dots[index]) {
-      dots[index].classList.add("active");
+    const slidesList = slidesContainer.querySelectorAll('.carousel-slide');
+    const dotsList = indicatorsContainer.querySelectorAll('span');
+    let currentIndex = 0;
+    let autoPlayInterval = null;
+    const SLIDE_DURATION = 500;
+
+    function updateIndicators() {
+      dotsList.forEach((d, idx) => {
+        if (idx === currentIndex) d.classList.add('active');
+        else d.classList.remove('active');
+      });
     }
-  }
 
-  function showSlide() {
-    slides.forEach((slide) => slide.classList.remove("active"));
-    if (slides[index]) {
-      slides[index].classList.add("active");
-    }
-    updateIndicators();
-  }
-
-  function goToSlide(idx) {
-    index = idx;
-    showSlide();
-  }
-
-  function nextSlide() {
-    index = (index + 1) % slides.length;
-    showSlide();
-  }
-
-  function prevSlide() {
-    index = (index - 1 + slides.length) % slides.length;
-    showSlide();
-  }
-
-  nextBtn.addEventListener("click", () => {
-    nextSlide();
-    resetAutoPlay();
-  });
-
-  prevBtn.addEventListener("click", () => {
-    prevSlide();
-    resetAutoPlay();
-  });
-
-  // Função para iniciar reprodução automática (5 segundos por slide)
-  function startAutoPlay() {
-    if (!autoPlayInterval) {
-      autoPlayInterval = setInterval(nextSlide, 5000);
-    }
-  }
-
-  // Função para parar reprodução automática
-  function stopAutoPlay() {
-    if (autoPlayInterval) {
-      clearInterval(autoPlayInterval);
-      autoPlayInterval = null;
-    }
-  }
-
-  // Reseta o timer ao interagir manualmente
-  function resetAutoPlay() {
-    stopAutoPlay();
-    startAutoPlay();
-  }
-
-  // Eventos de mouse no container para pausar / retomar
-  if (carouselEl) {
-    carouselEl.addEventListener("mouseenter", stopAutoPlay);
-    carouselEl.addEventListener("mouseleave", startAutoPlay);
-  }
-
-  showSlide(); // mostra o primeiro slide
-  startAutoPlay(); // inicia o auto play
-
-  // -------- efeito de "pulso" no carrossel --------
-  document.addEventListener("DOMContentLoaded", () => {
-    const carousel = document.getElementById("carousel");
-    const prev = document.getElementById("prevBtn");
-    const next = document.getElementById("nextBtn");
-
-    const SLIDE_DURATION = 500; // tempo da transição do slide
-
-    if (!carousel) return;
-
-    function runSequence() {
-      // escurece um pouco enquanto troca
-      carousel.classList.add("shadow-off");
-
+    function runPulseEffect() {
+      carouselEl.classList.add('shadow-off');
       setTimeout(() => {
-        carousel.classList.remove("shadow-off");
-
-        // reinicia a animação pulse
-        carousel.classList.remove("pulse");
-        void carousel.offsetWidth; // força reflow
-        carousel.classList.add("pulse");
-
-        // remove classe depois da animação
-        setTimeout(() => carousel.classList.remove("pulse"), 800);
+        carouselEl.classList.remove('shadow-off');
+        carouselEl.classList.remove('pulse');
+        void carouselEl.offsetWidth; // força reflow
+        carouselEl.classList.add('pulse');
+        setTimeout(() => carouselEl.classList.remove('pulse'), 800);
       }, SLIDE_DURATION);
     }
 
-    if (prev) prev.addEventListener("click", runSequence);
-    if (next) next.addEventListener("click", runSequence);
+    function showSlide() {
+      slidesList.forEach((s, idx) => {
+        if (idx === currentIndex) s.classList.add('active');
+        else s.classList.remove('active');
+      });
+      updateIndicators();
+      runPulseEffect();
+    }
 
-    carousel.addEventListener("slideChanged", runSequence);
-  });
+    function goToSlide(idx) {
+      if (currentIndex === idx) return;
+      currentIndex = idx;
+      showSlide();
+    }
+
+    function nextSlide() {
+      currentIndex = (currentIndex + 1) % slidesList.length;
+      showSlide();
+    }
+
+    function prevSlide() {
+      currentIndex = (currentIndex - 1 + slidesList.length) % slidesList.length;
+      showSlide();
+    }
+
+    nextBtn.onclick = () => {
+      nextSlide();
+      resetAutoPlay();
+    };
+
+    prevBtn.onclick = () => {
+      prevSlide();
+      resetAutoPlay();
+    };
+
+    function startAutoPlay() {
+      if (!autoPlayInterval && slidesList.length > 1) {
+        autoPlayInterval = setInterval(nextSlide, 5000);
+      }
+    }
+
+    function stopAutoPlay() {
+      if (autoPlayInterval) {
+        clearInterval(autoPlayInterval);
+        autoPlayInterval = null;
+      }
+    }
+
+    function resetAutoPlay() {
+      stopAutoPlay();
+      startAutoPlay();
+    }
+
+    carouselEl.addEventListener('mouseenter', stopAutoPlay);
+    carouselEl.addEventListener('mouseleave', startAutoPlay);
+
+    // Inicia rotação automática
+    startAutoPlay();
+
+  } catch (err) {
+    console.error('Erro ao conectar e inicializar carrossel de torneios:', err);
+  }
 }
+
+// Inicia o carrossel se estiver presente na página
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', inicializarCarrosselTorneios);
+} else {
+  inicializarCarrosselTorneios();
+}
+window.recarregarCarrosselTorneios = inicializarCarrosselTorneios;
 
 // =========================
 //  SIDEBAR (menu lateral)
@@ -298,10 +373,13 @@ document.addEventListener("DOMContentLoaded", () => {
       menuUser.innerHTML = `
         <li class="vh-user-name"><strong>${user.nome}</strong></li>
         <hr>
-        <li><a href="${publicProfileLink}" id="linkPerfilPublico">Ver Perfil Público</a></li>
-        <li><a href="/perfil/perfil.html" id="linkPerfil">Editar Perfil</a></li>
-        <li><a href="#" id="trocarConta">Mudar de conta</a></li>
-        <li><a href="#" id="sairConta">Sair da conta</a></li>
+        <li><a href="${publicProfileLink}" id="linkPerfilPublico"><i class="fa-solid fa-user" style="margin-right: 8px;"></i>Ver Perfil Público</a></li>
+        <li><a href="/perfil/perfil.html" id="linkPerfil"><i class="fa-solid fa-pen-to-square" style="margin-right: 8px;"></i>Editar Perfil</a></li>
+        <li><a href="/gerenciartorneios/gerentornindex.html"><i class="fa-solid fa-file-invoice" style="margin-right: 8px;"></i>Gerenciar Torneios</a></li>
+        <li><a href="/equipes/gerenciar_equipes.html"><i class="fa-solid fa-list-check" style="margin-right: 8px;"></i>Gerenciar Equipes</a></li>
+        <hr>
+        <li><a href="#" id="trocarConta"><i class="fa-solid fa-arrow-right-arrow-left" style="margin-right: 8px;"></i>Mudar de conta</a></li>
+        <li><a href="#" id="sairConta"><i class="fa-solid fa-right-from-bracket" style="margin-right: 8px;"></i>Sair da conta</a></li>
       `;
 
       const linkSair = document.getElementById("sairConta");
@@ -339,9 +417,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // menu simples com Login / Cadastro
       menuUser.innerHTML = `
-        <li><a href="/login/login.html">Login</a></li>
+        <li><a href="/login/login.html"><i class="fa-solid fa-right-to-bracket" style="margin-right: 8px;"></i>Login</a></li>
         <hr>
-        <li><a href="/cadastro/cadastro.html">Cadastro</a></li>
+        <li><a href="/cadastro/cadastro.html"><i class="fa-solid fa-user-plus" style="margin-right: 8px;"></i>Cadastro</a></li>
+        <hr>
+        <li><a href="/gerenciartorneios/gerentornindex.html"><i class="fa-solid fa-file-invoice" style="margin-right: 8px;"></i>Gerenciar Torneios</a></li>
+        <li><a href="/equipes/gerenciar_equipes.html"><i class="fa-solid fa-list-check" style="margin-right: 8px;"></i>Gerenciar Equipes</a></li>
       `;
     }
   }
@@ -373,353 +454,259 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// =========================================
-//  PROCESSO DE SOLICITAÇÃO DE INGRESSO EM EQUIPES
-// =========================================
+// =================================================================
+//  HOMEPAGE: CONSULTA EXCLUSIVA E FILTRAGEM DE CATEGORIAS
+// =================================================================
 document.addEventListener('DOMContentLoaded', () => {
-  const joinBtn = document.querySelector('.btn-join-team');
-  if (!joinBtn || joinBtn.dataset.solicitacaoInit) return;
-  joinBtn.dataset.solicitacaoInit = 'true';
+  const gridTorneiosHome = document.getElementById('gridTorneiosHome');
+  const categoryButtons = document.querySelectorAll('.btn-filtro-categoria');
+  
+  if (!gridTorneiosHome) return;
 
-  if (joinBtn.disabled) return;
+  const homeLoading = document.getElementById('homeLoading');
+  const noTournamentsMsg = document.getElementById('no-tournaments-msg');
+  const noTournamentsTitle = document.getElementById('no-tournaments-title');
+  const noTournamentsDesc = document.getElementById('no-tournaments-desc');
+  const btnLimparFiltrosHome = document.getElementById('btnLimparFiltrosHome');
+  const tituloSecao = document.getElementById('tituloSecaoTorneios');
+  const statusFiltro = document.getElementById('statusFiltroAtivo');
+  const searchInput = document.getElementById('searchInput');
 
-  const teamNameEl = document.querySelector('.team-info h1') || document.querySelector('.team-hero h1');
-  const teamName = teamNameEl ? teamNameEl.textContent.trim() : 'Equipe';
+  let categoriaAtiva = null;
+  let termoBuscaAtivo = '';
 
-  const loggedUserRaw = localStorage.getItem('vh_loggedUser');
-  const loggedUser = loggedUserRaw ? JSON.parse(loggedUserRaw) : null;
+  const nomesCategorias = {
+    luta: 'Jogos de Luta',
+    esportes: 'Futebol e Esportes',
+    futebol: 'Futebol e Esportes',
+    fps: 'FPS / Tiro',
+    tiro: 'FPS / Tiro',
+    cartas: 'Card Games',
+    card: 'Card Games',
+    moba: 'Jogos MOBA'
+  };
 
-  // Checa status assíncrono na tabela 'membros_equipe'
-  if (loggedUser && loggedUser.email) {
-    import('/supabaseClient.js').then(async ({ supabase }) => {
-      try {
-        const { data } = await supabase
-          .from('membros_equipe')
-          .select('*')
-          .eq('user_email', loggedUser.email)
-          .eq('equipe_id', teamName);
-
-        if (data && data.length > 0) {
-          joinBtn.innerHTML = 'Pendente de Aprovação <i class="fa-solid fa-envelope" style="color: #60a5fa; margin-left: 6px;"></i>';
-          joinBtn.style.background = '#22c55e';
-          joinBtn.style.borderColor = '#22c55e';
-        }
-      } catch (err) {
-        console.warn('Erro ao checar solicitação no banco:', err);
-      }
-    }).catch(() => {});
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
   }
 
-  joinBtn.addEventListener('click', async () => {
-    const userRaw = localStorage.getItem('vh_loggedUser');
-    if (!userRaw) {
-      showAuthToast("Faça login para se inscrever ou entrar em equipes!");
-      return;
-    }
-
-    const user = JSON.parse(userRaw);
-    joinBtn.disabled = true;
+  // Consulta assíncrona exclusivamente na tabela 'torneios' do Supabase
+  async function carregarTorneiosSupabase() {
+    if (homeLoading) homeLoading.style.display = 'flex';
+    gridTorneiosHome.style.display = 'none';
+    if (noTournamentsMsg) noTournamentsMsg.style.display = 'none';
 
     try {
       const { supabase } = await import('/supabaseClient.js');
+      let query = supabase.from('torneios').select('*');
 
-      // Verifica no Supabase se já existe solicitação
-      const { data: existingList } = await supabase
-        .from('membros_equipe')
-        .select('*')
-        .eq('user_email', user.email)
-        .eq('equipe_id', teamName);
+      // 1. Filtragem por categoria no Supabase
+      if (categoriaAtiva) {
+        const cat = categoriaAtiva.toLowerCase();
+        if (cat === 'luta') {
+          query = query.or('categoria.eq.luta,categoria.ilike.%luta%');
+        } else if (cat === 'esportes' || cat === 'futebol') {
+          query = query.or('categoria.eq.esportes,categoria.eq.futebol,categoria.ilike.%esporte%,categoria.ilike.%futebol%');
+        } else if (cat === 'fps' || cat === 'tiro') {
+          query = query.or('categoria.eq.fps,categoria.eq.tiro,categoria.eq.battle-royale,categoria.ilike.%fps%,categoria.ilike.%tiro%');
+        } else if (cat === 'cartas' || cat === 'card' || cat === 'card_game') {
+          query = query.or('categoria.eq.cartas,categoria.eq.card,categoria.eq.card_game,categoria.ilike.%carta%,categoria.ilike.%card%,jogo.ilike.%tcg%,nome.ilike.%tcg%');
+        } else if (cat === 'moba') {
+          query = query.or('categoria.eq.moba,categoria.ilike.%moba%');
+        } else {
+          query = query.eq('categoria', cat);
+        }
+      }
 
-      const jaSolicitou = existingList && existingList.length > 0;
+      // 2. Filtragem por busca no Supabase
+      const termo = (termoBuscaAtivo || '').trim();
+      if (termo) {
+        query = query.or(`nome.ilike.%${termo}%,jogo.ilike.%${termo}%,categoria.ilike.%${termo}%`);
+      }
 
-      if (jaSolicitou) {
-        // Cancela a solicitação
-        await supabase
-          .from('membros_equipe')
-          .delete()
-          .eq('user_email', user.email)
-          .eq('equipe_id', teamName);
+      query = query.order('created_at', { ascending: false });
 
-        let currentRequests = {};
-        try {
-          currentRequests = JSON.parse(localStorage.getItem('vh_teamJoinRequests') || '{}');
-          delete currentRequests[teamName];
-          localStorage.setItem('vh_teamJoinRequests', JSON.stringify(currentRequests));
-        } catch (e) {}
+      const { data, error } = await query;
 
-        joinBtn.innerHTML = 'Pedir para entrar';
-        joinBtn.style.background = '#d41111'; // cor vermelha original
-        joinBtn.style.borderColor = '#d41111';
-        showNotificationToast("Solicitação de entrada cancelada.", "info");
+      if (homeLoading) homeLoading.style.display = 'none';
+
+      if (error) {
+        console.error('Erro na consulta de torneios:', error);
+        if (noTournamentsMsg) {
+          noTournamentsMsg.style.display = 'block';
+          if (noTournamentsTitle) noTournamentsTitle.textContent = 'Erro ao Carregar Torneios';
+          if (noTournamentsDesc) noTournamentsDesc.textContent = 'Não foi possível carregar os torneios no momento. Tente recarregar a página.';
+        }
+        return;
+      }
+
+      // Atualiza Título da seção
+      if (termo && categoriaAtiva) {
+        if (tituloSecao) tituloSecao.textContent = `Busca: "${termo}" em ${nomesCategorias[categoriaAtiva] || categoriaAtiva}`;
+      } else if (termo) {
+        if (tituloSecao) tituloSecao.textContent = `Resultados da busca: "${termo}"`;
+      } else if (categoriaAtiva) {
+        if (tituloSecao) tituloSecao.textContent = `Torneios de ${nomesCategorias[categoriaAtiva] || categoriaAtiva}`;
       } else {
-        // Cria a solicitação no Supabase (membros_equipe)
-        await supabase
-          .from('membros_equipe')
-          .insert([{
-            equipe_id: teamName,
-            user_email: user.email,
-            status: 'Pendente'
-          }]);
-
-        let currentRequests = {};
-        try {
-          currentRequests = JSON.parse(localStorage.getItem('vh_teamJoinRequests') || '{}');
-        } catch (e) {
-          currentRequests = {};
-        }
-        currentRequests[teamName] = {
-          userEmail: user.email,
-          userName: user.nome || '',
-          date: new Date().toISOString()
-        };
-        localStorage.setItem('vh_teamJoinRequests', JSON.stringify(currentRequests));
-
-        joinBtn.innerHTML = 'Pendente de Aprovação <i class="fa-solid fa-envelope" style="color: #60a5fa; margin-left: 6px;"></i>';
-        joinBtn.style.background = '#22c55e'; // cor verde
-        joinBtn.style.borderColor = '#22c55e';
-        showNotificationToast(`Solicitação enviada para o time ${teamName}!`, "success");
+        if (tituloSecao) tituloSecao.textContent = 'Torneios em Destaque';
       }
-    } catch (dbErr) {
-      console.error('Erro na solicitação de equipe:', dbErr);
-      showNotificationToast("Não foi possível processar a solicitação no momento.", "info");
-    } finally {
-      joinBtn.disabled = false;
-    }
-  });
 
-  // Toasts personalizados e responsivos para segurança de autenticação
-  function showAuthToast(message) {
-    let toast = document.getElementById("vh-auth-toast");
-    if (toast) toast.remove();
-
-    toast = document.createElement("div");
-    toast.id = "vh-auth-toast";
-    toast.style.position = "fixed";
-    toast.style.bottom = "30px";
-    toast.style.right = "30px";
-    toast.style.background = "#141419";
-    toast.style.color = "#ffffff";
-    toast.style.border = "1px solid #d41111";
-    toast.style.borderRadius = "12px";
-    toast.style.padding = "16px 20px";
-    toast.style.boxShadow = "0 10px 30px rgba(0, 0, 0, 0.5)";
-    toast.style.zIndex = "10000";
-    toast.style.fontFamily = "system-ui, sans-serif";
-    toast.style.display = "flex";
-    toast.style.flexDirection = "column";
-    toast.style.gap = "10px";
-    toast.style.maxWidth = "320px";
-    toast.style.animation = "slideInRight 0.3s cubic-bezier(0.165, 0.84, 0.44, 1) forwards";
-
-    toast.innerHTML = `
-      <div style="display: flex; align-items: center; gap: 10px;">
-        <i class="fa-solid fa-lock" style="font-size: 18px; color: #ff3e3e;"></i>
-        <span style="font-weight: 600; font-size: 14px;">${message}</span>
-      </div>
-      <div style="display: flex; gap: 10px; margin-top: 4px;">
-        <a href="/login/login.html" style="background: #d41111; color: #fff; text-decoration: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 700; text-align: center; flex: 1;">Entrar</a>
-        <button id="close-toast-btn" style="background: rgba(255,255,255,0.1); color: #fff; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; flex: 1;">Fechar</button>
-      </div>
-    `;
-
-    document.body.appendChild(toast);
-    setupToastAnimation();
-
-    const closeBtn = toast.querySelector("#close-toast-btn");
-    if (closeBtn) {
-      closeBtn.addEventListener("click", () => {
-        toast.style.animation = "fadeOut 0.3s ease forwards";
-        setTimeout(() => toast.remove(), 300);
-      });
-    }
-
-    setTimeout(() => {
-      if (toast.parentNode) {
-        toast.style.animation = "fadeOut 0.3s ease forwards";
-        setTimeout(() => toast.remove(), 300);
-      }
-    }, 6000);
-  }
-
-  function showNotificationToast(message, type) {
-    let toast = document.getElementById("vh-notif-toast");
-    if (toast) toast.remove();
-
-    toast = document.createElement("div");
-    toast.id = "vh-notif-toast";
-    toast.style.position = "fixed";
-    toast.style.bottom = "30px";
-    toast.style.right = "30px";
-    toast.style.background = "#141419";
-    toast.style.color = "#ffffff";
-    toast.style.border = type === "success" ? "1px solid #22c55e" : "1px solid #3b82f6";
-    toast.style.borderRadius = "12px";
-    toast.style.padding = "16px 20px";
-    toast.style.boxShadow = "0 10px 30px rgba(0, 0, 0, 0.5)";
-    toast.style.zIndex = "10000";
-    toast.style.fontFamily = "system-ui, sans-serif";
-    toast.style.display = "flex";
-    toast.style.alignItems = "center";
-    toast.style.gap = "10px";
-    toast.style.maxWidth = "320px";
-    toast.style.animation = "slideInRight 0.3s cubic-bezier(0.165, 0.84, 0.44, 1) forwards";
-
-    const icon = type === "success" 
-      ? '<i class="fa-solid fa-circle-check" style="color: #22c55e; font-size: 18px;"></i>' 
-      : '<i class="fa-solid fa-circle-info" style="color: #3b82f6; font-size: 18px;"></i>';
-    toast.innerHTML = `
-      <span>${icon}</span>
-      <span style="font-weight: 600; font-size: 14px;">${message}</span>
-    `;
-
-    document.body.appendChild(toast);
-    setupToastAnimation();
-
-    setTimeout(() => {
-      if (toast.parentNode) {
-        toast.style.animation = "fadeOut 0.3s ease forwards";
-        setTimeout(() => toast.remove(), 300);
-      }
-    }, 4000);
-  }
-
-  function setupToastAnimation() {
-    if (!document.getElementById("vh-toast-style")) {
-      const style = document.createElement("style");
-      style.id = "vh-toast-style";
-      style.innerHTML = `
-        @keyframes slideInRight {
-          from { transform: translateX(100px); opacity: 0; }
-          to { transform: translateX(0); opacity: 1; }
+      // Atualiza badge de filtro ativo
+      if (statusFiltro) {
+        if (categoriaAtiva || termo) {
+          statusFiltro.style.display = 'inline-block';
+          statusFiltro.innerHTML = `Exibindo <strong>${data ? data.length : 0}</strong> torneio(s) cadastrado(s) • <button type="button" id="btnResetarFiltrosBadge" style="background: none; border: none; color: #ff3e3e; text-decoration: underline; cursor: pointer; font-size: 13px; font-weight: 600; padding: 0 4px;">Limpar filtros</button>`;
+          const btnResetBadge = document.getElementById('btnResetarFiltrosBadge');
+          if (btnResetBadge) {
+            btnResetBadge.onclick = (e) => {
+              e.preventDefault();
+              limparTodosFiltros();
+            };
+          }
+        } else {
+          statusFiltro.style.display = 'none';
         }
-        @keyframes fadeOut {
-          from { opacity: 1; }
-          to { opacity: 0; }
+      }
+
+      if (!data || data.length === 0) {
+        gridTorneiosHome.style.display = 'none';
+        if (noTournamentsMsg) {
+          noTournamentsMsg.style.display = 'block';
+          if (categoriaAtiva && termo) {
+            if (noTournamentsTitle) noTournamentsTitle.textContent = 'Nenhum Torneio Encontrado';
+            if (noTournamentsDesc) noTournamentsDesc.textContent = `Não encontramos torneios de ${nomesCategorias[categoriaAtiva] || categoriaAtiva} correspondentes a "${termo}".`;
+          } else if (categoriaAtiva) {
+            if (noTournamentsTitle) noTournamentsTitle.textContent = `Nenhum Torneio em ${nomesCategorias[categoriaAtiva] || categoriaAtiva}`;
+            if (noTournamentsDesc) noTournamentsDesc.textContent = `Não existem torneios competitivos cadastrados para esta modalidade no momento. Seja o primeiro a criar um campeonato!`;
+          } else if (termo) {
+            if (noTournamentsTitle) noTournamentsTitle.textContent = 'Nenhum Torneio Encontrado';
+            if (noTournamentsDesc) noTournamentsDesc.textContent = `Não encontramos torneios cadastrados correspondentes à sua pesquisa por "${termo}".`;
+          } else {
+            if (noTournamentsTitle) noTournamentsTitle.textContent = 'Nenhum Torneio Cadastrado';
+            if (noTournamentsDesc) noTournamentsDesc.textContent = 'Ainda não há torneios registrados no banco de dados.';
+          }
         }
-      `;
-      document.head.appendChild(style);
+        return;
+      }
+
+      // Renderiza os cards reais
+      gridTorneiosHome.innerHTML = data.map(t => {
+        const banner = t.banner || '/images/cerradocup.jpg';
+        const link = (t.link && t.link.startsWith('/') && !t.link.includes('?')) ? t.link : ('/torneio/custom.html?id=' + encodeURIComponent(t.id));
+        let statusClass = t.statusClass || (
+          t.status && t.status.toLowerCase().includes('andamento') ? 'status-andamento' :
+          t.status && t.status.toLowerCase().includes('encerrado') ? 'status-encerrado' : 'status-aberto'
+        );
+        let statusTexto = t.status || 'Inscrições abertas';
+
+        if (t.ao_vivo === true || t.transmissao_status === 'ao_vivo' || (t.status && t.status.toLowerCase().includes('ao vivo'))) {
+          statusTexto = "Ao Vivo <i class='fa-solid fa-tower-broadcast' style='margin-left: 4px;'></i>";
+          statusClass = 'status-andamento';
+        }
+
+        const nomeSeguro = escapeHtml(t.nome || 'Torneio');
+        const jogoSeguro = escapeHtml(t.jogo || 'Geral');
+        const catSegura = (t.categoria || 'Competitivo').toUpperCase();
+        const platSegura = (t.plataforma || 'Multi').toUpperCase();
+
+        return `
+          <article class="card-torneio"
+            data-id="${t.id}"
+            data-nome="${nomeSeguro}"
+            data-jogo="${jogoSeguro}"
+            data-categoria="${t.categoria || ''}"
+            data-plataforma="${t.plataforma || ''}"
+            data-status="${t.status || ''}">
+            
+            <img referrerpolicy="no-referrer" src="${banner}" alt="${nomeSeguro}" onerror="this.onerror=null;this.src='/images/cerradocup.jpg';">
+            <div class="card-info">
+              <h2>${nomeSeguro}</h2>
+              <p class="jogo">Jogo: ${jogoSeguro} • ${catSegura} • ${platSegura}</p>
+              <p class="data">Início: ${t.data || 'Em breve'}</p>
+              <p class="status ${statusClass}">${statusTexto}</p>
+              <a href="${link}"><button class="btn-detalhes">Ver detalhes</button></a>
+            </div>
+          </article>
+        `;
+      }).join('');
+
+      gridTorneiosHome.style.display = 'grid';
+
+    } catch (err) {
+      console.error('Falha ao conectar no banco de dados:', err);
+      if (homeLoading) homeLoading.style.display = 'none';
+      if (noTournamentsMsg) noTournamentsMsg.style.display = 'block';
     }
   }
-});
 
-// =========================================
-//  FILTRO DE CATEGORIAS (BOTÕES VERMELHOS)
-// =========================================
-document.addEventListener('DOMContentLoaded', () => {
-  const categoryButtons = document.querySelectorAll('.btn-filtro-categoria');
-  const tournamentSections = document.querySelectorAll('.bloco-categoria');
-  
-  if (!categoryButtons.length) return;
-
-  // Cria dinamicamente a mensagem de "nenhum torneio" se ela não existir
-  let noTournamentsMsg = document.getElementById("no-tournaments-msg");
-  if (!noTournamentsMsg) {
-    noTournamentsMsg = document.createElement("div");
-    noTournamentsMsg.id = "no-tournaments-msg";
-    noTournamentsMsg.style.textAlign = "center";
-    noTournamentsMsg.style.padding = "60px 20px";
-    noTournamentsMsg.style.background = "#141419";
-    noTournamentsMsg.style.borderRadius = "20px";
-    noTournamentsMsg.style.border = "1px dashed rgba(255, 255, 255, 0.1)";
-    noTournamentsMsg.style.maxWidth = "600px";
-    noTournamentsMsg.style.margin = "40px auto 80px auto";
-    noTournamentsMsg.style.display = "none";
-    noTournamentsMsg.style.fontFamily = "system-ui, sans-serif";
-    noTournamentsMsg.style.boxShadow = "0 10px 30px rgba(0,0,0,0.3)";
-    
-    noTournamentsMsg.innerHTML = `
-      <span style="font-size: 56px; display: block; margin-bottom: 20px; color: #ff3e3e;"><i class="fa-solid fa-gamepad"></i></span>
-      <h3 style="font-size: 22px; color: #ffffff; margin-bottom: 10px; font-weight: 800;">Nenhum Torneio Nesta Categoria</h3>
-      <p style="font-size: 15px; color: #9ca3af; margin-bottom: 25px; max-width: 440px; margin-left: auto; margin-right: auto; line-height: 1.6;">Não existem torneios competitivos ativos para esta categoria no momento. Que tal ser o pioneiro e criar o seu?</p>
-      <a href="/criar_torneio/criar_torneio.html" style="display: inline-flex; align-items: center; justify-content: center; background: #d41111; color: #ffffff; text-decoration: none; padding: 12px 32px; border-radius: 999px; font-size: 14px; font-weight: 700; gap: 8px; box-shadow: 0 4px 15px rgba(212, 17, 17, 0.4); transition: 0.3s ease-in-out;">Criar Torneio <i class="fa-solid fa-trophy" style="color: #ffd700; margin-left: 6px;"></i></a>
-    `;
-    
-    // Inserir antes do footer
-    const footer = document.querySelector('footer');
-    if (footer && footer.parentNode) {
-      footer.parentNode.insertBefore(noTournamentsMsg, footer);
-    }
+  function limparTodosFiltros() {
+    categoriaAtiva = null;
+    termoBuscaAtivo = '';
+    categoryButtons.forEach(b => b.classList.remove('active'));
+    if (searchInput) searchInput.value = '';
+    carregarTorneiosSupabase();
   }
 
+  // Interação com botões de categoria
   categoryButtons.forEach(btn => {
     btn.addEventListener('click', () => {
       const selectedCategory = btn.getAttribute('data-categoria-filtro');
       const isAlreadyActive = btn.classList.contains('active');
 
-      // 1. Resetar estados de todos os botões
       categoryButtons.forEach(b => b.classList.remove('active'));
 
-      // 2. Se já estava ativo, remove o filtro e exibe tudo
       if (isAlreadyActive) {
-        // Exibir todas as seções e todos os cards
-        tournamentSections.forEach(section => {
-          section.style.display = 'block';
-          const cards = section.querySelectorAll('.card-torneio');
-          cards.forEach(card => {
-            card.style.display = 'flex';
-          });
-        });
-        noTournamentsMsg.style.display = 'none';
-        return;
-      }
-
-      // 3. Caso contrário, ativa o filtro
-      btn.classList.add('active');
-
-      // Mapear o filtro do botão para as categorias dos cards
-      // Tiro engloba 'fps' e 'battle-royale'
-      // Moba engloba 'moba'
-      // Luta engloba 'luta' ou 'combate'
-      // Esportes engloba 'esportes'
-      // Cartas engloba 'cartas' ou 'card'
-      let matchingCategories = [selectedCategory];
-      if (selectedCategory === 'tiro') {
-        matchingCategories = ['fps', 'battle-royale'];
-      } else if (selectedCategory === 'cartas') {
-        matchingCategories = ['cartas', 'card', 'card_game'];
-      }
-
-      let anyCardVisibleOverall = false;
-
-      tournamentSections.forEach(section => {
-        const cards = section.querySelectorAll('.card-torneio');
-        let visibleCardsInSectionCount = 0;
-
-        cards.forEach(card => {
-          const cardCategory = card.getAttribute('data-categoria');
-          const isMatch = matchingCategories.includes(cardCategory);
-
-          if (isMatch) {
-            card.style.display = 'flex';
-            visibleCardsInSectionCount++;
-            anyCardVisibleOverall = true;
-          } else {
-            card.style.display = 'none';
-          }
-        });
-
-        // Se a seção não tiver nenhum card visível, esconde a seção inteira
-        if (visibleCardsInSectionCount > 0) {
-          section.style.display = 'block';
-        } else {
-          section.style.display = 'none';
-        }
-      });
-
-      // Se não houver nenhum card visível em toda a página, exibe a mensagem de feedback amigável
-      if (anyCardVisibleOverall) {
-        noTournamentsMsg.style.display = 'none';
+        categoriaAtiva = null;
       } else {
-        noTournamentsMsg.style.display = 'block';
+        btn.classList.add('active');
+        categoriaAtiva = selectedCategory;
       }
 
-      // Rolar suavemente até a âncora de torneios
+      if (searchInput) termoBuscaAtivo = searchInput.value.trim();
+      carregarTorneiosSupabase();
+
       const targetAnchor = document.getElementById('categorias');
       if (targetAnchor) {
         targetAnchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     });
   });
+
+  // Botão de limpar filtros no estado vazio
+  if (btnLimparFiltrosHome) {
+    btnLimparFiltrosHome.addEventListener('click', () => {
+      limparTodosFiltros();
+    });
+  }
+
+  // Expor busca da Home para ser invocada pelo Header
+  window.executarBuscaHomeSupabase = function(termo, rolarAteSecao = false) {
+    termoBuscaAtivo = termo || '';
+    carregarTorneiosSupabase();
+    if (rolarAteSecao) {
+      const targetAnchor = document.getElementById('categorias');
+      if (targetAnchor) {
+        targetAnchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  };
+
+  // Se a URL já trouxer um parâmetro de busca (?busca=...)
+  const urlParams = new URLSearchParams(window.location.search);
+  const buscaUrl = urlParams.get('busca');
+  if (buscaUrl) {
+    termoBuscaAtivo = buscaUrl;
+    if (searchInput) searchInput.value = buscaUrl;
+  }
+
+  // Carga inicial dos torneios reais
+  carregarTorneiosSupabase();
 });
 
 // =========================================================

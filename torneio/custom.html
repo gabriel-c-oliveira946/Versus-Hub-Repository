@@ -16,69 +16,100 @@
   <!-- Tela de Carregamento em Detalhes -->
   <div id="loaderDetalhes" class="loader-overlay" style="display: flex;"><i class="fa-solid fa-spinner fa-spin"></i></div>
 
-  <!-- ========= HEADER ========= -->
+    <!-- HEADER -->
   <header>
     <nav class="navbar">
 
+      <!-- ESQUERDA: menu + logo -->
       <div class="header-left">
-        <button id="menuToggle" class="menu-button">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="menu-svg"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-      </button>
 
+        <!-- Botão do menu lateral (hambúrguer) -->
+        <button id="menuToggle" class="menu-button" aria-label="Abrir menu lateral">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="menu-svg"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+
+        <!-- LOGO -->
         <div class="logo_header">
           <a href="/pagina_inicial/index.html">
             <img referrerpolicy="no-referrer" src="/image/logo%20plus%20tipo%20textura.png" alt="VersusHub">
           </a>
         </div>
+
       </div>
 
+      <!-- CENTRO: botões principais -->
       <div class="botoes_header">
         <a href="/aovivo/aovivo.html"><button id="aovivo_header">Ao Vivo</button></a>
         <a href="/criar_torneio/criar_torneio.html"><button id="criar_header">Criar Torneio</button></a>
-        <a href="/equipes/equipes.html"> <button id="equipes_header">Equipes</button> </a>
+        <a href="/equipes/equipes.html"><button id="equipes_header">Equipes</button></a>
       </div>
 
+      <!-- DIREITA: pesquisa + entrar + cadastrar + usuário -->
       <div class="header-right">
-        <form class="search-header" action="#" onsubmit="return false">
-          <input type="text" placeholder="Buscar torneios, jogos..." id="searchInput">
+
+        <!-- BARRA DE PESQUISA NO HEADER -->
+        <form class="search-header" id="searchHeaderForm" action="#" onsubmit="return false">
+          <input
+            type="text"
+            placeholder="Buscar torneios, jogos..."
+            id="searchInput"
+            aria-label="Buscar"
+          >
           <button type="submit" id="searchBtn" aria-label="Buscar"><i class="fa-solid fa-magnifying-glass"></i></button>
         </form>
 
+        <!-- BOTÕES À DIREITA -->
         <a href="/login/login.html" id="btentrar">Entrar</a>
         <a href="/cadastro/cadastro.html" id="btcadastrar">Cadastrar-se</a>
 
+        <!-- ÍCONE DO USUÁRIO -->
         <div class="user-icon">
           <img referrerpolicy="no-referrer" src="/image/boneco_logo_ofc.png" alt="Usuário" id="userBtn">
-          <ul id="menuUser" class="hidden"></ul>
+
+          <ul id="menuUser" class="hidden">
+            <li>
+              <a href="/login/login.html"><i class="fa-solid fa-right-to-bracket" style="margin-right: 8px;"></i>Login</a>
+            </li>
+            <hr>
+            <li>
+              <a href="/cadastro/cadastro.html"><i class="fa-solid fa-user-plus" style="margin-right: 8px;"></i>Cadastro</a>
+            </li>
+            <hr>
+            <li>
+              <a href="/gerenciartorneios/gerentornindex.html"><i class="fa-solid fa-file-invoice" style="margin-right: 8px;"></i>Gerenciar Torneios</a>
+            </li>
+            <li>
+              <a href="/equipes/gerenciar_equipes.html"><i class="fa-solid fa-list-check" style="margin-right: 8px;"></i>Gerenciar Equipes</a>
+            </li>
+          </ul>
         </div>
+
       </div>
 
     </nav>
   </header>
-  <!-- ========= FIM HEADER ========= -->
+  <!-- FIM HEADER -->
 
-<!-- SIDEBAR -->
-<aside id="sidebar" class="sidebar">
-  <h2 class="sidebar-title"></h2>
-  <nav class="sidebar-nav">
-    <a href="/pagina_inicial/index.html"><i class="fa-solid fa-house" style="margin-right: 10px; width: 16px; text-align: center;"></i>Início</a>
-    <a href="/pagina_inicial/torneios.html"><i class="fa-solid fa-trophy" style="margin-right: 10px; width: 16px; text-align: center;"></i>Todos os torneios</a>
-    <a href="/aovivo/aovivo.html"><i class="fa-solid fa-tower-broadcast" style="margin-right: 10px; width: 16px; text-align: center;"></i>Torneios ao vivo</a>
-    <a href="/criar_torneio/criar_torneio.html"><i class="fa-solid fa-award" style="margin-right: 10px; width: 16px; text-align: center;"></i>Criar Torneio</a>
-    <a href="/equipes/equipes.html"><i class="fa-solid fa-users" style="margin-right: 10px; width: 16px; text-align: center;"></i>Equipes</a>
-    <a href="/ranking.html"><i class="fa-solid fa-users-viewfinder" style="margin-right: 10px; width: 16px; text-align: center;"></i>Jogadores e Ranking</a>
-    <a href="/gerenciartorneios/gerentornindex.html"><i class="fa-solid fa-file-invoice" style="margin-right: 10px; width: 16px; text-align: center;"></i>Gerenciar torneios</a>
-    <a href="/equipes/gerenciar_equipes.html"><i class="fa-solid fa-list-check" style="margin-right: 10px; width: 16px; text-align: center;"></i>Gerenciar Equipes</a>
-    <a href="/termos/termos.html"><i class="fa-solid fa-briefcase" style="margin-right: 10px; width: 16px; text-align: center;"></i>Termos de Uso</a>
-    <a href="/feedback/feedback.html"><i class="fa-solid fa-star" style="margin-right: 10px; width: 16px; text-align: center;"></i>Enviar feedback / Sugestão</a>
-  </nav>
-</aside>
+  <!-- SIDEBAR -->
+  <aside id="sidebar" class="sidebar">
+    <h2 class="sidebar-title"></h2>
+    <nav class="sidebar-nav">
+      <a href="/pagina_inicial/index.html"><i class="fa-solid fa-house" style="margin-right: 10px; width: 16px; text-align: center;"></i>Início</a>
+      <a href="/pagina_inicial/torneios.html"><i class="fa-solid fa-trophy" style="margin-right: 10px; width: 16px; text-align: center;"></i>Todos os torneios</a>
+      <a href="/aovivo/aovivo.html"><i class="fa-solid fa-tower-broadcast" style="margin-right: 10px; width: 16px; text-align: center;"></i>Torneios ao vivo</a>
+      <a href="/criar_torneio/criar_torneio.html"><i class="fa-solid fa-award" style="margin-right: 10px; width: 16px; text-align: center;"></i>Criar Torneio</a>
+      <a href="/equipes/equipes.html"><i class="fa-solid fa-users" style="margin-right: 10px; width: 16px; text-align: center;"></i>Equipes</a>
+      <a href="/ranking.html"><i class="fa-solid fa-users-viewfinder" style="margin-right: 10px; width: 16px; text-align: center;"></i>Jogadores e Ranking</a>
+      <a href="/gerenciartorneios/gerentornindex.html"><i class="fa-solid fa-file-invoice" style="margin-right: 10px; width: 16px; text-align: center;"></i>Gerenciar torneios</a>
+      <a href="/equipes/gerenciar_equipes.html"><i class="fa-solid fa-list-check" style="margin-right: 10px; width: 16px; text-align: center;"></i>Gerenciar Equipes</a>
+      <a href="/termos/termos.html"><i class="fa-solid fa-briefcase" style="margin-right: 10px; width: 16px; text-align: center;"></i>Termos de Uso</a>
+      <a href="/feedback/feedback.html"><i class="fa-solid fa-star" style="margin-right: 10px; width: 16px; text-align: center;"></i>Enviar feedback / Sugestão</a>
+    </nav>
+  </aside>
 
   <!-- efeito da tela ficar escura no fundo -->
-
-<div id="sidebarOverlay" class="sidebar-overlay"></div>
-
-<!-- FIM SIDEBAR -->
+  <div id="sidebarOverlay" class="sidebar-overlay"></div>
+  <!-- FIM SIDEBAR -->
 
 
   <!-- ========= CONTEÚDO DINÂMICO ========= -->
@@ -105,6 +136,12 @@
           <span id="tagModalidade">Modalidade: --</span>
           <span id="tagLocalizacao">Localização: --</span>
           <span id="tagTaxa">Taxa: --</span>
+        </div>
+
+        <div id="areaAcoesCriador" style="display: none; margin-top: 16px;">
+          <button id="btnAbrirModalEditarTorneio" class="btn-editar-torneio" type="button">
+            <i class="fa-solid fa-pen-to-square" style="color: #ff7300;"></i> Editar Torneio
+          </button>
         </div>
       </div>
     </section>
@@ -194,6 +231,127 @@
       Verifique se o endereço do torneio está correto ou navegue por <strong>Todos os torneios</strong>.</p>
     </section>
   </main>
+
+  <!-- Modal de Edição de Torneio (Apenas Organizador / Admin) -->
+  <div id="modalEditarTorneioCustom" class="modal-inscricao-overlay" style="display: none;">
+    <div class="modal-editar-torneio-content">
+      <div class="modal-inscricao-header">
+        <h3><i class="fa-solid fa-pen-to-square" style="color: #ff7300;"></i> Editar Informações do Torneio</h3>
+        <button type="button" class="btn-close-modal" id="btnFecharModalEditarTorneio" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="formEditarTorneioCustom">
+        <input type="hidden" id="customEditId">
+
+        <!-- Banner do Torneio -->
+        <div class="modal-form-group">
+          <label for="customEditBannerFile">Banner do Torneio</label>
+          <p style="font-size: 12px; color: #9ca3af; margin: 2px 0 8px;">Recomendado: imagem panorâmica ou proporção 16:9.</p>
+          <input type="file" id="customEditBannerFile" accept="image/*">
+          <div class="banner-preview-box" id="customEditBannerPreviewBox">
+            <img id="customEditBannerPreviewImg" src="/images/cerradocup.jpg" alt="Preview do Banner">
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+          <div class="modal-form-group">
+            <label for="customEditNome">Nome do Torneio *</label>
+            <input type="text" id="customEditNome" required>
+          </div>
+
+          <div class="modal-form-group">
+            <label for="customEditJogo">Jogo Competitivo *</label>
+            <input type="text" id="customEditJogo" required>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+          <div class="modal-form-group">
+            <label for="customEditData">Data / Horário de Início *</label>
+            <input type="text" id="customEditData" placeholder="Ex: Início: 15/04/2026 às 19h" required>
+          </div>
+
+          <div class="modal-form-group">
+            <label for="customEditStatus">Status</label>
+            <select id="customEditStatus">
+              <option value="Inscrições abertas">Inscrições abertas</option>
+              <option value="Em andamento">Em andamento</option>
+              <option value="Ao Vivo">Ao Vivo</option>
+              <option value="Encerrado">Encerrado</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+          <div class="modal-form-group">
+            <label for="customEditModalidade">Modalidade</label>
+            <select id="customEditModalidade">
+              <option value="online">Online</option>
+              <option value="presencial">Presencial</option>
+            </select>
+          </div>
+
+          <div class="modal-form-group">
+            <label for="customEditLocalizacao">Localização</label>
+            <input type="text" id="customEditLocalizacao" placeholder="Ex: Online (Discord) ou São Paulo, SP">
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px;">
+          <div class="modal-form-group">
+            <label for="customEditCategoria">Categoria</label>
+            <select id="customEditCategoria">
+              <option value="fps">FPS</option>
+              <option value="battle-royale">Battle Royale</option>
+              <option value="moba">MOBA</option>
+              <option value="esportes">Esportes</option>
+              <option value="luta">Luta</option>
+              <option value="outros">Outros</option>
+            </select>
+          </div>
+
+          <div class="modal-form-group">
+            <label for="customEditPlataforma">Plataforma</label>
+            <select id="customEditPlataforma">
+              <option value="PC">PC</option>
+              <option value="Console">Console</option>
+              <option value="Mobile">Mobile</option>
+              <option value="Crossplay">Crossplay</option>
+            </select>
+          </div>
+
+          <div class="modal-form-group">
+            <label for="customEditLimite">Limite Participantes</label>
+            <input type="text" id="customEditLimite" placeholder="Ex: 16 equipes">
+          </div>
+        </div>
+
+        <div class="modal-form-group">
+          <label for="customEditLink">Link da Transmissão / Transmissão Ao Vivo</label>
+          <input type="text" id="customEditLink" placeholder="https://twitch.tv/... ou https://youtube.com/...">
+        </div>
+
+        <div class="modal-form-group">
+          <label for="customEditDescricao">Descrição do Torneio</label>
+          <textarea id="customEditDescricao" rows="3" placeholder="Informações detalhadas sobre o campeonato..."></textarea>
+        </div>
+
+        <div class="modal-form-group">
+          <label for="customEditRegras">Regras Principais</label>
+          <textarea id="customEditRegras" rows="3" placeholder="Uma regra por linha..."></textarea>
+        </div>
+
+        <div class="modal-form-group">
+          <label for="customEditRequisitos">Requisitos dos Jogadores</label>
+          <textarea id="customEditRequisitos" rows="2" placeholder="Requisitos de idade, nível, conta..."></textarea>
+        </div>
+
+        <div class="modal-footer-actions">
+          <button type="button" class="btn-modal-cancel" id="btnCancelarModalEditarTorneio">Cancelar</button>
+          <button type="submit" class="btn-modal-save" id="btnSalvarModalEditarTorneio">Salvar Alterações</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <!-- ========= FOOTER ========= -->
   <footer>

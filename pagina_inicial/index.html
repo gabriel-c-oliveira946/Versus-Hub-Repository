@@ -12,93 +12,100 @@
 
 <body>
 
-    <!-- HEADER -->
-<header>
-  <nav class="navbar">
+      <!-- HEADER -->
+  <header>
+    <nav class="navbar">
 
-    <!-- ESQUERDA: menu + logo -->
-    <div class="header-left">
+      <!-- ESQUERDA: menu + logo -->
+      <div class="header-left">
 
-      <!-- Botão do menu lateral (hambúrguer) -->
-      <button id="menuToggle" class="menu-button">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="menu-svg"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-      </button>
+        <!-- Botão do menu lateral (hambúrguer) -->
+        <button id="menuToggle" class="menu-button" aria-label="Abrir menu lateral">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="menu-svg"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
 
-      <!-- LOGO -->
-      <div class="logo_header">
-        <a href="/pagina_inicial/index.html">
-          <img referrerpolicy="no-referrer" src="/image/logo%20plus%20tipo%20textura.png" alt="VersusHub">
-        </a>
+        <!-- LOGO -->
+        <div class="logo_header">
+          <a href="/pagina_inicial/index.html">
+            <img referrerpolicy="no-referrer" src="/image/logo%20plus%20tipo%20textura.png" alt="VersusHub">
+          </a>
+        </div>
+
       </div>
 
-    </div>
-
-    <!-- CENTRO: botões principais -->
-    <div class="botoes_header">
-     <a href="/aovivo/aovivo.html"> <button id="aovivo_header">Ao Vivo</button></a>
-     <a href="/criar_torneio/criar_torneio.html"> <button id="criar_header">Criar Torneio</button> <a href="/equipes/equipes.html"> <button id="equipes_header">Equipes</button> </a>
-    </div>
-
-    <!-- DIREITA: pesquisa + entrar + cadastrar + usuário -->
-    <div class="header-right">
-
-      <!-- BARRA DE PESQUISA NO HEADER -->
-      <form class="search-header" action="#" onsubmit="return false">
-        <input
-          type="text"
-          placeholder="Buscar torneios, jogos..."
-          id="searchInput"
-        >
-        <button type="submit" id="searchBtn" aria-label="Buscar"><i class="fa-solid fa-magnifying-glass"></i></button>
-      </form>
-
-      <!-- BOTÕES À DIREITA -->
-      <a href="/login/login.html" id="btentrar">Entrar</a>
-      <a href="/cadastro/cadastro.html" id="btcadastrar">Cadastrar-se</a>
-
-      <!-- ÍCONE DO USUÁRIO -->
-      <div class="user-icon">
-        <img referrerpolicy="no-referrer" src="/image/boneco_logo_ofc.png" alt="Usuário" id="userBtn">
-
-        <ul id="menuUser" class="hidden">
-          <li>
-            <a href="/login/login.html">
-              Login
-            </a>
-          </li>
-          <hr>
-          <li><a href="/cadastro/cadastro.html">Cadastro</a></li>
-        </ul>
+      <!-- CENTRO: botões principais -->
+      <div class="botoes_header">
+        <a href="/aovivo/aovivo.html"><button id="aovivo_header">Ao Vivo</button></a>
+        <a href="/criar_torneio/criar_torneio.html"><button id="criar_header">Criar Torneio</button></a>
+        <a href="/equipes/equipes.html"><button id="equipes_header">Equipes</button></a>
       </div>
 
-    </div>
+      <!-- DIREITA: pesquisa + entrar + cadastrar + usuário -->
+      <div class="header-right">
 
-  </nav>
-</header>
-<!-- FIM HEADER -->
+        <!-- BARRA DE PESQUISA NO HEADER -->
+        <form class="search-header" id="searchHeaderForm" action="#" onsubmit="return false">
+          <input
+            type="text"
+            placeholder="Buscar torneios, jogos..."
+            id="searchInput"
+            aria-label="Buscar"
+          >
+          <button type="submit" id="searchBtn" aria-label="Buscar"><i class="fa-solid fa-magnifying-glass"></i></button>
+        </form>
 
-<!-- SIDEBAR -->
-<aside id="sidebar" class="sidebar">
-  <h2 class="sidebar-title"></h2>
-  <nav class="sidebar-nav">
-    <a href="/pagina_inicial/index.html"><i class="fa-solid fa-house" style="margin-right: 10px; width: 16px; text-align: center;"></i>Início</a>
-    <a href="/pagina_inicial/torneios.html"><i class="fa-solid fa-trophy" style="margin-right: 10px; width: 16px; text-align: center;"></i>Todos os torneios</a>
-    <a href="/aovivo/aovivo.html"><i class="fa-solid fa-tower-broadcast" style="margin-right: 10px; width: 16px; text-align: center;"></i>Torneios ao vivo</a>
-    <a href="/criar_torneio/criar_torneio.html"><i class="fa-solid fa-award" style="margin-right: 10px; width: 16px; text-align: center;"></i>Criar Torneio</a>
-    <a href="/equipes/equipes.html"><i class="fa-solid fa-users" style="margin-right: 10px; width: 16px; text-align: center;"></i>Equipes</a>
-    <a href="/ranking.html"><i class="fa-solid fa-users-viewfinder" style="margin-right: 10px; width: 16px; text-align: center;"></i>Jogadores e Ranking</a>
-    <a href="/gerenciartorneios/gerentornindex.html"><i class="fa-solid fa-file-invoice" style="margin-right: 10px; width: 16px; text-align: center;"></i>Gerenciar torneios</a>
-    <a href="/equipes/gerenciar_equipes.html"><i class="fa-solid fa-list-check" style="margin-right: 10px; width: 16px; text-align: center;"></i>Gerenciar Equipes</a>
-    <a href="/termos/termos.html"><i class="fa-solid fa-briefcase" style="margin-right: 10px; width: 16px; text-align: center;"></i>Termos de Uso</a>
-    <a href="/feedback/feedback.html"><i class="fa-solid fa-star" style="margin-right: 10px; width: 16px; text-align: center;"></i>Enviar feedback / Sugestão</a>
-  </nav>
-</aside>
+        <!-- BOTÕES À DIREITA -->
+        <a href="/login/login.html" id="btentrar">Entrar</a>
+        <a href="/cadastro/cadastro.html" id="btcadastrar">Cadastrar-se</a>
+
+        <!-- ÍCONE DO USUÁRIO -->
+        <div class="user-icon">
+          <img referrerpolicy="no-referrer" src="/image/boneco_logo_ofc.png" alt="Usuário" id="userBtn">
+
+          <ul id="menuUser" class="hidden">
+            <li>
+              <a href="/login/login.html"><i class="fa-solid fa-right-to-bracket" style="margin-right: 8px;"></i>Login</a>
+            </li>
+            <hr>
+            <li>
+              <a href="/cadastro/cadastro.html"><i class="fa-solid fa-user-plus" style="margin-right: 8px;"></i>Cadastro</a>
+            </li>
+            <hr>
+            <li>
+              <a href="/gerenciartorneios/gerentornindex.html"><i class="fa-solid fa-file-invoice" style="margin-right: 8px;"></i>Gerenciar Torneios</a>
+            </li>
+            <li>
+              <a href="/equipes/gerenciar_equipes.html"><i class="fa-solid fa-list-check" style="margin-right: 8px;"></i>Gerenciar Equipes</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+    </nav>
+  </header>
+  <!-- FIM HEADER -->
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar" class="sidebar">
+    <h2 class="sidebar-title"></h2>
+    <nav class="sidebar-nav">
+      <a href="/pagina_inicial/index.html"><i class="fa-solid fa-house" style="margin-right: 10px; width: 16px; text-align: center;"></i>Início</a>
+      <a href="/pagina_inicial/torneios.html"><i class="fa-solid fa-trophy" style="margin-right: 10px; width: 16px; text-align: center;"></i>Todos os torneios</a>
+      <a href="/aovivo/aovivo.html"><i class="fa-solid fa-tower-broadcast" style="margin-right: 10px; width: 16px; text-align: center;"></i>Torneios ao vivo</a>
+      <a href="/criar_torneio/criar_torneio.html"><i class="fa-solid fa-award" style="margin-right: 10px; width: 16px; text-align: center;"></i>Criar Torneio</a>
+      <a href="/equipes/equipes.html"><i class="fa-solid fa-users" style="margin-right: 10px; width: 16px; text-align: center;"></i>Equipes</a>
+      <a href="/ranking.html"><i class="fa-solid fa-users-viewfinder" style="margin-right: 10px; width: 16px; text-align: center;"></i>Jogadores e Ranking</a>
+      <a href="/gerenciartorneios/gerentornindex.html"><i class="fa-solid fa-file-invoice" style="margin-right: 10px; width: 16px; text-align: center;"></i>Gerenciar torneios</a>
+      <a href="/equipes/gerenciar_equipes.html"><i class="fa-solid fa-list-check" style="margin-right: 10px; width: 16px; text-align: center;"></i>Gerenciar Equipes</a>
+      <a href="/termos/termos.html"><i class="fa-solid fa-briefcase" style="margin-right: 10px; width: 16px; text-align: center;"></i>Termos de Uso</a>
+      <a href="/feedback/feedback.html"><i class="fa-solid fa-star" style="margin-right: 10px; width: 16px; text-align: center;"></i>Enviar feedback / Sugestão</a>
+    </nav>
+  </aside>
 
   <!-- efeito da tela ficar escura no fundo -->
-
-<div id="sidebarOverlay" class="sidebar-overlay"></div>
-
-<!-- FIM SIDEBAR -->
+  <div id="sidebarOverlay" class="sidebar-overlay"></div>
+  <!-- FIM SIDEBAR -->
 
   <!-- HERO / CARROSSEL -->
 
@@ -108,65 +115,14 @@
 
 
 
-      <!-- Slides com links e legendas informativas e bonitas -->
-      <div class="carousel-slide active">
-        <a href="/torneio/detalhes-campeonato-presen-fifa.html" class="carousel-link">
-          <img referrerpolicy="no-referrer" src="/images/torneio_fifa_22.jpg" alt="Torneio FIFA 22">
-          <div class="carousel-caption">
-            <span class="carousel-tag">Fifa • Presencial</span>
-            <h3 class="carousel-slide-title">Torneio Presencial de FIFA</h3>
-            <p class="carousel-slide-desc">O maior campeonato offline de futebol digital do Paraná. Sinta a emoção de jogar nos gramados virtuais presencialmente!</p>
-            <span class="carousel-action-btn">Ver Torneio <i class="fa-solid fa-arrow-right"></i></span>
+      <!-- Slides dinâmicos carregados do banco de dados -->
+      <div id="carouselSlidesContainer" style="position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 16px; overflow: hidden;">
+        <div class="carousel-slide active" id="carouselLoading" style="display: flex; align-items: center; justify-content: center; background: #0d0c12;">
+          <div style="text-align: center; color: #a1a1aa; padding: 20px;">
+            <i class="fa-solid fa-spinner fa-spin" style="font-size: 32px; color: #ff3e3e; margin-bottom: 12px; display: inline-block;"></i>
+            <p style="font-size: 14px; font-weight: 600; color: #e4e4e7; margin: 0;">Carregando torneios em destaque...</p>
           </div>
-        </a>
-      </div>
-
-      <div class="carousel-slide">
-        <a href="/torneio/detalhes-freefire-champions.html" class="carousel-link">
-          <img referrerpolicy="no-referrer" src="/images/ff_championsbrasil.jpg" alt="Free Fire Champions Brasil">
-          <div class="carousel-caption">
-            <span class="carousel-tag">Free Fire • Mobile</span>
-            <h3 class="carousel-slide-title">Free Fire Champions Brasil</h3>
-            <p class="carousel-slide-desc">Reúna seu squad e domine as quedas no maior torneio de Free Fire para celular. Inscrições abertas!</p>
-            <span class="carousel-action-btn">Ver Torneio <i class="fa-solid fa-arrow-right"></i></span>
-          </div>
-        </a>
-      </div>
-
-      <div class="carousel-slide">
-        <a href="/torneio/detalhes-fifaglobalseries.html" class="carousel-link">
-          <img referrerpolicy="no-referrer" src="/images/fifa23_globalseries.webp" alt="FIFA 23 Global Series">
-          <div class="carousel-caption">
-            <span class="carousel-tag">Fifa • Console</span>
-            <h3 class="carousel-slide-title">FIFA Global Series</h3>
-            <p class="carousel-slide-desc">A estrada para a glória competitiva internacional. Jogue contra os melhores do país e pontue no ranking global!</p>
-            <span class="carousel-action-btn">Ver Torneio <i class="fa-solid fa-arrow-right"></i></span>
-          </div>
-        </a>
-      </div>
-
-      <div class="carousel-slide">
-        <a href="/torneio/detalhes-cerradocup.html" class="carousel-link">
-          <img referrerpolicy="no-referrer" src="/images/cerradocup.jpg" alt="Cerrado Cup">
-          <div class="carousel-caption">
-            <span class="carousel-tag">CS:GO • PC</span>
-            <h3 class="carousel-slide-title">Cerrado Cup CS:GO</h3>
-            <p class="carousel-slide-desc">O confronto supremo de FPS no Centro-Oeste brasileiro. Prepare sua mira e trace suas melhores táticas de squad!</p>
-            <span class="carousel-action-btn">Ver Torneio <i class="fa-solid fa-arrow-right"></i></span>
-          </div>
-        </a>
-      </div>
-
-      <div class="carousel-slide">
-        <a href="/torneio/custom.html?id=contra-cup" class="carousel-link">
-          <img referrerpolicy="no-referrer" src="/images/contracup.jpeg" alt="Contra Cup">
-          <div class="carousel-caption">
-            <span class="carousel-tag">Free Fire • Mobile</span>
-            <h3 class="carousel-slide-title">Contra Cup</h3>
-            <p class="carousel-slide-desc">Torneio comunitário de tiro rápido e pura adrenalina. Chame seus parceiros e prepare-se para o combate!</p>
-            <span class="carousel-action-btn">Ver Torneio <i class="fa-solid fa-arrow-right"></i></span>
-          </div>
-        </a>
+        </div>
       </div>
 
 
@@ -192,226 +148,52 @@
 
   <div class="btscategorias">
 
-
     <!--  BOTÃO JOGOS DE MOBA-->
-
-
-    <button class="btn-filtro-categoria" data-categoria-filtro="moba"> <img referrerpolicy="no-referrer" src="/image/moba.png" alt=""></button>
-
+    <button class="btn-filtro-categoria" data-categoria-filtro="moba" title="Jogos MOBA"> <img referrerpolicy="no-referrer" src="/image/moba.png" alt="MOBA"></button>
 
     <!--  BOTÃO JOGOS DE LUTA-->
-
-
-    <button class="btn-filtro-categoria" data-categoria-filtro="luta"><img referrerpolicy="no-referrer" src="/image/luta.png" alt=""></button>
-
+    <button class="btn-filtro-categoria" data-categoria-filtro="luta" title="Jogos de Luta"><img referrerpolicy="no-referrer" src="/image/luta.png" alt="Luta"></button>
 
     <!--  BOTÃO JOGOS DE TIRO-->
-
-
-    <button class="btn-filtro-categoria" data-categoria-filtro="tiro"><img referrerpolicy="no-referrer" src="/image/tiro.png" alt=""></button>
-
+    <button class="btn-filtro-categoria" data-categoria-filtro="fps" title="FPS / Tiro"><img referrerpolicy="no-referrer" src="/image/tiro.png" alt="FPS / Tiro"></button>
 
     <!--  BOTÃO JOGOS DE ESPORTES-->
-
-
-    <button class="btn-filtro-categoria" data-categoria-filtro="esportes"><img referrerpolicy="no-referrer" src="/image/esportes.png" alt=""></button>
-
+    <button class="btn-filtro-categoria" data-categoria-filtro="esportes" title="Futebol / Esportes"><img referrerpolicy="no-referrer" src="/image/esportes.png" alt="Futebol e Esportes"></button>
 
     <!--  BOTÃO JOGOS DE CARTA-->
-
-
-    <button class="btn-filtro-categoria" data-categoria-filtro="cartas"><img referrerpolicy="no-referrer" src="/image/card_game.png" alt=""></button>
+    <button class="btn-filtro-categoria" data-categoria-filtro="cartas" title="Card Games"><img referrerpolicy="no-referrer" src="/image/card_game.png" alt="Card Game"></button>
 
   </div>
 
-  <!--  Videos e subcategorias de jogos que ficam abaixo dos botões vermelhos  -->
-
- <!-- BLOCO: CS-GO -->
+  <!-- SEÇÃO DINÂMICA DE TORNEIOS DA HOMEPAGE (CONSULTA EXCLUSIVA AO BANCO DE DADOS) -->
   <section class="bloco-categoria" id="categorias">
 
-    <h2 class="titulo-categoria">CS-GO</h2>
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 8px;">
+      <h2 class="titulo-categoria" id="tituloSecaoTorneios" style="margin-bottom: 0;">Torneios em Destaque</h2>
+      <div id="statusFiltroAtivo" style="font-size: 13px; color: #a1a1aa; font-weight: 500; display: none;"></div>
+    </div>
     <hr class="linha-categoria">
 
-    <div class="grid-torneios">
-
-      <article class="card-torneio"
-        data-nome="Evo Championship Series"
-        data-jogo="csgo"
-        data-categoria="fps"
-        data-plataforma="pc"
-        data-status="aberto">
-
-        <img referrerpolicy="no-referrer" src="/images/cerradocup.jpg" alt="Evo Championship Series - CS:GO">
-        <div class="card-info">
-          <h2>Cerrado Cup CS-GO</h2>
-          <p class="jogo">Jogo: CS:GO • FPS • PC</p>
-          <p class="data">Início: 02/01/2026</p>
-          <p class="status status-aberto">Inscrições abertas</p>
-         <a href="/torneio/detalhes-cerradocup.html"> <button class="btn-detalhes">Ver detalhes</button> </a>
-        </div>
-      </article>
-
-      <article class="card-torneio"
-        data-nome="Gamescom Latam CS:GO"
-        data-jogo="csgo"
-        data-categoria="fps"
-        data-plataforma="pc"
-        data-status="andamento">
-
-        <img referrerpolicy="no-referrer" src="/images/torneio_csgo2.webp" alt="Gamescom Latam - CS:GO">
-        <div class="card-info">
-          <h2>Time To Battle League</h2>
-          <p class="jogo">Jogo: CS:GO • FPS • PC</p>
-          <p class="data">Início: 06/12/2025</p>
-          <p class="status status-andamento">Em andamento</p>
-          <a href="/torneio/custom.html?id=gamescom-latam"> <button class="btn-detalhes">Ver detalhes</button> </a>
-        </div>
-      </article>
-
-      <article class="card-torneio"
-        data-nome="PARANÁ STARTUPS CHALLENGE CS:GO"
-        data-jogo="csgo"
-        data-categoria="fps"
-        data-plataforma="pc"
-        data-status="encerrado">
-
-        <img referrerpolicy="no-referrer" src="/images/fileiracsgo.jpeg" alt="PARANÁ STARTUPS CHALLENGE - CS:GO">
-        <div class="card-info">
-          <h2>CS-GO STARTUPS CHALLENGE</h2>
-          <p class="jogo">Jogo: CS:GO • FPS • PC</p>
-          <p class="data">Início: 04/11/2025</p>
-          <p class="status status-encerrado">Encerrado</p>
-          <a href="/torneio/custom.html?id=parana-startups"><button class="btn-detalhes">Ver detalhes</button></a>
-        </div>
-      </article>
-
+    <!-- Container de Loading -->
+    <div id="homeLoading" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 50px 20px; color: #9ca3af; text-align: center;">
+      <i class="fa-solid fa-spinner fa-spin" style="font-size: 32px; color: #ff3e3e; margin-bottom: 14px;"></i>
+      <span style="font-size: 15px; font-weight: 600; color: #f3f4f6;">Consultando torneios...</span>
     </div>
-  </section>
 
+    <!-- Grid dinâmico onde os cards reais são injetados -->
+    <div class="grid-torneios" id="gridTorneiosHome" style="display: none;"></div>
 
-  <!-- BLOCO: FREE FIRE -->
-  <section class="bloco-categoria">
-
-    <h2 class="titulo-categoria">Free Fire</h2>
-    <hr class="linha-categoria">
-
-    <div class="grid-torneios">
-
-      <article class="card-torneio"
-        data-nome="FF Evo Championship Series"
-        data-jogo="freefire"
-        data-categoria="battle-royale"
-        data-plataforma="mobile"
-        data-status="aberto">
-
-        <img referrerpolicy="no-referrer" src="/images/ff_championsbrasil.jpg" alt="Free Fire Champions Brasil">
-        <div class="card-info">
-          <h2>Free Fire Champions Brasil</h2>
-          <p class="jogo">Jogo: Free Fire • Battle Royale • Mobile</p>
-          <p class="data">Início: 03/01/2026</p>
-          <p class="status status-aberto">Inscrições abertas</p>
-          <a href="/torneio/detalhes-freefire-champions.html"><button class="btn-detalhes">Ver detalhes</button></a>
-        </div>
-      </article>
-
-      <article class="card-torneio"
-        data-nome="C.O.P.A - FREE FIRE"
-        data-jogo="freefire"
-        data-categoria="battle-royale"
-        data-plataforma="mobile"
-        data-status="andamento">
-
-        <img referrerpolicy="no-referrer" src="/images/ffcopaff.png" alt="C.O.P.A - FREE FIRE">
-        <div class="card-info">
-          <h2>C.O.P.A - FREE FIRE</h2>
-          <p class="jogo">Jogo: Free Fire • Battle Royale • Mobile</p>
-          <p class="data">Início: 23/01/2026</p>
-          <p class="status status-andamento">Em andamento</p>
-          <a href="/torneio/custom.html?id=copa-ff"><button class="btn-detalhes">Ver detalhes</button></a>
-        </div>
-      </article>
-
-      <article class="card-torneio"
-        data-nome="Liga FF Brasil"
-        data-jogo="freefire"
-        data-categoria="battle-royale"
-        data-plataforma="mobile"
-        data-status="encerrado">
-
-        <img referrerpolicy="no-referrer" src="/images/liga-ff-brasil.jpeg" alt="Liga FF Brasil">
-        <div class="card-info">
-          <h2>Liga FF Brasil</h2>
-          <p class="jogo">Jogo: Free Fire • Battle Royale • Mobile</p>
-          <p class="data">Início: 29/02/2026</p>
-          <p class="status status-encerrado">Encerrado</p>
-          <a href="/torneio/custom.html?id=liga-ff"><button class="btn-detalhes">Ver detalhes</button></a>
-        </div>
-      </article>
-
+    <!-- Mensagem de nenhum torneio encontrado / sem resultados -->
+    <div id="no-tournaments-msg" style="display: none; text-align: center; padding: 50px 20px; background: #141419; border-radius: 16px; border: 1px dashed rgba(255, 255, 255, 0.12); max-width: 600px; margin: 30px auto; font-family: system-ui, sans-serif; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+      <span style="font-size: 48px; display: block; margin-bottom: 16px; color: #ff3e3e;"><i class="fa-solid fa-gamepad"></i></span>
+      <h3 id="no-tournaments-title" style="font-size: 20px; color: #ffffff; margin-bottom: 8px; font-weight: 700;">Nenhum Torneio Encontrado</h3>
+      <p id="no-tournaments-desc" style="font-size: 14px; color: #9ca3af; margin-bottom: 22px; max-width: 440px; margin-left: auto; margin-right: auto; line-height: 1.6;">Não encontramos torneios cadastrados com estes critérios no momento.</p>
+      <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+        <button id="btnLimparFiltrosHome" style="background: #27272a; color: #f4f4f5; border: 1px solid #3f3f46; border-radius: 999px; padding: 10px 24px; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s;">Ver todos os torneios</button>
+        <a href="/criar_torneio/criar_torneio.html" style="display: inline-flex; align-items: center; justify-content: center; background: #d41111; color: #ffffff; text-decoration: none; padding: 10px 26px; border-radius: 999px; font-size: 13px; font-weight: 700; gap: 8px; box-shadow: 0 4px 15px rgba(212, 17, 17, 0.4); transition: 0.2s;">Criar Torneio <i class="fa-solid fa-trophy" style="color: #ffd700; margin-left: 4px;"></i></a>
+      </div>
     </div>
-  </section>
 
-
-  <!-- BLOCO: FIFA -->
-  <section class="bloco-categoria">
-
-    <h2 class="titulo-categoria">FIFA</h2>
-    <hr class="linha-categoria">
-
-    <div class="grid-torneios">
-
-      <article class="card-torneio"
-        data-nome="FIFA Global Series"
-        data-jogo="fifa"
-        data-categoria="esportes"
-        data-plataforma="console"
-        data-status="aberto">
-
-        <img referrerpolicy="no-referrer" src="/images/fifa_torneiofile1.jpg" alt="FIFA Global Series">
-        <div class="card-info">
-          <h2>FIFA Global Series</h2>
-          <p class="jogo">Jogo: FIFA • Esportes • Console</p>
-          <p class="data">Início: 22/02/2026</p>
-          <p class="status status-aberto">Inscrições abertas</p>
-          <a href="/torneio/detalhes-fifaglobalseries.html"><button class="btn-detalhes">Ver detalhes</button></a>
-        </div>
-      </article>
-
-      <article class="card-torneio"
-        data-nome="ARENA - FC25"
-        data-jogo="fifa"
-        data-categoria="esportes"
-        data-plataforma="console"
-        data-status="andamento">
-
-        <img referrerpolicy="no-referrer" src="/images/contracup.jpeg" alt="ARENA - FC25">
-        <div class="card-info">
-          <h2>COPA CONTRAF CUT</h2>
-          <p class="jogo">Jogo: FIFA • Esportes • Console</p>
-          <p class="data">Início: 05/11/2025</p>
-          <p class="status status-andamento">Em andamento</p>
-          <a href="/torneio/custom.html?id=contraf-cut"><button class="btn-detalhes">Ver detalhes</button></a>
-        </div>
-      </article>
-
-      <article class="card-torneio"
-        data-nome="eFootball Championship"
-        data-jogo="fifa"
-        data-categoria="esportes"
-        data-plataforma="console"
-        data-status="encerrado">
-
-        <img referrerpolicy="no-referrer" src="/images/fifa_torneio3.jpg" alt="eFootball Championship">
-        <div class="card-info">
-          <h2>Torneio Interclubes FIFA 20</h2>
-          <p class="jogo">Jogo: FIFA • Esportes • Console</p>
-          <p class="data">Início: 22/11/2025</p>
-          <p class="status status-encerrado">Encerrado</p>
-          <a href="/torneio/custom.html?id=interclubes-fifa"><button class="btn-detalhes">Ver detalhes</button></a>
-        </div>
-      </article>
-
-    </div>
   </section>
 
     <!-- PARTE DE BAIXO DO SITE< CHAMADA DE FOOTER -->

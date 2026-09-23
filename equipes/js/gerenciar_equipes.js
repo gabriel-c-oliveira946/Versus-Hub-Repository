@@ -458,7 +458,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const { data: memberships, error } = await supabase
         .from('membros_equipe')
         .select('*')
-        .eq('equipe_id', equipe.id);
+        .in('equipe_id', [String(equipe.id), String(equipe.nome)]);
 
       if (error) {
         console.warn('Erro ao consultar membros da equipe:', error);
@@ -512,9 +512,15 @@ document.addEventListener('DOMContentLoaded', async () => {
       `;
       membersContainer.appendChild(leaderCard);
 
+      // Filtra aceitos sem duplicar email do líder
+      const aceitosFiltrados = aceitos.filter(m => {
+        const mEmail = (m.user_email || '').toLowerCase().trim();
+        return !leaderEmailNormalized || mEmail !== leaderEmailNormalized;
+      });
+
       // Membros aceitos
-      if (aceitos.length > 0) {
-        aceitos.forEach(m => {
+      if (aceitosFiltrados.length > 0) {
+        aceitosFiltrados.forEach(m => {
           const mEmail = (m.user_email || '').toLowerCase();
           const uData = usersMap[mEmail] || {};
           const nome = uData.nome || m.user_email;
@@ -565,8 +571,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
       }
 
+      const leaderCount = (equipe.leaderEmail || equipe.leaderName) ? 1 : 0;
+      const totalMembrosAtuais = leaderCount + aceitosFiltrados.length;
+      const limiteMax = parseInt(equipe.limite, 10) > 0 ? parseInt(equipe.limite, 10) : 5;
+
       if (badgeMembers) {
-        badgeMembers.textContent = String(1 + aceitos.length);
+        badgeMembers.textContent = `${totalMembrosAtuais} / ${limiteMax}`;
       }
 
       // --- RENDERIZAÇÃO DAS SOLICITAÇÕES PENDENTES ---
@@ -609,28 +619,56 @@ document.addEventListener('DOMContentLoaded', async () => {
             </div>
           `;
 
-          // Botão Aceitar
+          // Botão Aceitar com verificação estrita de limite de vagas
           const btnAccept = card.querySelector('.btn-accept-request');
           btnAccept.addEventListener('click', async () => {
             btnAccept.disabled = true;
-            try {
-              const { error: updErr } = await supabase
-                .from('membros_equipe')
-                .update({ status: 'Aceito' })
-                .eq('id', p.id);
+            btnAccept.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Aceitando...';
 
-              if (updErr) {
-                showToast('Erro ao aceitar solicitação.', 'error');
+            try {
+              // 1. Verifica contagem atualizada no banco de dados para evitar estouro de vagas
+              const { data: membrosAtuaisDb } = await supabase
+                .from('membros_equipe')
+                .select('id, user_email')
+                .in('equipe_id', [String(equipe.id), String(equipe.nome)])
+                .eq('status', 'Aceito');
+
+              const currentAccepted = (membrosAtuaisDb || []).filter(m => {
+                const mEmail = (m.user_email || '').toLowerCase().trim();
+                return !equipe.leaderEmail || mEmail !== equipe.leaderEmail.toLowerCase().trim();
+              });
+
+              const lCount = (equipe.leaderEmail || equipe.leaderName) ? 1 : 0;
+              const lotacaoAtual = lCount + currentAccepted.length;
+              const maxVagas = parseInt(equipe.limite, 10) > 0 ? parseInt(equipe.limite, 10) : 5;
+
+              if (lotacaoAtual >= maxVagas) {
+                showToast(`A equipe "${equipe.nome}" já atingiu o limite de ${maxVagas} integrantes (${lotacaoAtual}/${maxVagas}). Não há vagas disponíveis para aceitar novos membros.`, 'error');
                 btnAccept.disabled = false;
+                btnAccept.innerHTML = '<i class="fa-solid fa-check"></i> Aceitar';
                 return;
               }
 
-              showToast(`Solicitação de "${nome}" aceita! O usuário agora é membro da equipe.`);
+              // 2. Atualiza a solicitação para Aceito e normaliza o equipe_id
+              const { error: updErr } = await supabase
+                .from('membros_equipe')
+                .update({ status: 'Aceito', equipe_id: String(equipe.id) })
+                .eq('id', p.id);
+
+              if (updErr) {
+                showToast('Erro ao aceitar solicitação. Tente novamente.', 'error');
+                btnAccept.disabled = false;
+                btnAccept.innerHTML = '<i class="fa-solid fa-check"></i> Aceitar';
+                return;
+              }
+
+              showToast(`Solicitação de "${nome}" aceita! A equipe agora possui ${lotacaoAtual + 1}/${maxVagas} integrantes.`);
               await carregarMembrosESolicitacoes(equipe);
             } catch (err) {
-              console.error('Erro ao aceitar:', err);
-              showToast('Erro ao processar.', 'error');
+              console.error('Erro ao aceitar solicitação:', err);
+              showToast('Erro ao processar solicitação.', 'error');
               btnAccept.disabled = false;
+              btnAccept.innerHTML = '<i class="fa-solid fa-check"></i> Aceitar';
             }
           });
 
@@ -672,12 +710,47 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ==============================================================================
   // 5. MODAL DE EDIÇÃO DE EQUIPE
   // ==============================================================================
+  let editTeamLogoDataUrl = '';
+  const editTeamLogoFileInput = document.getElementById('editTeamLogoFile');
+  const editTeamLogoImg = document.getElementById('editTeamLogoImg');
+
+  if (editTeamLogoFileInput) {
+    editTeamLogoFileInput.addEventListener('change', (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+
+      if (!file.type.startsWith('image/')) {
+        showToast('Selecione apenas arquivos de imagem.', 'error');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        editTeamLogoDataUrl = ev.target.result;
+        if (editTeamLogoImg) {
+          editTeamLogoImg.src = editTeamLogoDataUrl;
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
   function abrirModalEdicao(equipe) {
     document.getElementById('editTeamId').value = equipe.id;
     document.getElementById('editTeamNome').value = equipe.nome || '';
     document.getElementById('editTeamTag').value = equipe.tag || '';
     document.getElementById('editTeamJogos').value = equipe.jogos || '';
-    document.getElementById('editTeamLogo').value = equipe.logo || '';
+    
+    // Reseta estado do arquivo e carrega imagem atual no preview
+    editTeamLogoDataUrl = '';
+    if (editTeamLogoFileInput) editTeamLogoFileInput.value = '';
+    if (editTeamLogoImg) {
+      editTeamLogoImg.src = equipe.logo || '/image/logo.png';
+      editTeamLogoImg.onerror = () => {
+        editTeamLogoImg.src = '/image/logo.png';
+      };
+    }
+
     document.getElementById('editTeamRegiao').value = equipe.regiao || '';
     document.getElementById('editTeamSobre').value = equipe.sobre || '';
 
@@ -704,7 +777,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       const novoNome = document.getElementById('editTeamNome').value.trim();
       const novaTag = document.getElementById('editTeamTag').value.trim();
       const novosJogos = document.getElementById('editTeamJogos').value.trim();
-      const novoLogo = document.getElementById('editTeamLogo').value.trim() || '/image/logo.png';
+      
+      // Preserva a logo anterior caso nenhum arquivo novo tenha sido enviado
+      const logoAtual = (equipeSelecionada && String(equipeSelecionada.id) === String(teamId))
+        ? equipeSelecionada.logo
+        : (editTeamLogoImg ? editTeamLogoImg.src : '/image/logo.png');
+      const novoLogo = editTeamLogoDataUrl || logoAtual || '/image/logo.png';
+
       const novaRegiao = document.getElementById('editTeamRegiao').value.trim() || 'Brasil';
       const novoSobre = document.getElementById('editTeamSobre').value.trim();
 
