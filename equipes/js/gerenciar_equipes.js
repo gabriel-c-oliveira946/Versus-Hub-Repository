@@ -146,8 +146,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (equipesLideradas.length === 0) {
         minhasEquipesList.innerHTML = `
           <div class="empty-state-box">
-            <i class="fa-solid fa-shield-halved"></i>
-            Você não lidera nenhuma equipe no momento.
+            <i class="fa-solid fa-shield-halved" style="font-size: 24px; color: #6b7280; margin-bottom: 8px; display: block;"></i>
+            Você ainda não possui uma equipe.
           </div>
         `;
         renderEmptyDetailsPanel();
@@ -232,10 +232,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       } else {
         minhasEquipesList.innerHTML = `
           <div class="empty-state-box">
-            <i class="fa-solid fa-triangle-exclamation" style="color: #f59e0b;"></i>
-            Você não lidera nenhuma equipe ou está offline.
+            <i class="fa-solid fa-shield-halved" style="font-size: 24px; color: #6b7280; margin-bottom: 8px; display: block;"></i>
+            Você ainda não possui uma equipe.
           </div>
         `;
+        renderEmptyDetailsPanel();
       }
     }
   }
@@ -380,8 +381,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       console.error('Falha ao carregar equipes que participo:', err);
       equipesQueParticipoList.innerHTML = `
         <div class="empty-state-box">
-          <i class="fa-solid fa-triangle-exclamation" style="color:#f59e0b;"></i>
-          Erro ao carregar equipes.
+          <i class="fa-solid fa-user-group"></i>
+          Você ainda não participa de nenhuma equipe como membro.
         </div>
       `;
     }
@@ -392,12 +393,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ==============================================================================
   function renderEmptyDetailsPanel() {
     teamDetailsPanel.innerHTML = `
-      <div class="empty-state-box" style="padding: 60px 20px;">
-        <i class="fa-solid fa-shield-halved" style="font-size: 40px; color: #4b5563; margin-bottom: 14px;"></i>
-        <h3 style="color: #f3f4f6; font-size: 18px; margin-bottom: 6px;">Nenhuma equipe selecionada</h3>
-        <p style="color: #9ca3af; max-width: 400px; margin: 0 auto 18px;">Crie uma nova equipe para começar a recrutar membros e participar de torneios exclusivos.</p>
-        <a href="/cria_equipe/criar_equipe.html" class="btn-edit-team" style="display: inline-flex; text-decoration: none;">
-          <i class="fa-solid fa-plus"></i> Criar Equipe Agora
+      <div class="empty-state-box" style="padding: 60px 20px; text-align: center;">
+        <i class="fa-solid fa-shield-halved" style="font-size: 48px; color: #4b5563; margin-bottom: 16px; display: block;"></i>
+        <h3 style="color: #f3f4f6; font-size: 20px; font-weight: 700; margin-bottom: 8px;">Você ainda não possui uma equipe</h3>
+        <p style="color: #9ca3af; font-size: 14px; max-width: 440px; margin: 0 auto 24px; line-height: 1.5;">Crie sua equipe personalizada agora mesmo para recrutar jogadores, gerenciar solicitações e disputar torneios no VersusHub!</p>
+        <a href="/cria_equipe/criar_equipe.html" class="btn-edit-team" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; padding: 12px 24px; font-size: 14px; font-weight: 700; border-radius: 10px; background: #ff3b30; color: #ffffff;">
+          <i class="fa-solid fa-plus"></i> Criar Equipe
         </a>
       </div>
     `;
@@ -558,7 +559,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             </div>
             <div class="member-actions">
               <button type="button" class="btn-kick-member" data-id="${m.id}" data-nome="${nome}">
-                <i class="fa-solid fa-user-xmark"></i> Expulsar da Equipe
+                <i class="fa-solid fa-user-xmark"></i> Expulsar
               </button>
             </div>
           `;

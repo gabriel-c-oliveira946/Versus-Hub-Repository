@@ -65,6 +65,80 @@ document.addEventListener('DOMContentLoaded', async () => {
       console.warn('Erro ao ler vh_createdTournaments:', e);
     }
 
+    // 3. Fallback com torneios ao vivo padrão caso lista esteja vazia
+    const seedAoVivo = [
+      {
+        id: "cerrado-cup",
+        nome: "Cerrado Cup CS:GO",
+        jogo: "CS:GO",
+        categoria: "fps",
+        plataforma: "PC",
+        status: "Ao Vivo",
+        statusClass: "status-andamento",
+        data: "20/10/2026",
+        banner: "/images/cerradocup.jpg",
+        link: "/aovivo/cerrado-transmissao.html",
+        premiacao: "R$ 5.000",
+        ao_vivo: true,
+        transmissao_status: "ao_vivo",
+        espectadores: 1420
+      },
+      {
+        id: "br6-rainbow-six",
+        nome: "BR6 Campeonato Brasileiro R6",
+        jogo: "Rainbow Six Siege",
+        categoria: "fps",
+        plataforma: "PC",
+        status: "Ao Vivo",
+        statusClass: "status-andamento",
+        data: "24/10/2026",
+        banner: "/pagina_inicial/image/BR6-2021-o-campeonato-brasileiro-de-Rainbow-Six-Siege.jpeg",
+        link: "/torneio/custom.html?id=br6-rainbow-six",
+        premiacao: "R$ 8.000",
+        ao_vivo: true,
+        transmissao_status: "ao_vivo",
+        espectadores: 980
+      },
+      {
+        id: "liga-ff-brasil",
+        nome: "Liga Versus FF Champions",
+        jogo: "Free Fire",
+        categoria: "fps",
+        plataforma: "Mobile",
+        status: "Ao Vivo",
+        statusClass: "status-andamento",
+        data: "22/10/2026",
+        banner: "/images/liga-ff-brasil.jpeg",
+        link: "/torneio/custom.html?id=liga-ff-brasil",
+        premiacao: "R$ 2.500",
+        ao_vivo: true,
+        transmissao_status: "ao_vivo",
+        espectadores: 2350
+      },
+      {
+        id: "fortnite-battlecup",
+        nome: "Fortnite Battle Cup Versus",
+        jogo: "Fortnite",
+        categoria: "fps",
+        plataforma: "Multi",
+        status: "Finalizada",
+        statusClass: "status-encerrado",
+        data: "10/10/2026",
+        banner: "/images/cerradocup.jpg",
+        link: "/aovivo/fortnite-battlecup.html",
+        premiacao: "R$ 2.000",
+        ao_vivo: false,
+        transmissao_status: "finalizada",
+        gravacao_url: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+      }
+    ];
+
+    seedAoVivo.forEach(seed => {
+      if (!list.some(t => String(t.id) === String(seed.id))) {
+        list.push(seed);
+      }
+    });
+
     todosTorneios = list;
     renderizarCards();
   }

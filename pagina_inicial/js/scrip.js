@@ -28,46 +28,39 @@ function escapeHtml(str) {
 }
 
 // =========================================================
-//  CARROSSEL DE TORNEIOS: RENDERIZADOR E CONTROLES
+//  CARROSSEL DE TORNEIOS: RENDERIZADOR E CONTROLES (EXCLUSIVO SUPABASE)
 // =========================================================
 let autoPlayInterval = null;
 
-function renderizarCarrossel(data, error) {
+function renderizarCarrossel(data) {
   const carouselEl = document.getElementById("carousel");
   const slidesContainer = document.getElementById("carouselSlidesContainer") || carouselEl;
   const nextBtn = document.getElementById("nextBtn");
   const prevBtn = document.getElementById("prevBtn");
   const indicatorsContainer = document.getElementById("carouselIndicators");
+  const loadingEl = document.getElementById('carouselLoading');
 
   if (!carouselEl || !slidesContainer) return;
+
+  if (loadingEl) loadingEl.style.display = 'none';
 
   if (autoPlayInterval) {
     clearInterval(autoPlayInterval);
     autoPlayInterval = null;
   }
 
-  if (error) {
-    console.error('Erro ao buscar torneios para o carrossel:', error);
-    const loadingEl = document.getElementById('carouselLoading');
-    if (loadingEl) {
-      loadingEl.innerHTML = `
-        <div style="text-align: center; color: #a1a1aa; padding: 20px;">
-          <p style="font-size: 15px; font-weight: 600; color: #f87171; margin: 0;">Não foi possível carregar os torneios no momento.</p>
-        </div>
-      `;
-    }
-    return;
-  }
+  const listaCarrossel = Array.isArray(data) ? data : [];
 
-  if (!data || data.length === 0) {
-    const loadingEl = document.getElementById('carouselLoading');
-    if (loadingEl) {
-      loadingEl.innerHTML = `
-        <div style="text-align: center; color: #a1a1aa; padding: 20px;">
-          <p style="font-size: 15px; font-weight: 600; color: #e4e4e7; margin: 0;">Nenhum torneio cadastrado.</p>
-        </div>
-      `;
-    }
+  // Se a lista estiver vazia
+  if (listaCarrossel.length === 0) {
+    slidesContainer.innerHTML = `
+      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 320px; width: 100%; color: #9ca3af; text-align: center; background: rgba(14, 13, 22, 0.7); border-radius: 16px;">
+        <i class="fa-solid fa-trophy" style="font-size: 36px; color: #4b5563; margin-bottom: 12px;"></i>
+        <h4 style="font-size: 16px; color: #f3f4f6; margin-bottom: 4px;">Nenhum torneio cadastrado no momento</h4>
+        <p style="font-size: 13px; color: #6b7280;">Novos campeonatos aparecerão aqui em breve.</p>
+      </div>
+    `;
+    if (indicatorsContainer) indicatorsContainer.innerHTML = '';
     return;
   }
 
@@ -76,7 +69,7 @@ function renderizarCarrossel(data, error) {
   if (indicatorsContainer) indicatorsContainer.innerHTML = '';
 
   // Utiliza os torneios cadastrados (exibe até 8 em destaque no carrossel)
-  const torneiosDestaque = data.slice(0, 8);
+  const torneiosDestaque = listaCarrossel.slice(0, 8);
 
   torneiosDestaque.forEach((t, i) => {
     const banner = t.banner || '/images/cerradocup.jpg';
@@ -205,16 +198,45 @@ function renderizarCarrossel(data, error) {
 
 async function inicializarCarrosselTorneios() {
   const carouselEl = document.getElementById("carousel");
+  const slidesContainer = document.getElementById("carouselSlidesContainer") || carouselEl;
+  const loadingEl = document.getElementById('carouselLoading');
   if (!carouselEl) return;
+
   try {
     const supabase = await getSupabase();
     const { data, error } = await supabase
       .from('torneios')
       .select('*')
       .order('created_at', { ascending: false });
-    renderizarCarrossel(data, error);
+
+    if (error) {
+      console.warn('Aviso ao carregar carrossel do Supabase:', error);
+      if (loadingEl) loadingEl.style.display = 'none';
+      if (slidesContainer) {
+        slidesContainer.innerHTML = `
+          <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 320px; width: 100%; color: #9ca3af; text-align: center; background: rgba(14, 13, 22, 0.7); border-radius: 16px; padding: 20px;">
+            <i class="fa-solid fa-triangle-exclamation" style="font-size: 32px; color: #f59e0b; margin-bottom: 12px;"></i>
+            <h4 style="font-size: 16px; color: #f3f4f6; margin-bottom: 4px;">Não foi possível carregar os torneios em destaque</h4>
+            <p style="font-size: 13px; color: #6b7280;">Houve uma instabilidade na conexão com o servidor.</p>
+          </div>
+        `;
+      }
+      return;
+    }
+
+    renderizarCarrossel(data);
   } catch (err) {
-    console.error('Erro ao carregar carrossel isolado:', err);
+    console.warn('Falha na consulta de carrossel de torneios:', err);
+    if (loadingEl) loadingEl.style.display = 'none';
+    if (slidesContainer) {
+      slidesContainer.innerHTML = `
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 320px; width: 100%; color: #9ca3af; text-align: center; background: rgba(14, 13, 22, 0.7); border-radius: 16px; padding: 20px;">
+          <i class="fa-solid fa-triangle-exclamation" style="font-size: 32px; color: #f59e0b; margin-bottom: 12px;"></i>
+          <h4 style="font-size: 16px; color: #f3f4f6; margin-bottom: 4px;">Não foi possível carregar os torneios em destaque</h4>
+          <p style="font-size: 13px; color: #6b7280;">Verifique sua conexão e tente novamente.</p>
+        </div>
+      `;
+    }
   }
 }
 window.recarregarCarrosselTorneios = inicializarCarrosselTorneios;
@@ -535,15 +557,17 @@ document.addEventListener('DOMContentLoaded', () => {
     if (homeLoading) homeLoading.style.display = 'none';
 
     if (error) {
-      console.error('Erro na consulta de torneios:', error);
+      console.warn('Erro ao carregar torneios no grid:', error);
       if (gridTorneiosHome) gridTorneiosHome.style.display = 'none';
       if (noTournamentsMsg) {
         noTournamentsMsg.style.display = 'block';
         if (noTournamentsTitle) noTournamentsTitle.textContent = 'Erro ao Carregar Torneios';
-        if (noTournamentsDesc) noTournamentsDesc.textContent = 'Não foi possível carregar os torneios no momento. Tente recarregar a página.';
+        if (noTournamentsDesc) noTournamentsDesc.textContent = 'Não foi possível carregar os torneios do banco de dados no momento. Tente recarregar a página.';
       }
       return;
     }
+
+    const listaParaExibir = Array.isArray(data) ? data : [];
 
     // Atualiza Título da seção
     if (termo && categoria) {
@@ -560,7 +584,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (statusFiltro) {
       if (categoria || termo) {
         statusFiltro.style.display = 'inline-block';
-        statusFiltro.innerHTML = `Exibindo <strong>${data ? data.length : 0}</strong> torneio(s) cadastrado(s) • <button type="button" id="btnResetarFiltrosBadge" style="background: none; border: none; color: #ff3e3e; text-decoration: underline; cursor: pointer; font-size: 13px; font-weight: 600; padding: 0 4px;">Limpar filtros</button>`;
+        statusFiltro.innerHTML = `Exibindo <strong>${listaParaExibir.length}</strong> torneio(s) • <button type="button" id="btnResetarFiltrosBadge" style="background: none; border: none; color: #ff3e3e; text-decoration: underline; cursor: pointer; font-size: 13px; font-weight: 600; padding: 0 4px;">Limpar filtros</button>`;
         const btnResetBadge = document.getElementById('btnResetarFiltrosBadge');
         if (btnResetBadge) {
           btnResetBadge.onclick = (e) => {
@@ -573,7 +597,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    if (!data || data.length === 0) {
+    if (listaParaExibir.length === 0) {
       if (gridTorneiosHome) gridTorneiosHome.style.display = 'none';
       if (noTournamentsMsg) {
         noTournamentsMsg.style.display = 'block';
@@ -582,13 +606,13 @@ document.addEventListener('DOMContentLoaded', () => {
           if (noTournamentsDesc) noTournamentsDesc.textContent = `Não encontramos torneios de ${nomesCategorias[categoria] || categoria} correspondentes a "${termo}".`;
         } else if (categoria) {
           if (noTournamentsTitle) noTournamentsTitle.textContent = `Nenhum Torneio em ${nomesCategorias[categoria] || categoria}`;
-          if (noTournamentsDesc) noTournamentsDesc.textContent = `Não existem torneios competitivos cadastrados para esta modalidade no momento. Seja o primeiro a criar um campeonato!`;
+          if (noTournamentsDesc) noTournamentsDesc.textContent = `Não existem torneios cadastrados para esta modalidade no momento. Seja o primeiro a criar um campeonato!`;
         } else if (termo) {
           if (noTournamentsTitle) noTournamentsTitle.textContent = 'Nenhum Torneio Encontrado';
           if (noTournamentsDesc) noTournamentsDesc.textContent = `Não encontramos torneios cadastrados correspondentes à sua pesquisa por "${termo}".`;
         } else {
           if (noTournamentsTitle) noTournamentsTitle.textContent = 'Nenhum Torneio Cadastrado';
-          if (noTournamentsDesc) noTournamentsDesc.textContent = 'Ainda não há torneios registrados no banco de dados.';
+          if (noTournamentsDesc) noTournamentsDesc.textContent = 'Ainda não há torneios registrados no momento.';
         }
       }
       return;
@@ -598,7 +622,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Renderiza os cards reais
     if (gridTorneiosHome) {
-      gridTorneiosHome.innerHTML = data.map(t => {
+      gridTorneiosHome.innerHTML = listaParaExibir.map(t => {
         const banner = t.banner || '/images/cerradocup.jpg';
         const link = (t.link && t.link.startsWith('/') && !t.link.includes('?')) ? t.link : ('/torneio/custom.html?id=' + encodeURIComponent(t.id));
         let statusClass = t.statusClass || (
@@ -675,10 +699,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ===================================================================
   // CARREGAMENTO INICIAL PARALELO DA HOMEPAGE COM PROMISE.ALL
-  // Executa simultaneamente carrossel e listagem mantendo os spinners ativos
   // ===================================================================
   async function carregarDadosIniciaisHomepage() {
-    // 1. Mantém/exibe os spinners de carregamento
     if (homeLoading) homeLoading.style.display = 'flex';
     if (gridTorneiosHome) gridTorneiosHome.style.display = 'none';
     if (noTournamentsMsg) noTournamentsMsg.style.display = 'none';
@@ -689,7 +711,7 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const supabase = await getSupabase();
 
-      // Monta as promessas simultâneas para execução em paralelo
+      // Monta as promessas diretamente para o Supabase
       const promessaCarrossel = carouselEl
         ? supabase.from('torneios').select('*').order('created_at', { ascending: false })
         : Promise.resolve({ data: null, error: null });
@@ -698,26 +720,23 @@ document.addEventListener('DOMContentLoaded', () => {
         ? construirQueryGrid(supabase, categoriaAtiva, termoBuscaAtivo)
         : Promise.resolve({ data: null, error: null });
 
-      // EXECUTA TODAS AS CONSULTAS SIMULTANEAMENTE EM PARALELO VIA PROMISE.ALL
       const [resCarrossel, resGrid] = await Promise.all([
         promessaCarrossel,
         promessaGrid
       ]);
 
-      // 2. Processa o resultado do carrossel assim que o Promise.all conclui
-      if (carouselEl && resCarrossel) {
-        renderizarCarrossel(resCarrossel.data, resCarrossel.error);
+      if (carouselEl) {
+        renderizarCarrossel(resCarrossel?.data || []);
       }
 
-      // 3. Processa o resultado do grid assim que o Promise.all conclui
-      if (gridTorneiosHome && resGrid) {
-        renderizarGridTorneios(resGrid.data, resGrid.error, termoBuscaAtivo, categoriaAtiva);
+      if (gridTorneiosHome) {
+        renderizarGridTorneios(resGrid?.data || [], resGrid?.error || null, termoBuscaAtivo, categoriaAtiva);
       }
 
     } catch (err) {
-      console.error('Falha no carregamento inicial paralelo da Homepage:', err);
-      if (homeLoading) homeLoading.style.display = 'none';
-      if (noTournamentsMsg) noTournamentsMsg.style.display = 'block';
+      console.warn('Falha na consulta ao banco Supabase:', err);
+      if (carouselEl) renderizarCarrossel([]);
+      if (gridTorneiosHome) renderizarGridTorneios([], err, termoBuscaAtivo, categoriaAtiva);
     }
   }
 
@@ -730,12 +749,11 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const supabase = await getSupabase();
       const query = construirQueryGrid(supabase, categoriaAtiva, termoBuscaAtivo);
-      const { data, error } = await query;
-      renderizarGridTorneios(data, error, termoBuscaAtivo, categoriaAtiva);
+      const res = await query;
+      renderizarGridTorneios(res?.data || [], res?.error || null, termoBuscaAtivo, categoriaAtiva);
     } catch (err) {
-      console.error('Falha ao filtrar torneios:', err);
-      if (homeLoading) homeLoading.style.display = 'none';
-      if (noTournamentsMsg) noTournamentsMsg.style.display = 'block';
+      console.warn('Erro ao filtrar torneios do Supabase:', err);
+      renderizarGridTorneios([], err, termoBuscaAtivo, categoriaAtiva);
     }
   }
 

@@ -166,24 +166,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
       query = query.order('created_at', { ascending: false });
 
-      const { data, error } = await query;
-      let listaBase = [];
+      const res = await query;
 
-      if (!error && Array.isArray(data)) {
-        listaBase = data;
-      } else {
-        console.warn('Consulta no banco retornou aviso/erro:', error);
+      if (res.error) {
+        console.warn('Erro ao consultar torneios no Supabase:', res.error);
+        if (listaTorneios) {
+          listaTorneios.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 48px 20px; color: #9ca3af; background: #0e0d16; border-radius: 16px; border: 1px dashed #28283a; margin: 20px 0;">
+              <i class="fa-solid fa-circle-exclamation" style="font-size: 32px; color: #f59e0b; margin-bottom: 14px; display: block;"></i>
+              <p style="font-size: 16px; font-weight: 600; color: #e5e7eb; margin-bottom: 6px;">Não foi possível carregar os torneios</p>
+              <p style="font-size: 14px; color: #6b7280;">Houve uma instabilidade na conexão com o servidor. Tente novamente mais tarde.</p>
+            </div>
+          `;
+        }
+        return;
       }
 
-      // Mescla com torneios locais
-      try {
-        const localData = JSON.parse(localStorage.getItem('vh_createdTournaments') || '[]');
-        localData.forEach(loc => {
-          if (!listaBase.some(t => String(t.id) === String(loc.id))) {
-            listaBase.unshift(loc);
-          }
-        });
-      } catch (eLocal) {}
+      const listaBase = Array.isArray(res.data) ? res.data : [];
+
+      if (listaBase.length === 0) {
+        renderCards([]);
+        return;
+      }
 
       // Filtragem refinada em memória para assegurar correspondência 100% exata
       const filtrados = listaBase.filter(t => {
@@ -249,7 +253,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
       renderCards(filtrados);
     } catch (err) {
-      console.error('Falha na requisição de busca:', err);
+      console.error('Falha na requisição de busca de torneios:', err);
+      if (listaTorneios) {
+        listaTorneios.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 48px 20px; color: #9ca3af; background: #0e0d16; border-radius: 16px; border: 1px dashed #28283a; margin: 20px 0;">
+            <i class="fa-solid fa-triangle-exclamation" style="font-size: 32px; color: #f59e0b; margin-bottom: 14px; display: block;"></i>
+            <p style="font-size: 16px; font-weight: 600; color: #e5e7eb; margin-bottom: 6px;">Não foi possível consultar os torneios</p>
+            <p style="font-size: 14px; color: #6b7280;">Houve uma falha na conexão com o servidor. Tente recarregar a página.</p>
+          </div>
+        `;
+      }
     }
   }
 

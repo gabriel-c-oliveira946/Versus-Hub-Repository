@@ -8,6 +8,10 @@
   <link rel="stylesheet" href="/pagina_inicial/css/estilos.css">
   <link rel="icon" href="/image/logo.png" sizes="32x32">
   <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
     body {
       background: #09090c;
       color: #ffffff;
@@ -51,14 +55,17 @@
 
     .manage-grid {
       display: grid;
-      grid-template-columns: 360px 1fr;
+      grid-template-columns: 360px minmax(0, 1fr);
       gap: 24px;
       align-items: start;
+      width: 100%;
+      min-width: 0;
     }
 
-    @media (max-width: 900px) {
+    @media (max-width: 960px) {
       .manage-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: 100% !important;
+        gap: 20px !important;
       }
     }
 
@@ -650,14 +657,34 @@
     }
 
     /* ==============================================================================
-       RESPONSIVIDADE COMPLETA PARA SMARTPHONES (<= 768px e <= 480px)
+       RESPONSIVIDADE COMPLETA E ROBUSTA (<= 960px, <= 768px, <= 480px)
        ============================================================================== */
+    @media (max-width: 960px) {
+      .manage-grid {
+        grid-template-columns: 100% !important;
+        gap: 20px !important;
+      }
+
+      .teams-sidebar-panel {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+      }
+
+      #teamDetailsPanel {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+      }
+    }
+
     @media (max-width: 768px) {
       .manage-teams-page {
-        margin: 16px auto 40px;
-        padding: 0 12px;
-        width: 100%;
-        overflow-x: hidden;
+        margin: 16px auto 40px !important;
+        padding: 0 12px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
       }
 
       .manage-teams-header {
@@ -667,114 +694,175 @@
       .manage-teams-header h1 {
         font-size: 22px;
         gap: 8px;
+        flex-wrap: wrap;
       }
 
       .manage-teams-header p {
         font-size: 13.5px;
       }
 
-      .manage-grid {
-        grid-template-columns: 1fr;
-        gap: 16px;
-      }
-
       .teams-sidebar-panel {
-        padding: 16px 12px;
-        border-radius: 14px;
+        padding: 16px 14px !important;
+        border-radius: 14px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
       }
 
+      /* Card de Equipe no Sidebar: 100% responsivo em coluna para nunca cortar botões */
       .team-select-card {
-        padding: 12px 10px;
-        gap: 10px;
-        min-height: 48px;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 12px !important;
+        padding: 14px 12px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
       }
 
-      .team-select-logo {
-        width: 44px;
-        height: 44px;
+      .team-select-info {
+        width: 100% !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 12px !important;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
+      }
+
+      .team-select-text {
+        min-width: 0 !important;
+        flex: 1 !important;
+        overflow: hidden !important;
       }
 
       .team-select-text h4 {
-        font-size: 14px;
-        max-width: 160px;
+        max-width: 100% !important;
+        font-size: 14.5px !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
       }
 
       .team-select-text p {
-        font-size: 11.5px;
+        font-size: 12px !important;
+        color: #9ca3af !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
       }
 
+      /* Botões de Excluir e Sair: 100% visíveis, centrados e confortáveis para toque */
       .btn-team-delete, .btn-team-leave {
-        padding: 8px 10px;
-        font-size: 11.5px;
-        min-height: 38px;
+        width: 100% !important;
+        min-width: 100% !important;
+        max-width: 100% !important;
+        min-height: 42px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        font-size: 13.5px !important;
+        font-weight: 700 !important;
+        padding: 10px 14px !important;
+        border-radius: 8px !important;
+        box-sizing: border-box !important;
       }
 
+      /* Botão Criar Nova Equipe */
       .btn-create-new-team {
-        min-height: 46px;
-        padding: 12px;
-        font-size: 13.5px;
+        width: 100% !important;
+        min-width: 100% !important;
+        max-width: 100% !important;
+        min-height: 48px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        text-align: center !important;
+        padding: 12px 14px !important;
+        font-size: 14px !important;
+        font-weight: 700 !important;
+        box-sizing: border-box !important;
+        border-radius: 10px !important;
       }
 
       /* Painel de Detalhes no Mobile */
       .team-details-panel {
-        padding: 16px 12px;
-        border-radius: 14px;
-        min-height: auto;
+        padding: 18px 14px !important;
+        border-radius: 14px !important;
+        min-height: auto !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
       }
 
       .team-details-header {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 14px;
-        padding-bottom: 16px;
-        margin-bottom: 18px;
+        width: 100% !important;
+        max-width: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 16px !important;
+        padding-bottom: 16px !important;
+        margin-bottom: 18px !important;
+        box-sizing: border-box !important;
       }
 
       .team-details-left {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        width: 100%;
+        display: flex !important;
+        align-items: center !important;
+        gap: 12px !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
       }
 
       .team-banner-img {
-        width: 56px;
-        height: 56px;
-        border-radius: 10px;
-        flex-shrink: 0;
+        width: 56px !important;
+        height: 56px !important;
+        border-radius: 10px !important;
+        flex-shrink: 0 !important;
       }
 
       .team-details-text {
-        min-width: 0;
-        flex: 1;
+        min-width: 0 !important;
+        flex: 1 !important;
+        word-break: break-word !important;
       }
 
       .team-details-text h2 {
-        font-size: 18px;
-        line-height: 1.3;
-        word-break: break-word;
+        font-size: 18px !important;
+        line-height: 1.3 !important;
+        word-break: break-word !important;
       }
 
       .team-details-text p {
-        font-size: 12.5px;
-        line-height: 1.4;
+        font-size: 12.5px !important;
+        line-height: 1.4 !important;
+        word-break: break-word !important;
       }
 
+      /* Botões de Ação da Equipe: 100% de largura, empilhados, sem corte */
       .team-actions-row {
-        width: 100%;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
+        width: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 10px !important;
+        box-sizing: border-box !important;
       }
 
       .btn-edit-team, .btn-view-public {
-        width: 100%;
-        min-height: 44px;
-        padding: 10px 8px;
-        font-size: 12.5px;
-        justify-content: center;
-        text-align: center;
-        box-sizing: border-box;
+        width: 100% !important;
+        min-width: 100% !important;
+        max-width: 100% !important;
+        min-height: 46px !important;
+        padding: 12px 16px !important;
+        font-size: 13.5px !important;
+        font-weight: 700 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        text-align: center !important;
+        box-sizing: border-box !important;
+        border-radius: 8px !important;
       }
 
       .panel-sub-header {
@@ -787,77 +875,98 @@
       }
 
       /* Cards de Membros e Solicitações - 100% responsivos em lista vertical sem scroll lateral */
+      #panelMembersList, #panelRequestsList {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+      }
+
       .member-item-card {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
-        padding: 14px 12px;
-        border-radius: 10px;
-        width: 100%;
-        box-sizing: border-box;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 14px !important;
+        padding: 14px 12px !important;
+        border-radius: 10px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
       }
 
       .member-left {
-        width: 100%;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        min-width: 0;
+        width: 100% !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 10px !important;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
       }
 
       .member-avatar {
-        width: 42px;
-        height: 42px;
-        flex-shrink: 0;
+        width: 42px !important;
+        height: 42px !important;
+        flex-shrink: 0 !important;
       }
 
       .member-info {
-        min-width: 0;
-        flex: 1;
-        word-break: break-word;
+        min-width: 0 !important;
+        flex: 1 !important;
+        word-break: break-word !important;
       }
 
       .member-info h4 {
-        font-size: 14px;
-        margin: 0 0 2px;
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 6px;
+        font-size: 14px !important;
+        margin: 0 0 2px !important;
+        display: flex !important;
+        flex-wrap: wrap !important;
+        align-items: center !important;
+        gap: 6px !important;
+        word-break: break-word !important;
       }
 
       .member-info p {
-        font-size: 11.5px;
-        color: #9ca3af;
-        word-break: break-all;
-        margin: 0;
+        font-size: 12px !important;
+        color: #9ca3af !important;
+        word-break: break-all !important;
+        margin: 0 !important;
       }
 
       .member-actions {
-        width: 100%;
-        display: flex;
-        gap: 8px;
-        margin-top: 4px;
+        width: 100% !important;
+        display: flex !important;
+        gap: 8px !important;
+        margin-top: 4px !important;
+        flex-wrap: wrap !important;
+        box-sizing: border-box !important;
       }
 
       .btn-accept-request, .btn-refuse-request {
-        flex: 1;
-        min-height: 44px;
-        justify-content: center;
-        font-size: 13px;
-        font-weight: 700;
-        padding: 10px 12px;
-        border-radius: 8px;
+        flex: 1 1 120px !important;
+        min-height: 44px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        font-size: 13px !important;
+        font-weight: 700 !important;
+        padding: 10px 14px !important;
+        border-radius: 8px !important;
+        box-sizing: border-box !important;
+        white-space: nowrap !important;
       }
 
       .btn-kick-member {
-        width: 100%;
-        min-height: 44px;
-        justify-content: center;
-        font-size: 13px;
-        font-weight: 700;
-        padding: 10px 12px;
-        border-radius: 8px;
+        width: 100% !important;
+        min-width: 100% !important;
+        max-width: 100% !important;
+        min-height: 44px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        font-size: 13px !important;
+        font-weight: 700 !important;
+        padding: 10px 14px !important;
+        border-radius: 8px !important;
+        box-sizing: border-box !important;
       }
 
       /* Modal de Edição responsivo */
@@ -872,43 +981,43 @@
       .modal-buttons {
         display: flex;
         flex-direction: column-reverse;
-        gap: 8px;
+        gap: 10px;
         width: 100%;
       }
 
       .btn-cancel, .btn-save {
         width: 100%;
-        min-height: 44px;
+        min-height: 46px;
         justify-content: center;
         text-align: center;
+        font-size: 14px;
+        padding: 12px;
+        box-sizing: border-box;
       }
     }
 
     @media (max-width: 480px) {
-      .team-actions-row {
-        grid-template-columns: 1fr;
+      .manage-teams-page {
+        padding: 0 8px !important;
+      }
+
+      .teams-sidebar-panel {
+        padding: 14px 10px !important;
+      }
+
+      .team-details-panel {
+        padding: 14px 10px !important;
       }
 
       .team-select-card {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
+        padding: 12px 10px !important;
       }
 
-      .team-select-info {
-        width: 100%;
-      }
-
-      .team-select-text h4 {
-        max-width: 100%;
-      }
-
-      .btn-team-delete, .btn-team-leave {
-        width: 100%;
-        justify-content: center;
-        min-height: 40px;
+      .member-item-card {
+        padding: 12px 10px !important;
       }
     }
+  </style>
 </head>
 <body>
 
