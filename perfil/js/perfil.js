@@ -82,6 +82,33 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let user = loadUser();
 
+  // Sincroniza dados com a sessão do Supabase Auth
+  import('/supabaseClient.js').then(async ({ supabase }) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session && session.user) {
+        const email = session.user.email;
+        const { data: dbUser } = await supabase
+          .from('usuarios')
+          .select('id, nome, email, "dataNasc", bio, avatar, regiao, "jogosFavoritos", plataformas, banner, stats, conquistas')
+          .eq('email', email)
+          .maybeSingle();
+        if (dbUser) {
+          user = { ...user, ...dbUser };
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+          if (inputUsername) inputUsername.value = user.nome || "";
+          if (displayName) displayName.textContent = user.nome || "";
+          if (emailInput) emailInput.value = user.email || "";
+          if (bioTextarea) bioTextarea.value = user.bio || "";
+          if (imgProfile && user.avatar) imgProfile.src = user.avatar;
+          if (typeof renderTags === 'function') renderTags();
+        }
+      }
+    } catch (e) {
+      console.warn("Aviso ao sincronizar perfil do banco:", e);
+    }
+  });
+
   // --------- ELEMENTOS DA TELA ---------
   const headerUserImg   = document.getElementById("userBtn");
 
@@ -799,4 +826,306 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // chama ao carregar a página de perfil
   renderTeamsProfile();
+
+  // ==============================================================================
+  // ALTERAÇÃO DE SENHA DO USUÁRIO (Supabase Auth updateUser)
+  // ==============================================================================
+  const formAlterarSenhaPerfil = document.getElementById("formAlterarSenhaPerfil");
+  const inputNovaSenha = document.getElementById("inputNovaSenha");
+  const inputConfirmarSenha = document.getElementById("inputConfirmarSenha");
+  const novaSenhaErrorMsg = document.getElementById("novaSenhaErrorMsg");
+  const confirmarSenhaErrorMsg = document.getElementById("confirmarSenhaErrorMsg");
+  const senhaStatusMsg = document.getElementById("senhaStatusMsg");
+
+  // Modal de Senha
+  const btnOpenChangePassword = document.getElementById("btnOpenChangePassword");
+  const modalAlterarSenha = document.getElementById("modalAlterarSenha");
+  const btnFecharModalSenha = document.getElementById("btnFecharModalSenha");
+  const btnCancelarModalSenha = document.getElementById("btnCancelarModalSenha");
+  const formModalAlterarSenha = document.getElementById("formModalAlterarSenha");
+  const modalNovaSenha = document.getElementById("modalNovaSenha");
+  const modalConfirmarSenha = document.getElementById("modalConfirmarSenha");
+  const modalNovaSenhaError = document.getElementById("modalNovaSenhaError");
+  const modalConfirmarSenhaError = document.getElementById("modalConfirmarSenhaError");
+  const modalSenhaStatus = document.getElementById("modalSenhaStatus");
+
+  function setPasswordError(input, errorEl, message) {
+    if (input) input.classList.add("input-invalid");
+    if (errorEl) {
+      errorEl.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> ${message}`;
+      errorEl.style.display = "flex";
+    }
+  }
+
+  function clearPasswordError(input, errorEl) {
+    if (input) input.classList.remove("input-invalid");
+    if (errorEl) {
+      errorEl.innerHTML = "";
+      errorEl.style.display = "none";
+    }
+  }
+
+  // Validações em tempo real - Formulário da Aba
+  if (inputNovaSenha) {
+    inputNovaSenha.addEventListener("input", () => {
+      const val = inputNovaSenha.value;
+      if (val.length > 0 && val.length < 6) {
+        setPasswordError(inputNovaSenha, novaSenhaErrorMsg, "A senha deve ter no mínimo 6 caracteres.");
+      } else {
+        clearPasswordError(inputNovaSenha, novaSenhaErrorMsg);
+      }
+      if (inputConfirmarSenha && inputConfirmarSenha.value) {
+        if (inputConfirmarSenha.value !== val) {
+          setPasswordError(inputConfirmarSenha, confirmarSenhaErrorMsg, "As senhas não coincidem.");
+        } else {
+          clearPasswordError(inputConfirmarSenha, confirmarSenhaErrorMsg);
+        }
+      }
+    });
+  }
+
+  if (inputConfirmarSenha) {
+    inputConfirmarSenha.addEventListener("input", () => {
+      const valConfirm = inputConfirmarSenha.value;
+      const valNova = inputNovaSenha ? inputNovaSenha.value : "";
+      if (valConfirm.length > 0 && valConfirm !== valNova) {
+        setPasswordError(inputConfirmarSenha, confirmarSenhaErrorMsg, "As senhas não coincidem.");
+      } else {
+        clearPasswordError(inputConfirmarSenha, confirmarSenhaErrorMsg);
+      }
+    });
+  }
+
+  // Validações em tempo real - Modal
+  if (modalNovaSenha) {
+    modalNovaSenha.addEventListener("input", () => {
+      const val = modalNovaSenha.value;
+      if (val.length > 0 && val.length < 6) {
+        setPasswordError(modalNovaSenha, modalNovaSenhaError, "A senha deve ter no mínimo 6 caracteres.");
+      } else {
+        clearPasswordError(modalNovaSenha, modalNovaSenhaError);
+      }
+      if (modalConfirmarSenha && modalConfirmarSenha.value) {
+        if (modalConfirmarSenha.value !== val) {
+          setPasswordError(modalConfirmarSenha, modalConfirmarSenhaError, "As senhas não coincidem.");
+        } else {
+          clearPasswordError(modalConfirmarSenha, modalConfirmarSenhaError);
+        }
+      }
+    });
+  }
+
+  if (modalConfirmarSenha) {
+    modalConfirmarSenha.addEventListener("input", () => {
+      const valConfirm = modalConfirmarSenha.value;
+      const valNova = modalNovaSenha ? modalNovaSenha.value : "";
+      if (valConfirm.length > 0 && valConfirm !== valNova) {
+        setPasswordError(modalConfirmarSenha, modalConfirmarSenhaError, "As senhas não coincidem.");
+      } else {
+        clearPasswordError(modalConfirmarSenha, modalConfirmarSenhaError);
+      }
+    });
+  }
+
+  // Função centralizada para atualizar senha via Supabase Auth
+  async function processarAlteracaoSenha(novaSenha, confirmarSenha, elements) {
+    const { inputPass, inputConf, errPass, errConf, statusBox, submitBtn } = elements;
+
+    clearPasswordError(inputPass, errPass);
+    clearPasswordError(inputConf, errConf);
+    if (statusBox) {
+      statusBox.innerHTML = "";
+      statusBox.style.display = "none";
+      statusBox.className = "form-feedback-box";
+    }
+
+    if (!novaSenha) {
+      setPasswordError(inputPass, errPass, "Por favor, digite a nova senha.");
+      inputPass.focus();
+      return false;
+    }
+
+    if (novaSenha.length < 6) {
+      setPasswordError(inputPass, errPass, "A senha deve ter no mínimo 6 caracteres.");
+      inputPass.focus();
+      return false;
+    }
+
+    if (!confirmarSenha) {
+      setPasswordError(inputConf, errConf, "Por favor, confirme a nova senha.");
+      inputConf.focus();
+      return false;
+    }
+
+    if (novaSenha !== confirmarSenha) {
+      setPasswordError(inputConf, errConf, "As senhas não coincidem. Digite a mesma senha nos dois campos.");
+      inputConf.focus();
+      return false;
+    }
+
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Atualizando...';
+    }
+
+    try {
+      const { supabase } = await import('/supabaseClient.js');
+      
+      // 1. Atualização oficial via Supabase Auth
+      const { data, error } = await supabase.auth.updateUser({
+        password: novaSenha
+      });
+
+      if (error) {
+        console.error("Erro ao alterar senha:", error);
+        let msg = "Não foi possível alterar a senha. Tente novamente.";
+        if (error.message.includes("Password should be") || error.message.includes("least 6")) {
+          msg = "A senha deve ter no mínimo 6 caracteres.";
+          setPasswordError(inputPass, errPass, msg);
+        } else if (error.message) {
+          msg = error.message;
+        }
+
+        if (statusBox) {
+          statusBox.className = "form-feedback-box error";
+          statusBox.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> ${msg}`;
+          statusBox.style.display = "flex";
+        }
+
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<i class="fa-solid fa-key"></i> Atualizar Senha';
+        }
+        return false;
+      }
+
+      // 2. Sucesso
+      if (statusBox) {
+        statusBox.className = "form-feedback-box success";
+        statusBox.innerHTML = '<i class="fa-solid fa-circle-check"></i> Senha atualizada com sucesso no servidor!';
+        statusBox.style.display = "flex";
+      }
+
+      if (inputPass) inputPass.value = "";
+      if (inputConf) inputConf.value = "";
+
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fa-solid fa-check"></i> Senha Alterada!';
+        setTimeout(() => {
+          submitBtn.innerHTML = '<i class="fa-solid fa-key"></i> Atualizar Senha';
+        }, 3000);
+      }
+
+      return true;
+    } catch (err) {
+      console.error("Erro inesperado ao alterar senha:", err);
+      if (statusBox) {
+        statusBox.className = "form-feedback-box error";
+        statusBox.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Ocorreu um erro inesperado ao alterar a senha.';
+        statusBox.style.display = "flex";
+      }
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fa-solid fa-key"></i> Atualizar Senha';
+      }
+      return false;
+    }
+  }
+
+  // Submit do formulário na Aba Segurança
+  if (formAlterarSenhaPerfil) {
+    formAlterarSenhaPerfil.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const nova = inputNovaSenha ? inputNovaSenha.value : "";
+      const conf = inputConfirmarSenha ? inputConfirmarSenha.value : "";
+      const submitBtn = formAlterarSenhaPerfil.querySelector("button[type='submit']");
+
+      await processarAlteracaoSenha(nova, conf, {
+        inputPass: inputNovaSenha,
+        inputConf: inputConfirmarSenha,
+        errPass: novaSenhaErrorMsg,
+        errConf: confirmarSenhaErrorMsg,
+        statusBox: senhaStatusMsg,
+        submitBtn
+      });
+    });
+  }
+
+  // Abertura e fechamento do Modal de Senha
+  function abrirModalSenha() {
+    if (!modalAlterarSenha) return;
+    modalAlterarSenha.style.display = "flex";
+    if (modalNovaSenha) {
+      modalNovaSenha.value = "";
+      clearPasswordError(modalNovaSenha, modalNovaSenhaError);
+    }
+    if (modalConfirmarSenha) {
+      modalConfirmarSenha.value = "";
+      clearPasswordError(modalConfirmarSenha, modalConfirmarSenhaError);
+    }
+    if (modalSenhaStatus) {
+      modalSenhaStatus.style.display = "none";
+      modalSenhaStatus.innerHTML = "";
+    }
+    setTimeout(() => {
+      if (modalNovaSenha) modalNovaSenha.focus();
+    }, 100);
+  }
+
+  function fecharModalSenha() {
+    if (!modalAlterarSenha) return;
+    modalAlterarSenha.style.display = "none";
+  }
+
+  if (btnOpenChangePassword) {
+    btnOpenChangePassword.addEventListener("click", () => {
+      // Abre a aba de segurança caso esteja em desktop ou abre o modal diretamente
+      const abaSegurancaBtn = document.querySelector('.tab-btn-perfil[data-target="aba-seguranca"]');
+      if (window.innerWidth <= 768) {
+        abrirModalSenha();
+      } else if (abaSegurancaBtn) {
+        abaSegurancaBtn.click();
+        const sec = document.getElementById("aba-seguranca");
+        if (sec) sec.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        abrirModalSenha();
+      }
+    });
+  }
+
+  if (btnFecharModalSenha) btnFecharModalSenha.addEventListener("click", fecharModalSenha);
+  if (btnCancelarModalSenha) btnCancelarModalSenha.addEventListener("click", fecharModalSenha);
+
+  if (modalAlterarSenha) {
+    modalAlterarSenha.addEventListener("click", (e) => {
+      if (e.target === modalAlterarSenha) fecharModalSenha();
+    });
+  }
+
+  // Submit do formulário no Modal
+  if (formModalAlterarSenha) {
+    formModalAlterarSenha.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const nova = modalNovaSenha ? modalNovaSenha.value : "";
+      const conf = modalConfirmarSenha ? modalConfirmarSenha.value : "";
+      const submitBtn = formModalAlterarSenha.querySelector("button[type='submit']");
+
+      const success = await processarAlteracaoSenha(nova, conf, {
+        inputPass: modalNovaSenha,
+        inputConf: modalConfirmarSenha,
+        errPass: modalNovaSenhaError,
+        errConf: modalConfirmarSenhaError,
+        statusBox: modalSenhaStatus,
+        submitBtn
+      });
+
+      if (success) {
+        setTimeout(() => {
+          fecharModalSenha();
+        }, 1800);
+      }
+    });
+  }
 });
+

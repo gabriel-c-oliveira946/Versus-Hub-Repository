@@ -495,4 +495,160 @@
   }
 }
 
+/* ==============================================================================
+   MODAL E BOTÕES DE EDIÇÃO DE TORNEIO
+   ============================================================================== */
+.btn-editar-torneio {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #1f1f2c;
+  color: #ffffff;
+  border: 1px solid #3d3d52;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-editar-torneio:hover {
+  background: #2b2b3d;
+  border-color: #ff7300;
+  color: #ff7300;
+  transform: translateY(-1px);
+}
+
+.modal-editar-torneio-content {
+  background: #13131b;
+  border: 1px solid #28283a;
+  border-radius: 18px;
+  width: 100%;
+  max-width: 620px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85);
+  padding: 24px;
+  color: #ffffff;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.modal-form-group {
+  margin-bottom: 16px;
+}
+
+.modal-form-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #d1d5db;
+  margin-bottom: 6px;
+}
+
+.modal-form-group input,
+.modal-form-group select,
+.modal-form-group textarea {
+  width: 100%;
+  background: #191924;
+  border: 1px solid #2d2d3e;
+  color: #ffffff;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.modal-form-group input:focus,
+.modal-form-group select:focus,
+.modal-form-group textarea:focus {
+  border-color: #ff7300;
+}
+
+.modal-form-group input[type="file"] {
+  padding: 10px;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.modal-form-group input[type="file"]::file-selector-button {
+  background: #1f1f2b;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-right: 12px;
+  transition: all 0.2s ease;
+}
+
+.modal-form-group input[type="file"]::file-selector-button:hover {
+  background: #ff7300;
+  border-color: #ff7300;
+}
+
+.banner-preview-box {
+  margin-top: 10px;
+  border-radius: 12px;
+  border: 2px dashed rgba(255, 255, 255, 0.15);
+  background: rgba(0, 0, 0, 0.3);
+  min-height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 10px;
+}
+
+.banner-preview-box img {
+  width: 100%;
+  max-height: 180px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-footer-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #232333;
+}
+
+.btn-modal-cancel {
+  background: #20202d;
+  color: #9ca3af;
+  border: 1px solid #333347;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-modal-cancel:hover {
+  background: #2b2b3d;
+  color: #ffffff;
+}
+
+.btn-modal-save {
+  background: #ff7300;
+  color: #ffffff;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-modal-save:hover {
+  background: #ff8c24;
+}
+
 

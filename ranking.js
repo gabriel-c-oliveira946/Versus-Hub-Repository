@@ -1,6 +1,17 @@
 // /ranking.js
 import { supabase } from '/supabaseClient.js';
 
+// Utilitário oficial de sanitização contra XSS armazenado
+export function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 // Utilitário para remover acentos e padronizar textos para buscas
 function normalizeText(text) {
   return (text || '')
@@ -33,19 +44,6 @@ function resolvePlayerAvatar(u) {
   return '/image/boneco_logo_ofc.png';
 }
 
-// Fórmula oficial de pontuação calculada estritamente sobre dados reais
-function calculatePoints(stats) {
-  if (!stats) return 0;
-  const disputed = parseInt(stats.disputed) || 0;
-  const won = parseInt(stats.won) || 0;
-  const wins = parseInt(stats.wins) || 0;
-  const losses = parseInt(stats.losses) || 0;
-
-  // Pontuação justa: 300 pts por torneio vencido + 15 pts por vitória individual + 5 pts por participação - 2 por derrota
-  const score = (won * 300) + (wins * 15) + (disputed * 5) - (losses * 2);
-  return Math.max(0, score);
-}
-
 // Estado global do Ranking
 let currentTab = 'jogadores'; // 'jogadores' | 'equipes'
 let sortedPlayers = [];
@@ -62,7 +60,7 @@ let tabJogadoresBtn = null;
 let tabEquipesBtn = null;
 
 // ==============================================================================
-// RENDERIZAÇÃO DO PODIUM (TOP 3)
+// RENDERIZAÇÃO DO PODIUM (TOP 3) DIRETO DOS DADOS DA VIEW
 // ==============================================================================
 function renderPodium(items) {
   if (!podiumContainer) return;
@@ -91,33 +89,34 @@ function renderPodium(items) {
     const card = document.createElement('div');
     card.className = `podium-card ${cfg.cssClass}`;
 
-    const totalGames = (item.stats.wins || 0) + (item.stats.losses || 0);
-    const winRate = totalGames > 0
-      ? Math.round(((item.stats.wins || 0) / totalGames) * 100)
-      : (item.stats.disputed ? 100 : 0);
-
     const isTeam = currentTab === 'equipes';
-    const avatarImg = isTeam ? (item.logo || '/image/logo.png') : item.avatar;
-    const fallbackImg = isTeam ? '/image/logo.png' : '/image/boneco_logo_ofc.png';
+    const avatarImg = escapeHtml(isTeam ? (item.logo || '/image/logo.png') : item.avatar);
+    const fallbackImg = escapeHtml(isTeam ? '/image/logo.png' : '/image/boneco_logo_ofc.png');
+    const escapedNome = escapeHtml(item.nome);
+    const escapedTag = item.tag ? `[${escapeHtml(item.tag)}] ` : '';
+    const escapedTitle = escapeHtml(cfg.title);
+    const escapedPoints = escapeHtml(item.points);
+    const escapedDisputed = escapeHtml(item.stats.disputed);
 
     const middleStatLabel = isTeam ? 'Títulos' : 'Vitórias';
-    const middleStatValue = isTeam ? item.stats.won : item.stats.wins;
+    const middleStatValue = escapeHtml(isTeam ? item.stats.won : item.stats.wins);
+    const winRate = item.winRate !== undefined ? item.winRate : 0;
 
     card.innerHTML = `
       <div class="podium-rank-badge">
         ${cfg.cssClass === 'first' ? '<i class="fa-solid fa-crown" style="color: inherit;"></i>' : cfg.pos}
       </div>
       <div class="podium-avatar-wrapper">
-        <img referrerpolicy="no-referrer" src="${avatarImg}" alt="${item.nome}" class="podium-avatar" onerror="this.onerror=null; this.src='${fallbackImg}';" />
+        <img referrerpolicy="no-referrer" src="${avatarImg}" alt="${escapedNome}" class="podium-avatar" onerror="this.onerror=null; this.src='${fallbackImg}';" />
       </div>
-      <h3 class="podium-name">${item.nome}</h3>
-      <p class="podium-title">${item.tag ? `[${item.tag}] ` : ''}${cfg.title}</p>
-      <div class="podium-score">${item.points} pts</div>
+      <h3 class="podium-name">${escapedNome}</h3>
+      <p class="podium-title">${escapedTag}${escapedTitle}</p>
+      <div class="podium-score">${escapedPoints} pts</div>
       
       <div class="podium-stats-micro">
         <div class="podium-stat-item">
           <span class="podium-stat-label">Torneios</span>
-          <span class="podium-stat-value">${item.stats.disputed}</span>
+          <span class="podium-stat-value">${escapedDisputed}</span>
         </div>
         <div class="podium-stat-item">
           <span class="podium-stat-label">${middleStatLabel}</span>
@@ -188,35 +187,41 @@ function renderTableList(items, isFiltered = false) {
     const row = document.createElement('div');
     row.className = 'leaderboard-row' + (isCurrentUser ? ' current-user' : '');
 
-    const totalGames = (item.stats.wins || 0) + (item.stats.losses || 0);
-    const winRate = totalGames > 0 ? Math.round(((item.stats.wins || 0) / totalGames) * 100) : (item.stats.disputed ? 100 : 0);
-
+    const winRate = item.winRate !== undefined ? item.winRate : 0;
     let winRateClass = 'mid';
     if (winRate >= 70) winRateClass = 'high';
     else if (winRate < 50) winRateClass = 'low';
 
-    const avatarSrc = isTeam ? (item.logo || '/image/logo.png') : item.avatar;
-    const fallbackSrc = isTeam ? '/image/logo.png' : '/image/boneco_logo_ofc.png';
+    const avatarSrc = escapeHtml(isTeam ? (item.logo || '/image/logo.png') : item.avatar);
+    const fallbackSrc = escapeHtml(isTeam ? '/image/logo.png' : '/image/boneco_logo_ofc.png');
 
-    const subTitle = isTeam ? (item.tag ? `[${item.tag}] ${item.jogos || 'E-Sports'}` : (item.jogos || 'E-Sports')) : (item.email || '');
+    const rawSubTitle = isTeam ? (item.tag ? `[${item.tag}] ${item.jogos || 'E-Sports'}` : (item.jogos || 'E-Sports')) : (item.email || '');
+    const subTitle = escapeHtml(rawSubTitle);
+    const escapedNome = escapeHtml(item.nome);
+    const escapedPoints = escapeHtml(item.points);
+    const escapedDisputed = escapeHtml(item.stats.disputed);
+    const escapedLeader = escapeHtml(item.leaderName || 'Líder');
+    const escapedWon = escapeHtml(item.stats.won);
+    const escapedWins = escapeHtml(item.stats.wins);
+    const escapedLosses = escapeHtml(item.stats.losses);
 
-    const col5 = isTeam ? `<div class="player-stat" style="color: #4ade80;">${item.stats.won}</div>` : `<div class="player-stat" style="color: #4ade80;">${item.stats.wins}</div>`;
-    const col6 = isTeam ? `<div class="player-stat" style="color: #9cb1cf; font-size: 13px;">${item.leaderName || 'Líder'}</div>` : `<div class="player-stat" style="color: #f97373;">${item.stats.losses}</div>`;
+    const col5 = isTeam ? `<div class="player-stat" style="color: #4ade80;">${escapedWon}</div>` : `<div class="player-stat" style="color: #4ade80;">${escapedWins}</div>`;
+    const col6 = isTeam ? `<div class="player-stat" style="color: #9cb1cf; font-size: 13px;">${escapedLeader}</div>` : `<div class="player-stat" style="color: #f97373;">${escapedLosses}</div>`;
 
     row.innerHTML = `
       <div class="player-rank">#${originalRank}</div>
       <div class="player-identity">
-        <img referrerpolicy="no-referrer" src="${avatarSrc}" alt="${item.nome}" class="player-img" onerror="this.onerror=null; this.src='${fallbackSrc}';" />
+        <img referrerpolicy="no-referrer" src="${avatarSrc}" alt="${escapedNome}" class="player-img" onerror="this.onerror=null; this.src='${fallbackSrc}';" />
         <div class="player-name-wrapper">
           <span class="player-name">
-            ${item.nome}
+            ${escapedNome}
             ${isCurrentUser ? '<span class="player-badge">VOCÊ</span>' : ''}
           </span>
           <span style="font-size: 11px; color: #6b7280; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px;">${subTitle}</span>
         </div>
       </div>
-      <div class="player-points" style="color: #ff7300;">${item.points} pts</div>
-      <div class="player-stat">${item.stats.disputed}</div>
+      <div class="player-points" style="color: #ff7300;">${escapedPoints} pts</div>
+      <div class="player-stat">${escapedDisputed}</div>
       ${col5}
       ${col6}
       <div class="player-winrate ${winRateClass}">${winRate}%</div>
@@ -330,7 +335,7 @@ function switchTab(newTab) {
 }
 
 // ==============================================================================
-// CÁLCULO DAS CLASSIFICAÇÕES VIA DADOS REAIS DO SUPABASE
+// CONSULTA DIRETA DAS SQL VIEWS NO SUPABASE (vw_ranking_jogadores e vw_ranking_equipes)
 // ==============================================================================
 async function loadRealRankingData() {
   // 1. Recupera usuário logado
@@ -341,232 +346,144 @@ async function loadRealRankingData() {
     }
   } catch (e) {}
 
-  // 2. Busca tabelas centrais do Supabase em paralelo
-  let dbUsers = [];
-  let dbInscricoes = [];
-  let dbEquipes = [];
-  let dbMembros = [];
-  let dbTorneios = [];
-
+  // 2. Consulta direta das SQL Views pré-computadas no Supabase
   try {
-    const [resUsers, resInsc, resEq, resMem, resTorn] = await Promise.all([
-      supabase.from('usuarios').select('*'),
-      supabase.from('inscricoes').select('*').eq('status', 'Aceito'),
-      supabase.from('equipes').select('*'),
-      supabase.from('membros_equipe').select('*').eq('status', 'Aceito'),
-      supabase.from('torneios').select('*')
+    const [resJogadores, resEquipes] = await Promise.all([
+      supabase.from('vw_ranking_jogadores').select('*'),
+      supabase.from('vw_ranking_equipes').select('*')
     ]);
 
-    if (resUsers.data) dbUsers = resUsers.data;
-    if (resInsc.data)   dbInscricoes = resInsc.data;
-    if (resEq.data)     dbEquipes = resEq.data;
-    if (resMem.data)    dbMembros = resMem.data;
-    if (resTorn.data)   dbTorneios = resTorn.data;
+    if (resJogadores.data && resJogadores.data.length > 0) {
+      sortedPlayers = resJogadores.data.map(p => ({
+        id: p.id,
+        nome: p.nome || 'Jogador Sem Nome',
+        email: p.email || '',
+        avatar: resolvePlayerAvatar(p),
+        tag: p.tag || '',
+        link: p.link || `/perfil/perfil-publico.html?id=${encodeURIComponent(p.id || p.email)}`,
+        points: parseInt(p.points, 10) || 0,
+        winRate: p.win_rate !== undefined ? parseInt(p.win_rate, 10) : 0,
+        stats: {
+          disputed: parseInt(p.disputed, 10) || 0,
+          won: parseInt(p.won, 10) || 0,
+          wins: parseInt(p.wins, 10) || 0,
+          losses: parseInt(p.losses, 10) || 0
+        }
+      }));
+    } else {
+      sortedPlayers = await fallbackJogadoresRanking();
+    }
+
+    if (resEquipes.data && resEquipes.data.length > 0) {
+      sortedTeams = resEquipes.data.map(eq => ({
+        id: eq.id,
+        nome: eq.nome || 'Equipe',
+        tag: eq.tag || '',
+        logo: eq.logo || '/image/logo.png',
+        jogos: eq.jogos || 'Multi-jogos',
+        leaderName: eq.leaderName || 'Líder',
+        leaderEmail: eq.leaderEmail || '',
+        link: eq.link || `/equipes/template_equipe.html?id=${encodeURIComponent(eq.id)}`,
+        points: parseInt(eq.points, 10) || 0,
+        winRate: eq.win_rate !== undefined ? parseInt(eq.win_rate, 10) : 0,
+        stats: {
+          disputed: parseInt(eq.disputed, 10) || 0,
+          won: parseInt(eq.won, 10) || 0,
+          wins: parseInt(eq.wins, 10) || 0,
+          losses: parseInt(eq.losses, 10) || 0
+        }
+      }));
+    } else {
+      sortedTeams = await fallbackEquipesRanking();
+    }
   } catch (err) {
-    console.error('Falha na consulta ao Supabase:', err);
+    console.warn('Consulta às SQL Views retornou aviso, acionando fallback estruturado:', err);
+    sortedPlayers = await fallbackJogadoresRanking();
+    sortedTeams = await fallbackEquipesRanking();
   }
 
-  // 3. Fallback / Mesclagem com cache local da sessão (para torneios ou inscrições recém-aprovadas)
-  try {
-    const localInsc = JSON.parse(localStorage.getItem('vh_inscricoes') || '[]');
-    localInsc.forEach(li => {
-      if (li.status === 'Aceito') {
-        const jaExiste = dbInscricoes.some(di => di.torneio_id === li.torneio_id && di.user_email === li.user_email);
-        if (!jaExiste) {
-          dbInscricoes.push(li);
-        }
-      }
-    });
-
-    const localTeams = JSON.parse(localStorage.getItem('vh_createdTeams') || '[]');
-    localTeams.forEach(lt => {
-      const jaExiste = dbEquipes.some(de => de.id === lt.id || (de.nome || '').toLowerCase() === (lt.nome || '').toLowerCase());
-      if (!jaExiste) {
-        dbEquipes.push(lt);
-      }
-    });
-
-    // Se o usuário logado não estiver na lista de usuários remotos, adiciona
-    if (currentLoggedUser && currentLoggedUser.email) {
-      const jaExisteUser = dbUsers.some(u => (u.email || '').toLowerCase() === currentLoggedUser.email.toLowerCase());
-      if (!jaExisteUser) {
-        dbUsers.push(currentLoggedUser);
-      }
-    }
-  } catch (eLocal) {}
-
-  // 4. Mapeamento de equipes por ID e por Membro
-  const mapaEquipes = new Map();
-  dbEquipes.forEach(eq => mapaEquipes.set(String(eq.id), eq));
-
-  // Mapa de times do usuário (leader ou membro aceito)
-  const mapaUsuarioTimes = new Map(); // email -> Set de equipeIds
-  dbEquipes.forEach(eq => {
-    const lEmail = (eq.leaderEmail || '').toLowerCase().trim();
-    if (lEmail) {
-      if (!mapaUsuarioTimes.has(lEmail)) mapaUsuarioTimes.set(lEmail, new Set());
-      mapaUsuarioTimes.get(lEmail).add(String(eq.id));
-    }
-  });
-  dbMembros.forEach(m => {
-    const uEmail = (m.user_email || '').toLowerCase().trim();
-    if (uEmail) {
-      if (!mapaUsuarioTimes.has(uEmail)) mapaUsuarioTimes.set(uEmail, new Set());
-      mapaUsuarioTimes.get(uEmail).add(String(m.equipe_id));
-    }
-  });
-
-  // ==============================================================================
-  // CÁLCULO DO RANKING DE JOGADORES
-  // ==============================================================================
-  const playersList = dbUsers.map(u => {
-    const userEmail = (u.email || '').toLowerCase().trim();
-    const userNome = normalizeText(u.nome);
-    const userTeamIds = mapaUsuarioTimes.get(userEmail) || new Set();
-
-    // Encontra equipes que este usuário lidera para contagem de títulos
-    let userWonTournaments = 0;
-    dbEquipes.forEach(eq => {
-      const eqLeaderEmail = (eq.leaderEmail || '').toLowerCase().trim();
-      const eqLeaderName = normalizeText(eq.leaderName);
-      if (eqLeaderEmail === userEmail || (eqLeaderName && eqLeaderName === userNome)) {
-        let ganhos = eq.torneiosGanhos;
-        if (typeof ganhos === 'string') { try { ganhos = JSON.parse(ganhos); } catch { ganhos = []; } }
-        if (Array.isArray(ganhos)) userWonTournaments += ganhos.length;
-      }
-    });
-
-    // Inscrições aceitas únicas do jogador
-    const torneiosDisputados = new Set();
-    dbInscricoes.forEach(insc => {
-      const inscEmail = (insc.user_email || '').toLowerCase().trim();
-      const partId = String(insc.id_participante || '').trim();
-      const tipo = (insc.tipo || 'individual').toLowerCase();
-
-      const isIndividual = (tipo === 'individual' || !tipo) && (inscEmail === userEmail || partId === userEmail || (u.id && partId === String(u.id)));
-      const isTeam = (tipo === 'equipe') && (userTeamIds.has(partId) || inscEmail === userEmail);
-
-      if (isIndividual || isTeam) {
-        torneiosDisputados.add(String(insc.torneio_id));
-      }
-    });
-
-    // Também verifica se há torneios locais inscritos
-    try {
-      const joinedKey = `vh_joinedTournaments_${userEmail}`;
-      const joinedLocal = JSON.parse(localStorage.getItem(joinedKey) || '[]');
-      joinedLocal.forEach(jt => {
-        if (jt.inscricaoStatus === 'Aceito' || jt.statusInscricao === 'Aceito') {
-          torneiosDisputados.add(String(jt.id));
-        }
-      });
-    } catch(e) {}
-
-    const disputedCount = torneiosDisputados.size;
-    const wonCount = userWonTournaments;
-    const winsCount = (wonCount * 3) + Math.max(0, disputedCount - wonCount);
-    const lossesCount = Math.max(0, (disputedCount * 2) - winsCount);
-
-    const stats = {
-      disputed: disputedCount,
-      won: wonCount,
-      wins: winsCount,
-      losses: lossesCount
-    };
-
-    const points = calculatePoints(stats);
-
-    // Identificação de vínculo do usuário logado
-    const isCurrentUser = Boolean(
-      currentLoggedUser && (
-        (currentLoggedUser.id && u.id === currentLoggedUser.id) ||
-        (currentLoggedUser.email && u.email && normalizeText(u.email) === normalizeText(currentLoggedUser.email))
-      )
-    );
-
-    let avatar = resolvePlayerAvatar(u);
-    if (isCurrentUser && currentLoggedUser.avatar && currentLoggedUser.avatar !== '/image/boneco_logo_ofc.png') {
-      avatar = currentLoggedUser.avatar;
-    }
-
-    const targetId = isCurrentUser ? (currentLoggedUser.id || u.id || 'me') : (u.id || u.email || 'me');
-
-    return {
-      id: u.id || userEmail,
-      nome: u.nome || 'Jogador Sem Nome',
-      email: u.email || '',
-      avatar,
-      link: '/perfil/perfil-publico.html?id=' + encodeURIComponent(targetId),
-      stats,
-      points
-    };
-  });
-
-  // Ordenação de jogadores: Pontos decrescente -> Vitórias decrescente -> Disputas decrescente -> Nome
-  playersList.sort((a, b) => {
-    if (b.points !== a.points) return b.points - a.points;
-    if (b.stats.wins !== a.stats.wins) return b.stats.wins - a.stats.wins;
-    if (b.stats.disputed !== a.stats.disputed) return b.stats.disputed - a.stats.disputed;
-    return (a.nome || '').localeCompare(b.nome || '');
-  });
-
-  sortedPlayers = playersList;
-
-  // ==============================================================================
-  // CÁLCULO DO RANKING DE EQUIPES
-  // ==============================================================================
-  const teamsList = dbEquipes.map(eq => {
-    const eqId = String(eq.id);
-    let ganhos = eq.torneiosGanhos;
-    if (typeof ganhos === 'string') { try { ganhos = JSON.parse(ganhos); } catch { ganhos = []; } }
-    const wonCount = Array.isArray(ganhos) ? ganhos.length : 0;
-
-    const torneiosDisputados = new Set();
-    dbInscricoes.forEach(insc => {
-      const partId = String(insc.id_participante || '').trim();
-      const tipo = (insc.tipo || '').toLowerCase();
-      if ((tipo === 'equipe' && partId === eqId) || partId === eqId) {
-        torneiosDisputados.add(String(insc.torneio_id));
-      }
-    });
-
-    const disputedCount = Math.max(torneiosDisputados.size, wonCount);
-    const winsCount = (wonCount * 3) + Math.max(0, disputedCount - wonCount);
-    const lossesCount = Math.max(0, (disputedCount * 2) - winsCount);
-
-    const stats = {
-      disputed: disputedCount,
-      won: wonCount,
-      wins: winsCount,
-      losses: lossesCount
-    };
-
-    const points = calculatePoints(stats);
-
-    return {
-      id: eq.id,
-      nome: eq.nome || 'Equipe',
-      tag: eq.tag || '',
-      logo: eq.logo || '/image/logo.png',
-      jogos: eq.jogos || 'Multi-jogos',
-      leaderName: eq.leaderName || 'Líder',
-      leaderEmail: eq.leaderEmail || '',
-      link: `/equipes/template_equipe.html?id=${encodeURIComponent(eq.id)}`,
-      stats,
-      points
-    };
-  });
-
-  // Ordenação de equipes: Pontos decrescente -> Títulos decrescente -> Disputas decrescente -> Nome
-  teamsList.sort((a, b) => {
-    if (b.points !== a.points) return b.points - a.points;
-    if (b.stats.won !== a.stats.won) return b.stats.won - a.stats.won;
-    if (b.stats.disputed !== a.stats.disputed) return b.stats.disputed - a.stats.disputed;
-    return (a.nome || '').localeCompare(b.nome || '');
-  });
-
-  sortedTeams = teamsList;
   currentSortedList = currentTab === 'jogadores' ? [...sortedPlayers] : [...sortedTeams];
+}
+
+// ==============================================================================
+// FALLBACKS ESTRUTURADOS (CASO AS VIEWS AINDA NÃO TENHAM SIDO CRIADAS NO BANCO)
+// ==============================================================================
+async function fallbackJogadoresRanking() {
+  try {
+    const { data: users } = await supabase
+      .from('usuarios')
+      .select('id, nome, email, avatar, stats');
+
+    if (!users || !users.length) return [];
+
+    const list = users.map(u => {
+      const stats = u.stats || { disputed: 0, won: 0, wins: 0, losses: 0 };
+      const disputed = parseInt(stats.disputed, 10) || 0;
+      const won = parseInt(stats.won, 10) || 0;
+      const wins = parseInt(stats.wins, 10) || 0;
+      const losses = parseInt(stats.losses, 10) || 0;
+      const points = Math.max(0, (won * 300) + (wins * 15) + (disputed * 5) - (losses * 2));
+      const total = wins + losses;
+      const winRate = total > 0 ? Math.round((wins / total) * 100) : (disputed > 0 ? 100 : 0);
+
+      return {
+        id: u.id,
+        nome: u.nome || 'Jogador Sem Nome',
+        email: u.email || '',
+        avatar: resolvePlayerAvatar(u),
+        tag: '',
+        link: `/perfil/perfil-publico.html?id=${encodeURIComponent(u.id || u.email)}`,
+        points,
+        winRate,
+        stats: { disputed, won, wins, losses }
+      };
+    });
+
+    list.sort((a, b) => b.points - a.points || b.stats.wins - a.stats.wins || (a.nome || '').localeCompare(b.nome || ''));
+    return list;
+  } catch (e) {
+    return [];
+  }
+}
+
+async function fallbackEquipesRanking() {
+  try {
+    const { data: equipes } = await supabase
+      .from('equipes')
+      .select('*');
+
+    if (!equipes || !equipes.length) return [];
+
+    const list = equipes.map(eq => {
+      let ganhos = eq.torneiosGanhos;
+      if (typeof ganhos === 'string') { try { ganhos = JSON.parse(ganhos); } catch { ganhos = []; } }
+      const won = Array.isArray(ganhos) ? ganhos.length : 0;
+      const disputed = Math.max(0, won);
+      const wins = (won * 3);
+      const losses = 0;
+      const points = Math.max(0, (won * 300) + (wins * 15) + (disputed * 5));
+      const winRate = won > 0 ? 100 : 0;
+
+      return {
+        id: eq.id,
+        nome: eq.nome || 'Equipe',
+        tag: eq.tag || '',
+        logo: eq.logo || '/image/logo.png',
+        jogos: eq.jogos || 'Multi-jogos',
+        leaderName: eq.leaderName || 'Líder',
+        leaderEmail: eq.leaderEmail || '',
+        link: `/equipes/template_equipe.html?id=${encodeURIComponent(eq.id)}`,
+        points,
+        winRate,
+        stats: { disputed, won, wins, losses }
+      };
+    });
+
+    list.sort((a, b) => b.points - a.points || b.stats.won - a.stats.won || (a.nome || '').localeCompare(b.nome || ''));
+    return list;
+  } catch (e) {
+    return [];
+  }
 }
 
 // ==============================================================================
@@ -584,7 +501,7 @@ async function initRanking() {
     tableContainer.innerHTML = `
       <div class="ranking-no-results" style="color: #9cb1cf; padding: 32px 16px;">
         <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 32px; color: #ff7300; margin-bottom: 14px; display: block;"></i>
-        Carregando e calculando ranking oficial em tempo real...
+        Carregando Ranking...
       </div>
     `;
   }
@@ -597,7 +514,7 @@ async function initRanking() {
     tabEquipesBtn.addEventListener('click', () => switchTab('equipes'));
   }
 
-  // Executa o carregamento das estatísticas reais do banco
+  // Executa o carregamento das estatísticas diretas das views no banco
   await loadRealRankingData();
 
   // Configura ouvintes do input de pesquisa
@@ -608,14 +525,6 @@ async function initRanking() {
   if (searchInput) {
     ['input', 'keyup', 'change', 'search'].forEach(evtType => {
       searchInput.addEventListener(evtType, () => handleSearchEvent(searchInput.value));
-    });
-  }
-
-  const headerSearch = document.getElementById('searchInput');
-  if (headerSearch && headerSearch !== searchInput) {
-    headerSearch.addEventListener('input', () => {
-      if (searchInput) searchInput.value = headerSearch.value;
-      handleSearchEvent(headerSearch.value);
     });
   }
 

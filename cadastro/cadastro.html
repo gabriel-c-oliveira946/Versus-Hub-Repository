@@ -28,6 +28,13 @@
         </div>
     </header>
 
+    <!-- ILUMINAÇÃO AMBIENTE DIFUSA (AMBIENT GLOW) -->
+    <div class="ambient-glow-container" aria-hidden="true">
+        <div class="ambient-glow-primary"></div>
+        <div class="ambient-glow-secondary"></div>
+        <div class="ambient-glow-top"></div>
+    </div>
+
     <!-- Criando o Formulario da Aba Cadastro -->
         <div class="container">
             <div class="form-box">
@@ -39,23 +46,35 @@
                 <h2 id="cadastrop">Cadastro</h2>
 
                 <form id="formCadastro">
-    <input type="text" id="cadNome" placeholder="Nome de Usuário (2 a 33 caracteres)" minlength="2" maxlength="33" required>
-    
-    <div class="campo-data-nascimento">
-        <label for="cadNascimento" class="label-data-nasc"><i class="fa-regular fa-calendar"></i> Data de Nascimento</label>
-        <input type="date" id="cadNascimento" placeholder="Data de Nascimento" required>
-    </div>
+                    <div class="form-field-group">
+                        <input type="text" id="cadNome" placeholder="Nome de Usuário (2 a 33 caracteres)" minlength="2" maxlength="33" required>
+                        <div id="nomeErrorMsg" class="form-error-hint" style="display: none;"></div>
+                    </div>
+                    
+                    <div class="campo-data-nascimento">
+                        <label for="cadNascimento" class="label-data-nasc"><i class="fa-regular fa-calendar"></i> Data de Nascimento</label>
+                        <input type="date" id="cadNascimento" placeholder="Data de Nascimento" required>
+                    </div>
 
-    <input type="password" id="cadSenha" placeholder="Senha" required>
-    <input type="email" id="cadEmail" placeholder="E-mail" required>
+                    <div class="form-field-group">
+                        <input type="password" id="cadSenha" placeholder="Senha (mínimo 6 caracteres)" minlength="6" required>
+                        <div id="senhaErrorMsg" class="form-error-hint" style="display: none;"></div>
+                    </div>
 
-    <label class="checkbox-container">
-        <input type="checkbox" id="cadAceite" required>
-        Confirma direitos e restrições oferecida pela empresa.
-    </label>
+                    <div class="form-field-group">
+                        <input type="email" id="cadEmail" placeholder="E-mail" required>
+                        <div id="emailErrorMsg" class="form-error-hint" style="display: none;"></div>
+                    </div>
 
-    <button type="submit" class="btn">Cadastrar</button>
-</form>
+                    <div id="formGlobalErrorMsg" class="form-error-banner" style="display: none;"></div>
+
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="cadAceite" required>
+                        Confirma direitos e restrições oferecida pela empresa.
+                    </label>
+
+                    <button type="submit" class="btn">Cadastrar</button>
+                </form>
         
                   <a id="cliquelogin" href="/login/login.html">Já possui uma conta? Faça Login</a>
 

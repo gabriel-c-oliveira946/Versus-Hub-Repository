@@ -1,146 +1,187 @@
-// =========================
-//  CARROSSEL 
-// =========================
+// ===================================
+//  AUTENTICAÇÃO & ELEMENTOS DO HEADER
+// ===================================
 
-const slides = document.querySelectorAll(".carousel-slide");
-const nextBtn = document.getElementById("nextBtn");
-const prevBtn = document.getElementById("prevBtn");
-const indicatorsContainer = document.getElementById("carouselIndicators");
+const btEntrar = document.getElementById("btentrar");
+const btCadastrar = document.getElementById("btcadastrar");
+const userBtn = document.getElementById("userBtn");
+const menuUser = document.getElementById("menuUser");
+const userIconDiv = document.querySelector(".user-icon");
 
-   const btEntrar = document.getElementById("btentrar");
-  const btCadastrar = document.getElementById("btcadastrar");
-  const userBtn = document.getElementById("userBtn");
-  const menuUser = document.getElementById("menuUser");
-  const userIconDiv = document.querySelector(".user-icon");
-
-  // ========= Busca Global no Header com redirecionamento =========
-  const searchForm  = document.querySelector(".search-header");
-  const searchInput = document.getElementById("searchInput");
-  const searchBtn   = document.getElementById("searchBtn");
-
-  // Redireciona o usuário com base na rota atual (Busca Inteligente)
-  function executarBuscaHeader() {
-    if (!searchInput) return;
-    const termoDigitado = searchInput.value.trim();
-    const rota = window.location.pathname.toLowerCase();
-
-    if (rota.includes('aovivo')) {
-      // Na página ao vivo, a busca é dinâmica em tempo real no próprio container
-      return;
-    } else if (rota.includes('ranking')) {
-      window.location.href = '/ranking.html?busca=' + encodeURIComponent(termoDigitado);
-    } else if (rota.includes('equipes')) {
-      window.location.href = '/equipes/equipes.html?busca=' + encodeURIComponent(termoDigitado);
-    } else if (rota.includes('torneios')) {
-      window.location.href = '/pagina_inicial/torneios.html?busca=' + encodeURIComponent(termoDigitado);
-    } else {
-      window.location.href = '/pagina_inicial/torneios.html?busca=' + encodeURIComponent(termoDigitado);
-    }
+// Precarrega o cliente Supabase assim que o script for lido
+let _supabaseClientPromise = null;
+function getSupabase() {
+  if (!_supabaseClientPromise) {
+    _supabaseClientPromise = import('/supabaseClient.js').then(m => m.supabase);
   }
-  window.executarBuscaHeader = executarBuscaHeader;
+  return _supabaseClientPromise;
+}
 
-  // Se o usuário já estiver na página de equipes, torneios ou ranking, sincroniza a digitação com o filtro local
-  if (searchInput) {
-    searchInput.addEventListener("input", () => {
-      const campoEquipe = document.getElementById('filtroBuscaEquipe');
-      if (campoEquipe && window.location.pathname.includes('/equipes/equipes.html')) {
-        campoEquipe.value = searchInput.value;
-        campoEquipe.dispatchEvent(new Event('input'));
-      }
-      const campoTorneios = document.getElementById('filtroBusca');
-      if (campoTorneios && window.location.pathname.includes('torneios')) {
-        campoTorneios.value = searchInput.value;
-        campoTorneios.dispatchEvent(new Event('input'));
-      }
-      const campoRanking = document.getElementById('rankingSearch');
-      if (campoRanking && window.location.pathname.includes('ranking')) {
-        campoRanking.value = searchInput.value;
-        campoRanking.dispatchEvent(new Event('input'));
-      }
-    });
-  }
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
 
-  // quando enviar o formulário (Enter no input)
-  if (searchForm) {
-    searchForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      executarBuscaHeader();
-    });
-  }
+// =========================================================
+//  CARROSSEL DE TORNEIOS: RENDERIZADOR E CONTROLES
+// =========================================================
+let autoPlayInterval = null;
 
-  // quando clicar na lupa
-  if (searchBtn) {
-    searchBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      executarBuscaHeader();
-    });
-  }
-
-// Só monta o carrossel se a página tiver slides
-if (slides.length && nextBtn && prevBtn && indicatorsContainer) {
-  let index = 0;
-  let autoPlayInterval = null;
+function renderizarCarrossel(data, error) {
   const carouselEl = document.getElementById("carousel");
+  const slidesContainer = document.getElementById("carouselSlidesContainer") || carouselEl;
+  const nextBtn = document.getElementById("nextBtn");
+  const prevBtn = document.getElementById("prevBtn");
+  const indicatorsContainer = document.getElementById("carouselIndicators");
 
-  // Cria as "bolinhas" (indicadores)
-  slides.forEach((_, i) => {
-    const dot = document.createElement("span");
-    dot.addEventListener("click", () => {
-      goToSlide(i);
-      resetAutoPlay();
-    });
-    indicatorsContainer.appendChild(dot);
+  if (!carouselEl || !slidesContainer) return;
+
+  if (autoPlayInterval) {
+    clearInterval(autoPlayInterval);
+    autoPlayInterval = null;
+  }
+
+  if (error) {
+    console.error('Erro ao buscar torneios para o carrossel:', error);
+    const loadingEl = document.getElementById('carouselLoading');
+    if (loadingEl) {
+      loadingEl.innerHTML = `
+        <div style="text-align: center; color: #a1a1aa; padding: 20px;">
+          <p style="font-size: 15px; font-weight: 600; color: #f87171; margin: 0;">Não foi possível carregar os torneios no momento.</p>
+        </div>
+      `;
+    }
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    const loadingEl = document.getElementById('carouselLoading');
+    if (loadingEl) {
+      loadingEl.innerHTML = `
+        <div style="text-align: center; color: #a1a1aa; padding: 20px;">
+          <p style="font-size: 15px; font-weight: 600; color: #e4e4e7; margin: 0;">Nenhum torneio cadastrado.</p>
+        </div>
+      `;
+    }
+    return;
+  }
+
+  // Limpar slides anteriores e indicadores
+  slidesContainer.innerHTML = '';
+  if (indicatorsContainer) indicatorsContainer.innerHTML = '';
+
+  // Utiliza os torneios cadastrados (exibe até 8 em destaque no carrossel)
+  const torneiosDestaque = data.slice(0, 8);
+
+  torneiosDestaque.forEach((t, i) => {
+    const banner = t.banner || '/images/cerradocup.jpg';
+    const link = (t.link && t.link.startsWith('/') && !t.link.includes('?'))
+      ? t.link
+      : ('/torneio/custom.html?id=' + encodeURIComponent(t.id));
+    const nomeSeguro = escapeHtml(t.nome || 'Torneio');
+    const tagSegura = escapeHtml(t.jogo ? t.jogo.split('•')[0].trim() : (t.categoria || 'Torneio')).toUpperCase();
+
+    const slideDiv = document.createElement('div');
+    slideDiv.className = `carousel-slide ${i === 0 ? 'active' : ''}`;
+    slideDiv.innerHTML = `
+      <a href="${link}" class="carousel-link">
+        <img referrerpolicy="no-referrer" src="${banner}" alt="${nomeSeguro}" onerror="this.onerror=null;this.src='/images/cerradocup.jpg';">
+        <div class="carousel-caption">
+          <span class="carousel-tag">${tagSegura}</span>
+          <h3 class="carousel-slide-title">${nomeSeguro}</h3>
+          <span class="carousel-action-btn">Ver Torneio <i class="fa-solid fa-arrow-right" style="margin-left: 6px;"></i></span>
+        </div>
+      </a>
+    `;
+    slidesContainer.appendChild(slideDiv);
+
+    // Cria a bolinha indicadora
+    if (indicatorsContainer) {
+      const dot = document.createElement('span');
+      if (i === 0) dot.classList.add('active');
+      dot.addEventListener('click', () => {
+        goToSlide(i);
+        resetAutoPlay();
+      });
+      indicatorsContainer.appendChild(dot);
+    }
   });
 
+  const slidesList = slidesContainer.querySelectorAll('.carousel-slide');
+  const dotsList = indicatorsContainer ? indicatorsContainer.querySelectorAll('span') : [];
+  let currentIndex = 0;
+  const SLIDE_DURATION = 500;
+
   function updateIndicators() {
-    const dots = document.querySelectorAll("#carouselIndicators span");
-    dots.forEach((d) => d.classList.remove("active"));
-    if (dots[index]) {
-      dots[index].classList.add("active");
-    }
+    dotsList.forEach((d, idx) => {
+      if (idx === currentIndex) d.classList.add('active');
+      else d.classList.remove('active');
+    });
+  }
+
+  function runPulseEffect() {
+    carouselEl.classList.add('shadow-off');
+    setTimeout(() => {
+      carouselEl.classList.remove('shadow-off');
+      carouselEl.classList.remove('pulse');
+      void carouselEl.offsetWidth; // força reflow
+      carouselEl.classList.add('pulse');
+      setTimeout(() => carouselEl.classList.remove('pulse'), 800);
+    }, SLIDE_DURATION);
   }
 
   function showSlide() {
-    slides.forEach((slide) => slide.classList.remove("active"));
-    if (slides[index]) {
-      slides[index].classList.add("active");
-    }
+    slidesList.forEach((s, idx) => {
+      if (idx === currentIndex) s.classList.add('active');
+      else s.classList.remove('active');
+    });
     updateIndicators();
+    runPulseEffect();
   }
 
   function goToSlide(idx) {
-    index = idx;
+    if (currentIndex === idx) return;
+    currentIndex = idx;
     showSlide();
   }
 
   function nextSlide() {
-    index = (index + 1) % slides.length;
+    if (slidesList.length <= 1) return;
+    currentIndex = (currentIndex + 1) % slidesList.length;
     showSlide();
   }
 
   function prevSlide() {
-    index = (index - 1 + slides.length) % slides.length;
+    if (slidesList.length <= 1) return;
+    currentIndex = (currentIndex - 1 + slidesList.length) % slidesList.length;
     showSlide();
   }
 
-  nextBtn.addEventListener("click", () => {
-    nextSlide();
-    resetAutoPlay();
-  });
+  if (nextBtn) {
+    nextBtn.onclick = () => {
+      nextSlide();
+      resetAutoPlay();
+    };
+  }
 
-  prevBtn.addEventListener("click", () => {
-    prevSlide();
-    resetAutoPlay();
-  });
+  if (prevBtn) {
+    prevBtn.onclick = () => {
+      prevSlide();
+      resetAutoPlay();
+    };
+  }
 
-  // Função para iniciar reprodução automática (5 segundos por slide)
   function startAutoPlay() {
-    if (!autoPlayInterval) {
+    if (!autoPlayInterval && slidesList.length > 1) {
       autoPlayInterval = setInterval(nextSlide, 5000);
     }
   }
 
-  // Função para parar reprodução automática
   function stopAutoPlay() {
     if (autoPlayInterval) {
       clearInterval(autoPlayInterval);
@@ -148,54 +189,35 @@ if (slides.length && nextBtn && prevBtn && indicatorsContainer) {
     }
   }
 
-  // Reseta o timer ao interagir manualmente
   function resetAutoPlay() {
     stopAutoPlay();
     startAutoPlay();
   }
 
-  // Eventos de mouse no container para pausar / retomar
-  if (carouselEl) {
-    carouselEl.addEventListener("mouseenter", stopAutoPlay);
-    carouselEl.addEventListener("mouseleave", startAutoPlay);
-  }
+  carouselEl.removeEventListener('mouseenter', stopAutoPlay);
+  carouselEl.removeEventListener('mouseleave', startAutoPlay);
+  carouselEl.addEventListener('mouseenter', stopAutoPlay);
+  carouselEl.addEventListener('mouseleave', startAutoPlay);
 
-  showSlide(); // mostra o primeiro slide
-  startAutoPlay(); // inicia o auto play
-
-  // -------- efeito de "pulso" no carrossel --------
-  document.addEventListener("DOMContentLoaded", () => {
-    const carousel = document.getElementById("carousel");
-    const prev = document.getElementById("prevBtn");
-    const next = document.getElementById("nextBtn");
-
-    const SLIDE_DURATION = 500; // tempo da transição do slide
-
-    if (!carousel) return;
-
-    function runSequence() {
-      // escurece um pouco enquanto troca
-      carousel.classList.add("shadow-off");
-
-      setTimeout(() => {
-        carousel.classList.remove("shadow-off");
-
-        // reinicia a animação pulse
-        carousel.classList.remove("pulse");
-        void carousel.offsetWidth; // força reflow
-        carousel.classList.add("pulse");
-
-        // remove classe depois da animação
-        setTimeout(() => carousel.classList.remove("pulse"), 800);
-      }, SLIDE_DURATION);
-    }
-
-    if (prev) prev.addEventListener("click", runSequence);
-    if (next) next.addEventListener("click", runSequence);
-
-    carousel.addEventListener("slideChanged", runSequence);
-  });
+  // Inicia rotação automática
+  startAutoPlay();
 }
+
+async function inicializarCarrosselTorneios() {
+  const carouselEl = document.getElementById("carousel");
+  if (!carouselEl) return;
+  try {
+    const supabase = await getSupabase();
+    const { data, error } = await supabase
+      .from('torneios')
+      .select('*')
+      .order('created_at', { ascending: false });
+    renderizarCarrossel(data, error);
+  } catch (err) {
+    console.error('Erro ao carregar carrossel isolado:', err);
+  }
+}
+window.recarregarCarrosselTorneios = inicializarCarrosselTorneios;
 
 // =========================
 //  SIDEBAR (menu lateral)
@@ -254,9 +276,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // ===========================
-  //  Le usuário do localstorage
-  // ===========================
+  // ==============================================================================
+  //  AUTENTICAÇÃO NATIVA SUPABASE (getSession, onAuthStateChange e signOut)
+  // ==============================================================================
   let loggedUser = null;
   const raw = localStorage.getItem("vh_loggedUser");
 
@@ -268,15 +290,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Função para aplicar o estado visual do header //
-
+  // Função para aplicar o estado visual do header
   function aplicarEstadoHeader(user) {
     if (user && user.nome) {
-
       // ---------- USUÁRIO LOGADO ----------
-
-      // some com entrar e cadastrar
-
       if (btEntrar) btEntrar.style.display = "none";
       if (btCadastrar) btCadastrar.style.display = "none";
 
@@ -286,73 +303,182 @@ document.addEventListener("DOMContentLoaded", () => {
         nomeSpan = document.createElement("span");
         nomeSpan.id = "vhUserName";
         nomeSpan.className = "username-header";
-        // insere ANTES da imagem do usuário => nome à esquerda
         userIconDiv.insertBefore(nomeSpan, userBtn);
       }
       nomeSpan.textContent = user.nome;
 
-      // monta menu do usuario logado
+      // atualiza avatar nos botões de usuário
+      if (user.avatar) {
+        const userImgs = document.querySelectorAll('#userBtn, .user-icon img');
+        userImgs.forEach(img => {
+          img.src = user.avatar;
+        });
+      }
 
+      // monta menu do usuário logado
       const publicProfileLink = user.id ? `/perfil/perfil-publico.html?id=${encodeURIComponent(user.id)}` : '/perfil/perfil-publico.html';
 
       menuUser.innerHTML = `
         <li class="vh-user-name"><strong>${user.nome}</strong></li>
         <hr>
-        <li><a href="${publicProfileLink}" id="linkPerfilPublico">Ver Perfil Público</a></li>
-        <li><a href="/perfil/perfil.html" id="linkPerfil">Editar Perfil</a></li>
-        <li><a href="#" id="trocarConta">Mudar de conta</a></li>
-        <li><a href="#" id="sairConta">Sair da conta</a></li>
+        <li><a href="${publicProfileLink}" id="linkPerfilPublico"><i class="fa-solid fa-user" style="margin-right: 8px;"></i>Ver Perfil Público</a></li>
+        <li><a href="/perfil/perfil.html" id="linkPerfil"><i class="fa-solid fa-pen-to-square" style="margin-right: 8px;"></i>Editar Perfil</a></li>
+        <li><a href="/gerenciartorneios/gerentornindex.html"><i class="fa-solid fa-file-invoice" style="margin-right: 8px;"></i>Gerenciar Torneios</a></li>
+        <li><a href="/equipes/gerenciar_equipes.html"><i class="fa-solid fa-list-check" style="margin-right: 8px;"></i>Gerenciar Equipes</a></li>
+        <hr>
+        <li><a href="#" id="trocarConta"><i class="fa-solid fa-arrow-right-arrow-left" style="margin-right: 8px;"></i>Mudar de conta</a></li>
+        <li><a href="#" id="sairConta"><i class="fa-solid fa-right-from-bracket" style="margin-right: 8px;"></i>Sair da conta</a></li>
       `;
 
       const linkSair = document.getElementById("sairConta");
       const linkTrocar = document.getElementById("trocarConta");
 
-      // quando clica sair da conta o localstarage é apagado e carrega a pagina 
+      // Logout nativo com supabase.auth.signOut()
       if (linkSair) {
-        linkSair.addEventListener("click", (e) => {
+        linkSair.addEventListener("click", async (e) => {
           e.preventDefault();
-          localStorage.removeItem("vh_loggedUser");
-          window.location.reload();
+          linkSair.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="margin-right: 8px;"></i>Saindo...';
+          try {
+            const supabase = await getSupabase();
+            await supabase.auth.signOut();
+          } catch (err) {
+            console.warn("Erro ao fazer signOut no Supabase:", err);
+          } finally {
+            localStorage.removeItem("vh_loggedUser");
+            window.location.reload();
+          }
         });
       }
 
-      // aqui qundo o cara clica pra mudar conta o local storage é apagado e o user vai pra page de login
-
+      // Mudar de conta com supabase.auth.signOut() e redirect para login
       if (linkTrocar) {
-        linkTrocar.addEventListener("click", (e) => {
+        linkTrocar.addEventListener("click", async (e) => {
           e.preventDefault();
-          localStorage.removeItem("vh_loggedUser");
-          window.location.href = "/login/login.html";
+          linkTrocar.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="margin-right: 8px;"></i>Desconectando...';
+          try {
+            const supabase = await getSupabase();
+            await supabase.auth.signOut();
+          } catch (err) {
+            console.warn("Erro ao fazer signOut no Supabase:", err);
+          } finally {
+            localStorage.removeItem("vh_loggedUser");
+            window.location.href = "/login/login.html";
+          }
         });
       }
     } else {
-
-      // ---------- ninguem LOGADO ----------
-
-      // mostra botões padrão
+      // ---------- NINGUÉM LOGADO ----------
       if (btEntrar) btEntrar.style.display = "";
       if (btCadastrar) btCadastrar.style.display = "";
 
-      // remove span com nome se existir
       const nomeSpan = document.getElementById("vhUserName");
       if (nomeSpan) nomeSpan.remove();
 
-      // menu simples com Login / Cadastro
+      const userImgs = document.querySelectorAll('#userBtn, .user-icon img');
+      userImgs.forEach(img => {
+        img.src = '/image/boneco_logo_ofc.png';
+      });
+
       menuUser.innerHTML = `
-        <li><a href="/login/login.html">Login</a></li>
+        <li><a href="/login/login.html"><i class="fa-solid fa-right-to-bracket" style="margin-right: 8px;"></i>Login</a></li>
         <hr>
-        <li><a href="/cadastro/cadastro.html">Cadastro</a></li>
+        <li><a href="/cadastro/cadastro.html"><i class="fa-solid fa-user-plus" style="margin-right: 8px;"></i>Cadastro</a></li>
+        <hr>
+        <li><a href="/gerenciartorneios/gerentornindex.html"><i class="fa-solid fa-file-invoice" style="margin-right: 8px;"></i>Gerenciar Torneios</a></li>
+        <li><a href="/equipes/gerenciar_equipes.html"><i class="fa-solid fa-list-check" style="margin-right: 8px;"></i>Gerenciar Equipes</a></li>
       `;
     }
   }
 
-
-  
-  // deixa apenas a fotinha do cara n logado e os botões pra logar e cadastrar
-
+  // Aplicação inicial otimista com cache local
   aplicarEstadoHeader(loggedUser);
-});
 
+  // Validação assíncrona oficial de sessão e escuta em tempo real no Supabase Auth
+  getSupabase().then(async (supabase) => {
+    if (!supabase || !supabase.auth) return;
+
+    try {
+      const { data: { session }, error: sessError } = await supabase.auth.getSession();
+      if (sessError) {
+        console.warn("Aviso ao validar sessão Supabase Auth:", sessError);
+      }
+
+      if (session && session.user) {
+        // Usuário autenticado: sincroniza perfil atualizado
+        const email = session.user.email;
+        let profile = null;
+        try {
+          const { data: dbUser } = await supabase
+            .from('usuarios')
+            .select('id, nome, email, "dataNasc", bio, avatar, regiao, "jogosFavoritos", plataformas, banner, stats, conquistas')
+            .eq('email', email)
+            .maybeSingle();
+          if (dbUser) profile = dbUser;
+        } catch (dbErr) {
+          console.warn("Aviso ao buscar perfil atualizado:", dbErr);
+        }
+
+        const freshUser = {
+          id: profile?.id || session.user.id,
+          nome: profile?.nome || session.user.user_metadata?.nome || email.split('@')[0],
+          email: email,
+          avatar: profile?.avatar || '/image/boneco_logo_ofc.png',
+          banner: profile?.banner || '',
+          bio: profile?.bio || '',
+          regiao: profile?.regiao || 'Brasil',
+          plataformas: profile?.plataformas || [],
+          jogosFavoritos: profile?.jogosFavoritos || [],
+          stats: profile?.stats || { disputed: 0, won: 0, wins: 0, losses: 0 },
+          conquistas: profile?.conquistas || [],
+          auth_id: session.user.id
+        };
+
+        localStorage.setItem("vh_loggedUser", JSON.stringify(freshUser));
+        aplicarEstadoHeader(freshUser);
+      } else {
+        // Sem sessão ativa no Supabase Auth: limpa qualquer estado antigo
+        if (localStorage.getItem("vh_loggedUser")) {
+          localStorage.removeItem("vh_loggedUser");
+        }
+        aplicarEstadoHeader(null);
+      }
+
+      // Escuta alterações de estado de autenticação em tempo real
+      supabase.auth.onAuthStateChange(async (event, session) => {
+        if (event === 'SIGNED_OUT' || !session) {
+          localStorage.removeItem("vh_loggedUser");
+          aplicarEstadoHeader(null);
+        } else if (event === 'SIGNED_IN' || event === 'USER_UPDATED' || event === 'TOKEN_REFRESHED') {
+          if (session && session.user) {
+            const email = session.user.email;
+            let profile = null;
+            try {
+              const { data: dbUser } = await supabase
+                .from('usuarios')
+                .select('id, nome, email, "dataNasc", bio, avatar, regiao, "jogosFavoritos", plataformas, banner, stats, conquistas')
+                .eq('email', email)
+                .maybeSingle();
+              if (dbUser) profile = dbUser;
+            } catch (e) {}
+
+            const freshUser = {
+              id: profile?.id || session.user.id,
+              nome: profile?.nome || session.user.user_metadata?.nome || email.split('@')[0],
+              email: email,
+              avatar: profile?.avatar || '/image/boneco_logo_ofc.png',
+              auth_id: session.user.id
+            };
+
+            localStorage.setItem("vh_loggedUser", JSON.stringify(freshUser));
+            aplicarEstadoHeader(freshUser);
+          }
+        }
+      });
+    } catch (errAuth) {
+      console.warn("Erro ao configurar validação de sessão Supabase:", errAuth);
+    }
+  });
+});
 
 document.addEventListener('DOMContentLoaded', () => {
   try {
@@ -362,9 +488,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const user = JSON.parse(raw);
     if (!user || !user.avatar) return;
 
-    // pega todos os ícones de usuário (caso tenha em mais de um lugar)
     const userImgs = document.querySelectorAll('#userBtn, .user-icon img');
-
     userImgs.forEach(img => {
       img.src = user.avatar;
     });
@@ -373,353 +497,311 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// =========================================
-//  PROCESSO DE SOLICITAÇÃO DE INGRESSO EM EQUIPES
-// =========================================
+// =================================================================
+//  HOMEPAGE: CONSULTA EXCLUSIVA E FILTRAGEM DE CATEGORIAS
+// =================================================================
 document.addEventListener('DOMContentLoaded', () => {
-  const joinBtn = document.querySelector('.btn-join-team');
-  if (!joinBtn || joinBtn.dataset.solicitacaoInit) return;
-  joinBtn.dataset.solicitacaoInit = 'true';
+  const gridTorneiosHome = document.getElementById('gridTorneiosHome');
+  const carouselEl = document.getElementById('carousel');
+  const categoryButtons = document.querySelectorAll('.btn-filtro-categoria');
+  
+  if (!gridTorneiosHome && !carouselEl) return;
 
-  if (joinBtn.disabled) return;
+  const homeLoading = document.getElementById('homeLoading');
+  const noTournamentsMsg = document.getElementById('no-tournaments-msg');
+  const noTournamentsTitle = document.getElementById('no-tournaments-title');
+  const noTournamentsDesc = document.getElementById('no-tournaments-desc');
+  const btnLimparFiltrosHome = document.getElementById('btnLimparFiltrosHome');
+  const tituloSecao = document.getElementById('tituloSecaoTorneios');
+  const statusFiltro = document.getElementById('statusFiltroAtivo');
+  const searchInput = document.getElementById('searchInput');
 
-  const teamNameEl = document.querySelector('.team-info h1') || document.querySelector('.team-hero h1');
-  const teamName = teamNameEl ? teamNameEl.textContent.trim() : 'Equipe';
+  let categoriaAtiva = null;
+  let termoBuscaAtivo = '';
 
-  const loggedUserRaw = localStorage.getItem('vh_loggedUser');
-  const loggedUser = loggedUserRaw ? JSON.parse(loggedUserRaw) : null;
+  const nomesCategorias = {
+    luta: 'Jogos de Luta',
+    esportes: 'Futebol e Esportes',
+    futebol: 'Futebol e Esportes',
+    fps: 'FPS / Tiro',
+    tiro: 'FPS / Tiro',
+    cartas: 'Card Games',
+    card: 'Card Games',
+    moba: 'Jogos MOBA'
+  };
 
-  // Checa status assíncrono na tabela 'membros_equipe'
-  if (loggedUser && loggedUser.email) {
-    import('/supabaseClient.js').then(async ({ supabase }) => {
-      try {
-        const { data } = await supabase
-          .from('membros_equipe')
-          .select('*')
-          .eq('user_email', loggedUser.email)
-          .eq('equipe_id', teamName);
+  // Renderiza a lista de cards dinamicamente no grid da homepage
+  function renderizarGridTorneios(data, error, termo, categoria) {
+    if (homeLoading) homeLoading.style.display = 'none';
 
-        if (data && data.length > 0) {
-          joinBtn.innerHTML = 'Pendente de Aprovação <i class="fa-solid fa-envelope" style="color: #60a5fa; margin-left: 6px;"></i>';
-          joinBtn.style.background = '#22c55e';
-          joinBtn.style.borderColor = '#22c55e';
-        }
-      } catch (err) {
-        console.warn('Erro ao checar solicitação no banco:', err);
+    if (error) {
+      console.error('Erro na consulta de torneios:', error);
+      if (gridTorneiosHome) gridTorneiosHome.style.display = 'none';
+      if (noTournamentsMsg) {
+        noTournamentsMsg.style.display = 'block';
+        if (noTournamentsTitle) noTournamentsTitle.textContent = 'Erro ao Carregar Torneios';
+        if (noTournamentsDesc) noTournamentsDesc.textContent = 'Não foi possível carregar os torneios no momento. Tente recarregar a página.';
       }
-    }).catch(() => {});
-  }
-
-  joinBtn.addEventListener('click', async () => {
-    const userRaw = localStorage.getItem('vh_loggedUser');
-    if (!userRaw) {
-      showAuthToast("Faça login para se inscrever ou entrar em equipes!");
       return;
     }
 
-    const user = JSON.parse(userRaw);
-    joinBtn.disabled = true;
+    // Atualiza Título da seção
+    if (termo && categoria) {
+      if (tituloSecao) tituloSecao.textContent = `Busca: "${termo}" em ${nomesCategorias[categoria] || categoria}`;
+    } else if (termo) {
+      if (tituloSecao) tituloSecao.textContent = `Resultados da busca: "${termo}"`;
+    } else if (categoria) {
+      if (tituloSecao) tituloSecao.textContent = `Torneios de ${nomesCategorias[categoria] || categoria}`;
+    } else {
+      if (tituloSecao) tituloSecao.textContent = 'Torneios em Destaque';
+    }
+
+    // Atualiza badge de filtro ativo
+    if (statusFiltro) {
+      if (categoria || termo) {
+        statusFiltro.style.display = 'inline-block';
+        statusFiltro.innerHTML = `Exibindo <strong>${data ? data.length : 0}</strong> torneio(s) cadastrado(s) • <button type="button" id="btnResetarFiltrosBadge" style="background: none; border: none; color: #ff3e3e; text-decoration: underline; cursor: pointer; font-size: 13px; font-weight: 600; padding: 0 4px;">Limpar filtros</button>`;
+        const btnResetBadge = document.getElementById('btnResetarFiltrosBadge');
+        if (btnResetBadge) {
+          btnResetBadge.onclick = (e) => {
+            e.preventDefault();
+            limparTodosFiltros();
+          };
+        }
+      } else {
+        statusFiltro.style.display = 'none';
+      }
+    }
+
+    if (!data || data.length === 0) {
+      if (gridTorneiosHome) gridTorneiosHome.style.display = 'none';
+      if (noTournamentsMsg) {
+        noTournamentsMsg.style.display = 'block';
+        if (categoria && termo) {
+          if (noTournamentsTitle) noTournamentsTitle.textContent = 'Nenhum Torneio Encontrado';
+          if (noTournamentsDesc) noTournamentsDesc.textContent = `Não encontramos torneios de ${nomesCategorias[categoria] || categoria} correspondentes a "${termo}".`;
+        } else if (categoria) {
+          if (noTournamentsTitle) noTournamentsTitle.textContent = `Nenhum Torneio em ${nomesCategorias[categoria] || categoria}`;
+          if (noTournamentsDesc) noTournamentsDesc.textContent = `Não existem torneios competitivos cadastrados para esta modalidade no momento. Seja o primeiro a criar um campeonato!`;
+        } else if (termo) {
+          if (noTournamentsTitle) noTournamentsTitle.textContent = 'Nenhum Torneio Encontrado';
+          if (noTournamentsDesc) noTournamentsDesc.textContent = `Não encontramos torneios cadastrados correspondentes à sua pesquisa por "${termo}".`;
+        } else {
+          if (noTournamentsTitle) noTournamentsTitle.textContent = 'Nenhum Torneio Cadastrado';
+          if (noTournamentsDesc) noTournamentsDesc.textContent = 'Ainda não há torneios registrados no banco de dados.';
+        }
+      }
+      return;
+    }
+
+    if (noTournamentsMsg) noTournamentsMsg.style.display = 'none';
+
+    // Renderiza os cards reais
+    if (gridTorneiosHome) {
+      gridTorneiosHome.innerHTML = data.map(t => {
+        const banner = t.banner || '/images/cerradocup.jpg';
+        const link = (t.link && t.link.startsWith('/') && !t.link.includes('?')) ? t.link : ('/torneio/custom.html?id=' + encodeURIComponent(t.id));
+        let statusClass = t.statusClass || (
+          t.status && t.status.toLowerCase().includes('andamento') ? 'status-andamento' :
+          t.status && t.status.toLowerCase().includes('encerrado') ? 'status-encerrado' : 'status-aberto'
+        );
+        let statusTexto = t.status || 'Inscrições abertas';
+
+        if (t.ao_vivo === true || t.transmissao_status === 'ao_vivo' || (t.status && t.status.toLowerCase().includes('ao vivo'))) {
+          statusTexto = "Ao Vivo <i class='fa-solid fa-tower-broadcast' style='margin-left: 4px;'></i>";
+          statusClass = 'status-andamento';
+        }
+
+        const nomeSeguro = escapeHtml(t.nome || 'Torneio');
+        const jogoSeguro = escapeHtml(t.jogo || 'Geral');
+        const catSegura = (t.categoria || 'Competitivo').toUpperCase();
+        const platSegura = (t.plataforma || 'Multi').toUpperCase();
+
+        return `
+          <article class="card-torneio"
+            data-id="${t.id}"
+            data-nome="${nomeSeguro}"
+            data-jogo="${jogoSeguro}"
+            data-categoria="${t.categoria || ''}"
+            data-plataforma="${t.plataforma || ''}"
+            data-status="${t.status || ''}">
+            
+            <img referrerpolicy="no-referrer" src="${banner}" alt="${nomeSeguro}" onerror="this.onerror=null;this.src='/images/cerradocup.jpg';">
+            <div class="card-info">
+              <h2>${nomeSeguro}</h2>
+              <p class="jogo">Jogo: ${jogoSeguro} • ${catSegura} • ${platSegura}</p>
+              <p class="data">Início: ${t.data || 'Em breve'}</p>
+              <p class="status ${statusClass}">${statusTexto}</p>
+              <a href="${link}"><button class="btn-detalhes">Ver detalhes</button></a>
+            </div>
+          </article>
+        `;
+      }).join('');
+
+      gridTorneiosHome.style.display = 'grid';
+    }
+  }
+
+  // Monta a query com filtros para o Supabase
+  function construirQueryGrid(supabaseClient, categoria, termo) {
+    let query = supabaseClient.from('torneios').select('*');
+
+    // 1. Filtragem por categoria no Supabase
+    if (categoria) {
+      const cat = categoria.toLowerCase();
+      if (cat === 'luta') {
+        query = query.or('categoria.eq.luta,categoria.ilike.%luta%');
+      } else if (cat === 'esportes' || cat === 'futebol') {
+        query = query.or('categoria.eq.esportes,categoria.eq.futebol,categoria.ilike.%esporte%,categoria.ilike.%futebol%');
+      } else if (cat === 'fps' || cat === 'tiro') {
+        query = query.or('categoria.eq.fps,categoria.eq.tiro,categoria.eq.battle-royale,categoria.ilike.%fps%,categoria.ilike.%tiro%');
+      } else if (cat === 'cartas' || cat === 'card' || cat === 'card_game') {
+        query = query.or('categoria.eq.cartas,categoria.eq.card,categoria.eq.card_game,categoria.ilike.%carta%,categoria.ilike.%card%,jogo.ilike.%tcg%,nome.ilike.%tcg%');
+      } else if (cat === 'moba') {
+        query = query.or('categoria.eq.moba,categoria.ilike.%moba%');
+      } else {
+        query = query.eq('categoria', cat);
+      }
+    }
+
+    // 2. Filtragem por busca no Supabase
+    const t = (termo || '').trim();
+    if (t) {
+      query = query.or(`nome.ilike.%${t}%,jogo.ilike.%${t}%,categoria.ilike.%${t}%`);
+    }
+
+    return query.order('created_at', { ascending: false });
+  }
+
+  // ===================================================================
+  // CARREGAMENTO INICIAL PARALELO DA HOMEPAGE COM PROMISE.ALL
+  // Executa simultaneamente carrossel e listagem mantendo os spinners ativos
+  // ===================================================================
+  async function carregarDadosIniciaisHomepage() {
+    // 1. Mantém/exibe os spinners de carregamento
+    if (homeLoading) homeLoading.style.display = 'flex';
+    if (gridTorneiosHome) gridTorneiosHome.style.display = 'none';
+    if (noTournamentsMsg) noTournamentsMsg.style.display = 'none';
+
+    const carouselLoading = document.getElementById('carouselLoading');
+    if (carouselLoading) carouselLoading.style.display = 'flex';
 
     try {
-      const { supabase } = await import('/supabaseClient.js');
+      const supabase = await getSupabase();
 
-      // Verifica no Supabase se já existe solicitação
-      const { data: existingList } = await supabase
-        .from('membros_equipe')
-        .select('*')
-        .eq('user_email', user.email)
-        .eq('equipe_id', teamName);
+      // Monta as promessas simultâneas para execução em paralelo
+      const promessaCarrossel = carouselEl
+        ? supabase.from('torneios').select('*').order('created_at', { ascending: false })
+        : Promise.resolve({ data: null, error: null });
 
-      const jaSolicitou = existingList && existingList.length > 0;
+      const promessaGrid = gridTorneiosHome
+        ? construirQueryGrid(supabase, categoriaAtiva, termoBuscaAtivo)
+        : Promise.resolve({ data: null, error: null });
 
-      if (jaSolicitou) {
-        // Cancela a solicitação
-        await supabase
-          .from('membros_equipe')
-          .delete()
-          .eq('user_email', user.email)
-          .eq('equipe_id', teamName);
+      // EXECUTA TODAS AS CONSULTAS SIMULTANEAMENTE EM PARALELO VIA PROMISE.ALL
+      const [resCarrossel, resGrid] = await Promise.all([
+        promessaCarrossel,
+        promessaGrid
+      ]);
 
-        let currentRequests = {};
-        try {
-          currentRequests = JSON.parse(localStorage.getItem('vh_teamJoinRequests') || '{}');
-          delete currentRequests[teamName];
-          localStorage.setItem('vh_teamJoinRequests', JSON.stringify(currentRequests));
-        } catch (e) {}
-
-        joinBtn.innerHTML = 'Pedir para entrar';
-        joinBtn.style.background = '#d41111'; // cor vermelha original
-        joinBtn.style.borderColor = '#d41111';
-        showNotificationToast("Solicitação de entrada cancelada.", "info");
-      } else {
-        // Cria a solicitação no Supabase (membros_equipe)
-        await supabase
-          .from('membros_equipe')
-          .insert([{
-            equipe_id: teamName,
-            user_email: user.email,
-            status: 'Pendente'
-          }]);
-
-        let currentRequests = {};
-        try {
-          currentRequests = JSON.parse(localStorage.getItem('vh_teamJoinRequests') || '{}');
-        } catch (e) {
-          currentRequests = {};
-        }
-        currentRequests[teamName] = {
-          userEmail: user.email,
-          userName: user.nome || '',
-          date: new Date().toISOString()
-        };
-        localStorage.setItem('vh_teamJoinRequests', JSON.stringify(currentRequests));
-
-        joinBtn.innerHTML = 'Pendente de Aprovação <i class="fa-solid fa-envelope" style="color: #60a5fa; margin-left: 6px;"></i>';
-        joinBtn.style.background = '#22c55e'; // cor verde
-        joinBtn.style.borderColor = '#22c55e';
-        showNotificationToast(`Solicitação enviada para o time ${teamName}!`, "success");
+      // 2. Processa o resultado do carrossel assim que o Promise.all conclui
+      if (carouselEl && resCarrossel) {
+        renderizarCarrossel(resCarrossel.data, resCarrossel.error);
       }
-    } catch (dbErr) {
-      console.error('Erro na solicitação de equipe:', dbErr);
-      showNotificationToast("Não foi possível processar a solicitação no momento.", "info");
-    } finally {
-      joinBtn.disabled = false;
-    }
-  });
 
-  // Toasts personalizados e responsivos para segurança de autenticação
-  function showAuthToast(message) {
-    let toast = document.getElementById("vh-auth-toast");
-    if (toast) toast.remove();
-
-    toast = document.createElement("div");
-    toast.id = "vh-auth-toast";
-    toast.style.position = "fixed";
-    toast.style.bottom = "30px";
-    toast.style.right = "30px";
-    toast.style.background = "#141419";
-    toast.style.color = "#ffffff";
-    toast.style.border = "1px solid #d41111";
-    toast.style.borderRadius = "12px";
-    toast.style.padding = "16px 20px";
-    toast.style.boxShadow = "0 10px 30px rgba(0, 0, 0, 0.5)";
-    toast.style.zIndex = "10000";
-    toast.style.fontFamily = "system-ui, sans-serif";
-    toast.style.display = "flex";
-    toast.style.flexDirection = "column";
-    toast.style.gap = "10px";
-    toast.style.maxWidth = "320px";
-    toast.style.animation = "slideInRight 0.3s cubic-bezier(0.165, 0.84, 0.44, 1) forwards";
-
-    toast.innerHTML = `
-      <div style="display: flex; align-items: center; gap: 10px;">
-        <i class="fa-solid fa-lock" style="font-size: 18px; color: #ff3e3e;"></i>
-        <span style="font-weight: 600; font-size: 14px;">${message}</span>
-      </div>
-      <div style="display: flex; gap: 10px; margin-top: 4px;">
-        <a href="/login/login.html" style="background: #d41111; color: #fff; text-decoration: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 700; text-align: center; flex: 1;">Entrar</a>
-        <button id="close-toast-btn" style="background: rgba(255,255,255,0.1); color: #fff; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; flex: 1;">Fechar</button>
-      </div>
-    `;
-
-    document.body.appendChild(toast);
-    setupToastAnimation();
-
-    const closeBtn = toast.querySelector("#close-toast-btn");
-    if (closeBtn) {
-      closeBtn.addEventListener("click", () => {
-        toast.style.animation = "fadeOut 0.3s ease forwards";
-        setTimeout(() => toast.remove(), 300);
-      });
-    }
-
-    setTimeout(() => {
-      if (toast.parentNode) {
-        toast.style.animation = "fadeOut 0.3s ease forwards";
-        setTimeout(() => toast.remove(), 300);
+      // 3. Processa o resultado do grid assim que o Promise.all conclui
+      if (gridTorneiosHome && resGrid) {
+        renderizarGridTorneios(resGrid.data, resGrid.error, termoBuscaAtivo, categoriaAtiva);
       }
-    }, 6000);
-  }
 
-  function showNotificationToast(message, type) {
-    let toast = document.getElementById("vh-notif-toast");
-    if (toast) toast.remove();
-
-    toast = document.createElement("div");
-    toast.id = "vh-notif-toast";
-    toast.style.position = "fixed";
-    toast.style.bottom = "30px";
-    toast.style.right = "30px";
-    toast.style.background = "#141419";
-    toast.style.color = "#ffffff";
-    toast.style.border = type === "success" ? "1px solid #22c55e" : "1px solid #3b82f6";
-    toast.style.borderRadius = "12px";
-    toast.style.padding = "16px 20px";
-    toast.style.boxShadow = "0 10px 30px rgba(0, 0, 0, 0.5)";
-    toast.style.zIndex = "10000";
-    toast.style.fontFamily = "system-ui, sans-serif";
-    toast.style.display = "flex";
-    toast.style.alignItems = "center";
-    toast.style.gap = "10px";
-    toast.style.maxWidth = "320px";
-    toast.style.animation = "slideInRight 0.3s cubic-bezier(0.165, 0.84, 0.44, 1) forwards";
-
-    const icon = type === "success" 
-      ? '<i class="fa-solid fa-circle-check" style="color: #22c55e; font-size: 18px;"></i>' 
-      : '<i class="fa-solid fa-circle-info" style="color: #3b82f6; font-size: 18px;"></i>';
-    toast.innerHTML = `
-      <span>${icon}</span>
-      <span style="font-weight: 600; font-size: 14px;">${message}</span>
-    `;
-
-    document.body.appendChild(toast);
-    setupToastAnimation();
-
-    setTimeout(() => {
-      if (toast.parentNode) {
-        toast.style.animation = "fadeOut 0.3s ease forwards";
-        setTimeout(() => toast.remove(), 300);
-      }
-    }, 4000);
-  }
-
-  function setupToastAnimation() {
-    if (!document.getElementById("vh-toast-style")) {
-      const style = document.createElement("style");
-      style.id = "vh-toast-style";
-      style.innerHTML = `
-        @keyframes slideInRight {
-          from { transform: translateX(100px); opacity: 0; }
-          to { transform: translateX(0); opacity: 1; }
-        }
-        @keyframes fadeOut {
-          from { opacity: 1; }
-          to { opacity: 0; }
-        }
-      `;
-      document.head.appendChild(style);
-    }
-  }
-});
-
-// =========================================
-//  FILTRO DE CATEGORIAS (BOTÕES VERMELHOS)
-// =========================================
-document.addEventListener('DOMContentLoaded', () => {
-  const categoryButtons = document.querySelectorAll('.btn-filtro-categoria');
-  const tournamentSections = document.querySelectorAll('.bloco-categoria');
-  
-  if (!categoryButtons.length) return;
-
-  // Cria dinamicamente a mensagem de "nenhum torneio" se ela não existir
-  let noTournamentsMsg = document.getElementById("no-tournaments-msg");
-  if (!noTournamentsMsg) {
-    noTournamentsMsg = document.createElement("div");
-    noTournamentsMsg.id = "no-tournaments-msg";
-    noTournamentsMsg.style.textAlign = "center";
-    noTournamentsMsg.style.padding = "60px 20px";
-    noTournamentsMsg.style.background = "#141419";
-    noTournamentsMsg.style.borderRadius = "20px";
-    noTournamentsMsg.style.border = "1px dashed rgba(255, 255, 255, 0.1)";
-    noTournamentsMsg.style.maxWidth = "600px";
-    noTournamentsMsg.style.margin = "40px auto 80px auto";
-    noTournamentsMsg.style.display = "none";
-    noTournamentsMsg.style.fontFamily = "system-ui, sans-serif";
-    noTournamentsMsg.style.boxShadow = "0 10px 30px rgba(0,0,0,0.3)";
-    
-    noTournamentsMsg.innerHTML = `
-      <span style="font-size: 56px; display: block; margin-bottom: 20px; color: #ff3e3e;"><i class="fa-solid fa-gamepad"></i></span>
-      <h3 style="font-size: 22px; color: #ffffff; margin-bottom: 10px; font-weight: 800;">Nenhum Torneio Nesta Categoria</h3>
-      <p style="font-size: 15px; color: #9ca3af; margin-bottom: 25px; max-width: 440px; margin-left: auto; margin-right: auto; line-height: 1.6;">Não existem torneios competitivos ativos para esta categoria no momento. Que tal ser o pioneiro e criar o seu?</p>
-      <a href="/criar_torneio/criar_torneio.html" style="display: inline-flex; align-items: center; justify-content: center; background: #d41111; color: #ffffff; text-decoration: none; padding: 12px 32px; border-radius: 999px; font-size: 14px; font-weight: 700; gap: 8px; box-shadow: 0 4px 15px rgba(212, 17, 17, 0.4); transition: 0.3s ease-in-out;">Criar Torneio <i class="fa-solid fa-trophy" style="color: #ffd700; margin-left: 6px;"></i></a>
-    `;
-    
-    // Inserir antes do footer
-    const footer = document.querySelector('footer');
-    if (footer && footer.parentNode) {
-      footer.parentNode.insertBefore(noTournamentsMsg, footer);
+    } catch (err) {
+      console.error('Falha no carregamento inicial paralelo da Homepage:', err);
+      if (homeLoading) homeLoading.style.display = 'none';
+      if (noTournamentsMsg) noTournamentsMsg.style.display = 'block';
     }
   }
 
+  // Filtragem posterior dinâmica (quando o usuário clica em categoria ou pesquisa)
+  async function carregarTorneiosSupabase() {
+    if (homeLoading) homeLoading.style.display = 'flex';
+    if (gridTorneiosHome) gridTorneiosHome.style.display = 'none';
+    if (noTournamentsMsg) noTournamentsMsg.style.display = 'none';
+
+    try {
+      const supabase = await getSupabase();
+      const query = construirQueryGrid(supabase, categoriaAtiva, termoBuscaAtivo);
+      const { data, error } = await query;
+      renderizarGridTorneios(data, error, termoBuscaAtivo, categoriaAtiva);
+    } catch (err) {
+      console.error('Falha ao filtrar torneios:', err);
+      if (homeLoading) homeLoading.style.display = 'none';
+      if (noTournamentsMsg) noTournamentsMsg.style.display = 'block';
+    }
+  }
+
+  function limparTodosFiltros() {
+    categoriaAtiva = null;
+    termoBuscaAtivo = '';
+    categoryButtons.forEach(b => b.classList.remove('active'));
+    if (searchInput) searchInput.value = '';
+    carregarTorneiosSupabase();
+  }
+
+  // Interação com botões de categoria
   categoryButtons.forEach(btn => {
     btn.addEventListener('click', () => {
       const selectedCategory = btn.getAttribute('data-categoria-filtro');
       const isAlreadyActive = btn.classList.contains('active');
 
-      // 1. Resetar estados de todos os botões
       categoryButtons.forEach(b => b.classList.remove('active'));
 
-      // 2. Se já estava ativo, remove o filtro e exibe tudo
       if (isAlreadyActive) {
-        // Exibir todas as seções e todos os cards
-        tournamentSections.forEach(section => {
-          section.style.display = 'block';
-          const cards = section.querySelectorAll('.card-torneio');
-          cards.forEach(card => {
-            card.style.display = 'flex';
-          });
-        });
-        noTournamentsMsg.style.display = 'none';
-        return;
-      }
-
-      // 3. Caso contrário, ativa o filtro
-      btn.classList.add('active');
-
-      // Mapear o filtro do botão para as categorias dos cards
-      // Tiro engloba 'fps' e 'battle-royale'
-      // Moba engloba 'moba'
-      // Luta engloba 'luta' ou 'combate'
-      // Esportes engloba 'esportes'
-      // Cartas engloba 'cartas' ou 'card'
-      let matchingCategories = [selectedCategory];
-      if (selectedCategory === 'tiro') {
-        matchingCategories = ['fps', 'battle-royale'];
-      } else if (selectedCategory === 'cartas') {
-        matchingCategories = ['cartas', 'card', 'card_game'];
-      }
-
-      let anyCardVisibleOverall = false;
-
-      tournamentSections.forEach(section => {
-        const cards = section.querySelectorAll('.card-torneio');
-        let visibleCardsInSectionCount = 0;
-
-        cards.forEach(card => {
-          const cardCategory = card.getAttribute('data-categoria');
-          const isMatch = matchingCategories.includes(cardCategory);
-
-          if (isMatch) {
-            card.style.display = 'flex';
-            visibleCardsInSectionCount++;
-            anyCardVisibleOverall = true;
-          } else {
-            card.style.display = 'none';
-          }
-        });
-
-        // Se a seção não tiver nenhum card visível, esconde a seção inteira
-        if (visibleCardsInSectionCount > 0) {
-          section.style.display = 'block';
-        } else {
-          section.style.display = 'none';
-        }
-      });
-
-      // Se não houver nenhum card visível em toda a página, exibe a mensagem de feedback amigável
-      if (anyCardVisibleOverall) {
-        noTournamentsMsg.style.display = 'none';
+        categoriaAtiva = null;
       } else {
-        noTournamentsMsg.style.display = 'block';
+        btn.classList.add('active');
+        categoriaAtiva = selectedCategory;
       }
 
-      // Rolar suavemente até a âncora de torneios
+      if (searchInput) termoBuscaAtivo = searchInput.value.trim();
+      carregarTorneiosSupabase();
+
       const targetAnchor = document.getElementById('categorias');
       if (targetAnchor) {
         targetAnchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     });
   });
+
+  // Botão de limpar filtros no estado vazio
+  if (btnLimparFiltrosHome) {
+    btnLimparFiltrosHome.addEventListener('click', () => {
+      limparTodosFiltros();
+    });
+  }
+
+  // Expor busca da Home para ser invocada pelo Header
+  window.executarBuscaHomeSupabase = function(termo, rolarAteSecao = false) {
+    termoBuscaAtivo = termo || '';
+    carregarTorneiosSupabase();
+    if (rolarAteSecao) {
+      const targetAnchor = document.getElementById('categorias');
+      if (targetAnchor) {
+        targetAnchor.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  };
+
+  // Se a URL já trouxer um parâmetro de busca (?busca=...)
+  const urlParams = new URLSearchParams(window.location.search);
+  const buscaUrl = urlParams.get('busca');
+  if (buscaUrl) {
+    termoBuscaAtivo = buscaUrl;
+    if (searchInput) searchInput.value = buscaUrl;
+  }
+
+  // Dispara o carregamento inicial em paralelo via Promise.all
+  carregarDadosIniciaisHomepage();
+  window.recarregarHomepage = carregarDadosIniciaisHomepage;
 });
 
 // =========================================================

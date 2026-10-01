@@ -4,14 +4,32 @@
 import { supabase } from '/supabaseClient.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
-  const rawUser = localStorage.getItem('vh_loggedUser');
   let loggedUser = null;
-  if (rawUser) {
-    try {
-      loggedUser = JSON.parse(rawUser);
-    } catch (e) {
-      console.error('Erro ao ler usuário logado:', e);
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session && session.user) {
+      const email = session.user.email;
+      const rawUser = localStorage.getItem('vh_loggedUser');
+      if (rawUser) {
+        try {
+          const parsed = JSON.parse(rawUser);
+          if (parsed && parsed.email === email) loggedUser = parsed;
+        } catch (e) {}
+      }
+      if (!loggedUser) {
+        const { data: profile } = await supabase.from('usuarios').select('id, nome, email, "dataNasc", bio, avatar, regiao, "jogosFavoritos", plataformas, banner, stats, conquistas').eq('email', email).maybeSingle();
+        loggedUser = {
+          id: profile?.id || session.user.id,
+          nome: profile?.nome || session.user.user_metadata?.nome || email.split('@')[0],
+          email: email,
+          avatar: profile?.avatar || '/image/boneco_logo_ofc.png',
+          auth_id: session.user.id
+        };
+        localStorage.setItem('vh_loggedUser', JSON.stringify(loggedUser));
+      }
     }
+  } catch (err) {
+    console.warn('Aviso ao consultar sessão em gerenciartorneios:', err);
   }
 
   // Se não estiver logado, exibe aviso amigável de autenticação
@@ -778,7 +796,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           try {
             const { data: uData } = await supabase
               .from('usuarios')
-              .select('*')
+              .select('id, nome, email, avatar')
               .eq('email', idPart)
               .maybeSingle();
 

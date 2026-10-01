@@ -453,15 +453,17 @@ async function fetchUserProfile(idParam) {
 
   const cleanId = (idParam || '').trim();
 
+  const SAFE_COLS = 'id, nome, email, "dataNasc", bio, avatar, regiao, "jogosFavoritos", plataformas, banner, stats, conquistas';
+
   // 1. Se nenhum ID foi passado ou for "me", carrega o usuário logado
   if (!cleanId || cleanId.toLowerCase() === 'me' || cleanId.toLowerCase() === 'meu-perfil') {
     if (loggedUser) {
       if (loggedUser.id && isUuid(loggedUser.id)) {
-        const { data } = await supabase.from('usuarios').select('*').eq('id', loggedUser.id).maybeSingle();
+        const { data } = await supabase.from('usuarios').select(SAFE_COLS).eq('id', loggedUser.id).maybeSingle();
         if (data) return { ...loggedUser, ...data };
       }
       if (loggedUser.email) {
-        const { data } = await supabase.from('usuarios').select('*').eq('email', loggedUser.email).maybeSingle();
+        const { data } = await supabase.from('usuarios').select(SAFE_COLS).eq('email', loggedUser.email).maybeSingle();
         if (data) return { ...loggedUser, ...data };
       }
       return loggedUser;
@@ -479,11 +481,11 @@ async function fetchUserProfile(idParam) {
     );
     if (matchesLogged) {
       if (loggedUser.id && isUuid(loggedUser.id)) {
-        const { data } = await supabase.from('usuarios').select('*').eq('id', loggedUser.id).maybeSingle();
+        const { data } = await supabase.from('usuarios').select(SAFE_COLS).eq('id', loggedUser.id).maybeSingle();
         if (data) return { ...loggedUser, ...data };
       }
       if (loggedUser.email) {
-        const { data } = await supabase.from('usuarios').select('*').eq('email', loggedUser.email).maybeSingle();
+        const { data } = await supabase.from('usuarios').select(SAFE_COLS).eq('email', loggedUser.email).maybeSingle();
         if (data) return { ...loggedUser, ...data };
       }
       return loggedUser;
@@ -493,7 +495,7 @@ async function fetchUserProfile(idParam) {
   // 3. Se for UUID válido, busca no Supabase por id
   if (isUuid(cleanId)) {
     try {
-      const { data, error } = await supabase.from('usuarios').select('*').eq('id', cleanId).maybeSingle();
+      const { data, error } = await supabase.from('usuarios').select(SAFE_COLS).eq('id', cleanId).maybeSingle();
       if (data && !error) return data;
     } catch (err) {
       console.warn('Erro ao buscar por UUID no Supabase:', err);
@@ -503,7 +505,7 @@ async function fetchUserProfile(idParam) {
   // 4. Se for e-mail, busca por email
   if (cleanId.includes('@')) {
     try {
-      const { data, error } = await supabase.from('usuarios').select('*').eq('email', cleanId).maybeSingle();
+      const { data, error } = await supabase.from('usuarios').select(SAFE_COLS).eq('email', cleanId).maybeSingle();
       if (data && !error) return data;
     } catch (err) {
       console.warn('Erro ao buscar por email no Supabase:', err);
@@ -514,7 +516,7 @@ async function fetchUserProfile(idParam) {
   try {
     const { data: usersByName } = await supabase
       .from('usuarios')
-      .select('*')
+      .select(SAFE_COLS)
       .ilike('nome', `%${cleanId}%`);
     if (usersByName && usersByName.length > 0) {
       return usersByName[0];
@@ -526,7 +528,7 @@ async function fetchUserProfile(idParam) {
   // 6. Slugs conhecidos de integrantes de equipes (caique, gabriel, dean, marcuzcuz, joaovitor, lucas)
   const slugLower = cleanId.toLowerCase();
   if (slugLower === 'caique') {
-    const { data } = await supabase.from('usuarios').select('*').eq('email', 'caiquebrandao09@gmail.com').maybeSingle();
+    const { data } = await supabase.from('usuarios').select(SAFE_COLS).eq('email', 'caiquebrandao09@gmail.com').maybeSingle();
     if (data) return data;
     return {
       nome: 'Caíque Brandão',
@@ -541,7 +543,7 @@ async function fetchUserProfile(idParam) {
   }
 
   if (slugLower === 'gabriel' || slugLower.includes('costaoliveira')) {
-    const { data } = await supabase.from('usuarios').select('*').eq('email', 'gabriel.costaoliveira77@gmail.com').maybeSingle();
+    const { data } = await supabase.from('usuarios').select(SAFE_COLS).eq('email', 'gabriel.costaoliveira77@gmail.com').maybeSingle();
     if (data) return data;
     return {
       nome: 'Gabriel Oliveira',

@@ -1,12 +1,39 @@
 // /cria_equipe/js/criar_equipe.js
 import { supabase } from '/supabaseClient.js';
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   const STORAGE_KEY_TEAMS = 'vh_createdTeams';
 
-  // --- LOGIN VERIFICATION ---
-  const loggedUserRaw = localStorage.getItem("vh_loggedUser");
-  if (!loggedUserRaw) {
+  // --- LOGIN VERIFICATION COM SUPABASE AUTH ---
+  let loggedUser = null;
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session && session.user) {
+      const email = session.user.email;
+      const raw = localStorage.getItem("vh_loggedUser");
+      if (raw) {
+        try {
+          const parsed = JSON.parse(raw);
+          if (parsed && parsed.email === email) loggedUser = parsed;
+        } catch (e) {}
+      }
+      if (!loggedUser) {
+        const { data: profile } = await supabase.from('usuarios').select('id, nome, email, "dataNasc", bio, avatar, regiao, "jogosFavoritos", plataformas, banner, stats, conquistas').eq('email', email).maybeSingle();
+        loggedUser = {
+          id: profile?.id || session.user.id,
+          nome: profile?.nome || session.user.user_metadata?.nome || email.split('@')[0],
+          email: email,
+          avatar: profile?.avatar || '/image/boneco_logo_ofc.png',
+          auth_id: session.user.id
+        };
+        localStorage.setItem("vh_loggedUser", JSON.stringify(loggedUser));
+      }
+    }
+  } catch (err) {
+    console.warn("Aviso ao validar auth em cria_equipe:", err);
+  }
+
+  if (!loggedUser) {
     const container = document.querySelector('.criar-torneio-page') || document.querySelector('.team-page') || document.querySelector('main');
     if (container) {
       container.innerHTML = `
@@ -110,6 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
         leaderName: loggedUser?.nome || 'Líder',
         leaderAvatar: loggedUser?.avatar || '/image/boneco_logo_ofc.png',
         leaderEmail: loggedUser?.email || '',
+        leaderId: loggedUser?.auth_id || (loggedUser?.id && String(loggedUser.id).length === 36 ? loggedUser.id : null),
 
         torneiosGanhos: [],
         torneiosAtuais: [],

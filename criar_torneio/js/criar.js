@@ -1,12 +1,39 @@
 // /criar_torneio/js/criar.js
 import { supabase } from '/supabaseClient.js';
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   const STORAGE_KEY = 'vh_createdTournaments';
 
-  // --- LOGIN VERIFICATION ---
-  const loggedUserRaw = localStorage.getItem("vh_loggedUser");
-  if (!loggedUserRaw) {
+  // --- LOGIN VERIFICATION COM SUPABASE AUTH ---
+  let loggedUser = null;
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session && session.user) {
+      const email = session.user.email;
+      const raw = localStorage.getItem("vh_loggedUser");
+      if (raw) {
+        try {
+          const parsed = JSON.parse(raw);
+          if (parsed && parsed.email === email) loggedUser = parsed;
+        } catch (e) {}
+      }
+      if (!loggedUser) {
+        const { data: profile } = await supabase.from('usuarios').select('id, nome, email, "dataNasc", bio, avatar, regiao, "jogosFavoritos", plataformas, banner, stats, conquistas').eq('email', email).maybeSingle();
+        loggedUser = {
+          id: profile?.id || session.user.id,
+          nome: profile?.nome || session.user.user_metadata?.nome || email.split('@')[0],
+          email: email,
+          avatar: profile?.avatar || '/image/boneco_logo_ofc.png',
+          auth_id: session.user.id
+        };
+        localStorage.setItem("vh_loggedUser", JSON.stringify(loggedUser));
+      }
+    }
+  } catch (err) {
+    console.warn("Aviso ao validar auth em criar.js:", err);
+  }
+
+  if (!loggedUser) {
     const container = document.querySelector('.criar-torneio-page');
     if (container) {
       container.innerHTML = `
@@ -69,11 +96,32 @@ document.addEventListener('DOMContentLoaded', () => {
   const inicioData = document.getElementById('inicioData');
   const inicioHora = document.getElementById('inicioHora');
   const statusSelect = document.getElementById('status');
+  const tipoInscricaoSelect = document.getElementById('tipoInscricao');
+  const maxIntegrantesInput = document.getElementById('maxIntegrantes');
+  const maxIntegrantesBlock = document.getElementById('maxIntegrantesBlock');
   const descricao = document.getElementById('descricao');
   const localizacao = document.getElementById('localizacao');
   const requisitos = document.getElementById('requisitos');
   const regras = document.getElementById('regras');
   const taxaValor = document.getElementById('taxaValor');
+
+  // Ajuste interativo do campo de integrantes com base no tipo de inscrição
+  if (tipoInscricaoSelect && maxIntegrantesInput) {
+    tipoInscricaoSelect.addEventListener('change', () => {
+      const val = tipoInscricaoSelect.value;
+      if (val === 'Apenas Solo (1v1)') {
+        maxIntegrantesInput.value = '1';
+        maxIntegrantesInput.disabled = true;
+        if (maxIntegrantesBlock) maxIntegrantesBlock.style.opacity = '0.5';
+      } else {
+        maxIntegrantesInput.disabled = false;
+        if (maxIntegrantesBlock) maxIntegrantesBlock.style.opacity = '1';
+        if (maxIntegrantesInput.value === '1' || !maxIntegrantesInput.value) {
+          maxIntegrantesInput.value = '5';
+        }
+      }
+    });
+  }
 
   const premio1 = document.getElementById('premio1');
   const premio2 = document.getElementById('premio2');
@@ -294,6 +342,13 @@ document.addEventListener('DOMContentLoaded', () => {
         showValidationFeedback(inicioHora, 'Por favor, defina o horário de início.');
         return false;
       }
+      if (tipoInscricaoSelect && tipoInscricaoSelect.value !== 'Apenas Solo (1v1)') {
+        const maxVal = parseInt(maxIntegrantesInput.value, 10);
+        if (isNaN(maxVal) || maxVal < 1) {
+          showValidationFeedback(maxIntegrantesInput, 'Informe o número máximo de integrantes por equipe (mínimo 1).');
+          return false;
+        }
+      }
       if (modalidadeInput.value === 'presencial' && !localizacao.value.trim()) {
         showValidationFeedback(localizacao, 'Por favor, insira o endereço presencial do torneio.');
         return false;
@@ -455,7 +510,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const bannerFinal = bannerDataUrl || '/images/cerradocup.jpg';
 
     // Objeto de dados estruturados
-    const userObj = JSON.parse(loggedUserRaw);
+    const userObj = loggedUser || JSON.parse(localStorage.getItem('vh_loggedUser') || '{}');
     const novoTorneio = {
       id,
       nome: nomeTorneio.value.trim(),
@@ -470,6 +525,11 @@ document.addEventListener('DOMContentLoaded', () => {
       categoria: categoriaInput.value,
       plataforma: plataformaInput.value,
       inicioIso,
+
+      tipoInscricao: tipoInscricaoSelect ? tipoInscricaoSelect.value : 'Solo ou Equipe',
+      tipo_inscricao: tipoInscricaoSelect ? tipoInscricaoSelect.value : 'Solo ou Equipe',
+      maxIntegrantes: parseInt(maxIntegrantesInput ? maxIntegrantesInput.value : 5, 10) || 5,
+      max_integrantes: parseInt(maxIntegrantesInput ? maxIntegrantesInput.value : 5, 10) || 5,
 
       localizacao: localizacao.value.trim(),
       modalidade: modalidadeInput.value,
@@ -489,12 +549,49 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     try {
-      // 1. Inserir no Supabase (tabela torneios)
-      const { data, error } = await supabase
+      // 1. Inserir no Supabase (tabela torneios) com fallback resiliente de colunas
+      let { data, error } = await supabase
         .from('torneios')
         .insert([novoTorneio])
         .select()
         .single();
+
+      if (error) {
+        console.warn('Tentativa inicial com payload completo falhou, testando payloads de compatibilidade:', error);
+        // Tenta apenas com tipoInscricao e maxIntegrantes (padrão camelCase de supabase_schema.sql)
+        const payloadCamel = { ...novoTorneio };
+        delete payloadCamel.tipo_inscricao;
+        delete payloadCamel.max_integrantes;
+        const resCamel = await supabase.from('torneios').insert([payloadCamel]).select().single();
+        if (!resCamel.error) {
+          error = null;
+          data = resCamel.data;
+        } else {
+          // Tenta apenas com tipo_inscricao e max_integrantes (padrão snake_case)
+          const payloadSnake = { ...novoTorneio };
+          delete payloadSnake.tipoInscricao;
+          delete payloadSnake.maxIntegrantes;
+          const resSnake = await supabase.from('torneios').insert([payloadSnake]).select().single();
+          if (!resSnake.error) {
+            error = null;
+            data = resSnake.data;
+          } else {
+            // Tenta payload base caso as colunas novas ainda não tenham sido migradas no Supabase remoto
+            const payloadBase = { ...novoTorneio };
+            delete payloadBase.tipoInscricao;
+            delete payloadBase.tipo_inscricao;
+            delete payloadBase.maxIntegrantes;
+            delete payloadBase.max_integrantes;
+            const resBase = await supabase.from('torneios').insert([payloadBase]).select().single();
+            if (!resBase.error) {
+              error = null;
+              data = resBase.data;
+            } else {
+              error = resBase.error;
+            }
+          }
+        }
+      }
 
       if (error) {
         console.error('Erro ao inserir torneio no Supabase:', error);

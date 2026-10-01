@@ -1,109 +1,30 @@
 // /torneio/js/custom.js
 import { supabase } from '/supabaseClient.js';
 
-// Lista de apoio para torneios padrão do sistema caso id seja estático
-const predefinedTournaments = {
-  'gamescom-latam': {
-    id: 'gamescom-latam',
-    nome: 'Gamescom Latam CS:GO',
-    jogo: 'CS:GO • FPS • PC',
-    data: 'Início: 06/12/2025 às 19h',
-    status: 'Em andamento',
-    statusClass: 'status-andamento',
-    banner: '/images/torneio_csgo2.webp',
-    descricao: 'O Time To Battle League da Gamescom Latam reúne os maiores talentos de CS:GO da América Latina. Com uma premiação recorde e as melhores equipes disputando ponto a ponto, este campeonato consagra a equipe mais resiliente e tática do continente.',
-    regras: 'Times de 5x5\nEliminação dupla\nServidores locais em SP\nAnti-cheat obrigatório.',
-    requisitos: 'Idade 16+, Conta da Gamers Club verificada, Sem banimentos ativos.',
-    tipoPremio: 'valores',
-    premio1: 'R$ 15.000 + Vaga para o Mundial',
-    premio2: 'R$ 5.000',
-    premio3: 'R$ 2.500',
-    modalidade: 'presencial',
-    localizacao: 'São Paulo Expo, SP',
-    taxaTipo: 'gratis',
-    criadorEmail: 'admin@versushub.com'
-  },
-  'parana-startups': {
-    id: 'parana-startups',
-    nome: 'CS-GO Startups Challenge',
-    jogo: 'CS:GO • FPS • PC',
-    data: 'Início: 04/11/2025 às 18h',
-    status: 'Encerrado',
-    statusClass: 'status-encerrado',
-    banner: '/images/fileiracsgo.jpeg',
-    descricao: 'O Paraná Startups Challenge une o ecossistema de tecnologia e inovação com o mundo dos e-sports. Empresas de tecnologia disputam a supremacia em partidas empolgantes de Counter-Strike.',
-    regras: 'Times compostos por colaboradores ou parceiros das startups inscritas\nFormato suíço\nPartidas MD1 na fase de grupos, MD3 nas finais.',
-    requisitos: 'Vínculo com startup participante, conta Steam válida.',
-    tipoPremio: 'valores',
-    premio1: 'Troféu Startups + R$ 5.000 em créditos de nuvem',
-    premio2: 'Mentorias de negócios + Placas comemorativas',
-    premio3: 'Kit de brindes dos patrocinadores',
-    modalidade: 'online',
-    localizacao: 'Online (Servidor SP)',
-    taxaTipo: 'gratis'
-  },
-  'copa-ff': {
-    id: 'copa-ff',
-    nome: 'C.O.P.A - FREE FIRE',
-    jogo: 'Free Fire • Battle Royale • Mobile',
-    data: 'Início: 23/01/2026 às 18h',
-    status: 'Em andamento',
-    statusClass: 'status-andamento',
-    banner: '/images/ffcopaff.png',
-    descricao: 'A clássica Copa Free Fire traz os squads mais agressivos e estratégicos do cenário mobile. Sobrevivência, rotações precisas e combates de alta velocidade marcam essa emocionante competição oficial.',
-    regras: 'Formato de pontos corridos\nQuedas em Bermuda, Purgatório e Kalahari\n6 quedas por rodada.',
-    requisitos: 'Dispositivo mobile apenas (emulador proibido), nível 50+ na conta.',
-    tipoPremio: 'valores',
-    premio1: 'R$ 10.000 + Troféu C.O.P.A',
-    premio2: 'R$ 4.000',
-    premio3: 'R$ 2.000',
-    modalidade: 'online',
-    localizacao: 'Online (Servidor Mobile)',
-    taxaTipo: 'gratis'
-  },
-  'contra-cup': {
-    id: 'contra-cup',
-    nome: 'Contra Cup Free Fire',
-    jogo: 'Free Fire • Battle Royale • Mobile',
-    data: 'Início: 01/03/2026 às 17h',
-    status: 'Em andamento',
-    statusClass: 'status-andamento',
-    banner: '/images/contracup.jpeg',
-    descricao: 'A Contra Cup é um torneio focado no confronto direto 4v4 contra adversários do mesmo nível, testando a frieza e precisão dos competidores sob extrema pressão.',
-    regras: 'Confronto Contra Squad tradicional\nMD5 até quartas, MD7 nas fases finais\nSem armas apelativas/proibidas.',
-    requisitos: 'Squad de 4 jogadores + 1 reserva.',
-    tipoPremio: 'valores',
-    premio1: 'R$ 3.000 + Medalhas',
-    premio2: 'R$ 1.000',
-    modalidade: 'online',
-    localizacao: 'Online',
-    taxaTipo: 'gratis'
-  },
-  'arena-fc25': {
-    id: 'arena-fc25',
-    nome: 'ARENA - FC25',
-    jogo: 'FIFA • Esportes • Console',
-    data: 'Início: 05/05/2026 às 19h',
-    status: 'Inscrições abertas',
-    statusClass: 'status-aberto',
-    banner: '/pagina_inicial/image/arenafc25.jpg',
-    descricao: 'Entre em campo na nova edição da Copa ARENA FC25! Teste suas novas jogadas ensaiadas, dribles e táticas no simulador de futebol mais jogado do planeta.',
-    regras: 'Modo Ultimate Team (UT)\nLimite de classificação de elenco de até 88\nMD3 nas eliminatórias.',
-    requisitos: 'Jogo EA Sports FC 25 original, conta ativa na PSN ou Xbox Live.',
-    tipoPremio: 'valores',
-    premio1: 'R$ 5.000 + 12.000 FC Points',
-    premio2: 'R$ 2.000 + 5.800 FC Points',
-    premio3: 'R$ 1.000 + 2.800 FC Points',
-    modalidade: 'online',
-    localizacao: 'Online (Crossplay)',
-    taxaTipo: 'gratis'
-  }
-};
-
-function getLoggedUser() {
+async function getLoggedUser() {
   const raw = localStorage.getItem('vh_loggedUser');
   if (raw) {
     try { return JSON.parse(raw); } catch (e) {}
+  }
+
+  // Validação assíncrona com Supabase Auth
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session && session.user) {
+      const email = session.user.email;
+      const { data: profile } = await supabase.from('usuarios').select('id, nome, email, "dataNasc", bio, avatar, regiao, "jogosFavoritos", plataformas, banner, stats, conquistas').eq('email', email).maybeSingle();
+      const userObj = {
+        id: profile?.id || session.user.id,
+        nome: profile?.nome || session.user.user_metadata?.nome || email.split('@')[0],
+        email: email,
+        avatar: profile?.avatar || '/image/boneco_logo_ofc.png',
+        auth_id: session.user.id
+      };
+      localStorage.setItem('vh_loggedUser', JSON.stringify(userObj));
+      return userObj;
+    }
+  } catch (err) {
+    console.warn('Aviso ao consultar sessão Supabase:', err);
   }
   return null;
 }
@@ -198,27 +119,26 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   let torneio = null;
+  let preloadedInscricoes = [];
 
-  // 2) Consulta a tabela torneios no Supabase com .single()
+  // Consulta simultânea em paralelo via Promise.all para máxima velocidade de carregamento
   try {
-    const { data, error } = await supabase
-      .from('torneios')
-      .select('*')
-      .eq('id', id)
-      .single();
+    const [resTorneio, resInscricoes] = await Promise.all([
+      supabase.from('torneios').select('*').eq('id', id).single(),
+      supabase.from('inscricoes').select('*').eq('torneio_id', String(id)).eq('status', 'Aceito')
+    ]);
 
-    if (!error && data) {
-      torneio = data;
+    if (!resTorneio.error && resTorneio.data) {
+      torneio = resTorneio.data;
     } else {
-      console.warn('Torneio não retornado do Supabase:', error);
+      console.warn('Torneio não retornado do Supabase:', resTorneio.error);
+    }
+
+    if (!resInscricoes.error && Array.isArray(resInscricoes.data)) {
+      preloadedInscricoes = resInscricoes.data;
     }
   } catch (err) {
-    console.warn('Aviso ao consultar torneio no Supabase:', err);
-  }
-
-  // Fallback caso seja um torneio com chave predefinida do sistema
-  if (!torneio && predefinedTournaments[id]) {
-    torneio = predefinedTournaments[id];
+    console.warn('Aviso ao consultar dados do torneio no Supabase:', err);
   }
 
   if (!torneio) {
@@ -256,6 +176,25 @@ document.addEventListener('DOMContentLoaded', async () => {
   const infoModalidade = document.getElementById('infoModalidade');
   const infoLocal      = document.getElementById('infoLocal');
   const infoTaxa       = document.getElementById('infoTaxa');
+  const textoTipoInscricao = document.getElementById('textoTipoInscricao');
+  const textoMaxIntegrantes = document.getElementById('textoMaxIntegrantes');
+  const liMaxIntegrantes = document.getElementById('liMaxIntegrantes');
+
+  const tipoInscricaoTorneio = torneio.tipoInscricao || torneio.tipo_inscricao || 'Solo ou Equipe';
+  const maxIntegrantesTorneio = parseInt(torneio.maxIntegrantes || torneio.max_integrantes || 5, 10) || 5;
+
+  if (textoTipoInscricao) {
+    textoTipoInscricao.textContent = tipoInscricaoTorneio;
+  }
+
+  if (liMaxIntegrantes && textoMaxIntegrantes) {
+    if (tipoInscricaoTorneio === 'Apenas Solo (1v1)') {
+      liMaxIntegrantes.style.display = 'none';
+    } else {
+      liMaxIntegrantes.style.display = 'flex';
+      textoMaxIntegrantes.textContent = `Até ${maxIntegrantesTorneio} jogadores`;
+    }
+  }
 
   // Banner
   if (detBanner) {
@@ -515,14 +454,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  // Libera a tela de carregamento após a injeção dos dados no DOM
+  // 6) Carrega os Participantes Confirmados (Ação 2) utilizando os dados obtidos em paralelo
+  await carregarParticipantesConfirmados(torneio.id, preloadedInscricoes);
+
+  // Libera a tela de carregamento após a injeção completa de todos os dados no DOM
   if (document.getElementById('loaderDetalhes')) {
     document.getElementById('loaderDetalhes').style.display = 'none';
   }
   hideLoader();
-
-  // 6) Carrega os Participantes Confirmados (Ação 2)
-  await carregarParticipantesConfirmados(torneio.id);
 
   // 7) Inscrição no Torneio (Ação 1)
   const btnInscrever = document.getElementById('btnInscrever');
@@ -536,7 +475,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       btnInscrever.style.cursor = 'not-allowed';
       btnInscrever.style.pointerEvents = 'none';
     } else {
-      const loggedUser = getLoggedUser();
+      const loggedUser = await getLoggedUser();
       let inscricaoAtual = null;
 
       if (loggedUser) {
@@ -565,12 +504,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (inscricaoAtual) {
           aplicarEstadoBotaoInscrito(btnInscrever, inscricaoAtual.status);
+        } else {
+          if (tipoInscricaoTorneio === 'Apenas Solo (1v1)') {
+            btnInscrever.textContent = 'Inscrever-se (Solo)';
+          } else if (tipoInscricaoTorneio === 'Apenas Equipe') {
+            btnInscrever.textContent = 'Inscrever Equipe';
+          } else {
+            btnInscrever.textContent = 'Inscrever-se no Torneio';
+          }
         }
       }
 
       btnInscrever.addEventListener('click', async () => {
         if (btnInscrever.disabled) return;
-        const user = getLoggedUser();
+        const user = await getLoggedUser();
         if (!user) {
           showToast('Você precisa estar logado para se inscrever! Redirecionando...');
           setTimeout(() => {
@@ -585,11 +532,316 @@ document.addEventListener('DOMContentLoaded', async () => {
           return;
         }
 
+        // Torneio Apenas Solo (1v1): Inscrição direta do usuário logado
+        if (tipoInscricaoTorneio === 'Apenas Solo (1v1)') {
+          await realizarInscricaoSoloDireta(torneio, user, (novaInscricao) => {
+            inscricaoAtual = novaInscricao;
+            aplicarEstadoBotaoInscrito(btnInscrever, novaInscricao.status);
+            carregarParticipantesConfirmados(torneio.id);
+          });
+          return;
+        }
+
+        // Torneio Apenas Equipe ou Solo ou Equipe: Abre modal com escalação
         abrirModalEscolhaInscricao(torneio, user, (novaInscricao) => {
           inscricaoAtual = novaInscricao;
           aplicarEstadoBotaoInscrito(btnInscrever, novaInscricao.status);
           carregarParticipantesConfirmados(torneio.id);
         });
+      });
+    }
+
+    // ==============================================================================
+    // 5. MODAL DE EDIÇÃO DE TORNEIO (Upload de Arquivo + Preview + Update Supabase)
+    // ==============================================================================
+    const modalEditarTorneio = document.getElementById('modalEditarTorneioCustom');
+    const formEditarTorneio = document.getElementById('formEditarTorneioCustom');
+    const btnAbrirModalEdit = document.getElementById('btnAbrirModalEditarTorneio');
+    const btnFecharModalEdit = document.getElementById('btnFecharModalEditarTorneio');
+    const btnCancelarModalEdit = document.getElementById('btnCancelarModalEditarTorneio');
+    const areaAcoesCriador = document.getElementById('areaAcoesCriador');
+
+    const fileInputBanner = document.getElementById('customEditBannerFile');
+    const previewBannerImg = document.getElementById('customEditBannerPreviewImg');
+    let customEditBannerDataUrl = '';
+
+    // Verifica se o usuário logado é o organizador/criador do torneio
+    const isCriador = loggedUser && (
+      (torneio.criadorEmail && loggedUser.email === torneio.criadorEmail) ||
+      (torneio.criador_email && loggedUser.email === torneio.criador_email) ||
+      (torneio.user_email && loggedUser.email === torneio.user_email) ||
+      loggedUser.isAdmin ||
+      loggedUser.cargo === 'admin' ||
+      loggedUser.email === 'admin@versushub.com'
+    );
+
+    const isCriadorLocal = (() => {
+      try {
+        const createdList = JSON.parse(localStorage.getItem('vh_createdTournaments') || '[]');
+        return createdList.some(t => String(t.id) === String(torneio.id));
+      } catch (e) {
+        return false;
+      }
+    })();
+
+    if (areaAcoesCriador && (isCriador || isCriadorLocal)) {
+      areaAcoesCriador.style.display = 'block';
+    }
+
+    if (fileInputBanner) {
+      fileInputBanner.addEventListener('change', (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+
+        if (!file.type.startsWith('image/')) {
+          showToast('Selecione apenas arquivos de imagem.');
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          customEditBannerDataUrl = ev.target.result;
+          if (previewBannerImg) {
+            previewBannerImg.src = customEditBannerDataUrl;
+          }
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function fecharModalEdicaoTorneio() {
+      if (modalEditarTorneio) modalEditarTorneio.style.display = 'none';
+    }
+
+    if (btnFecharModalEdit) btnFecharModalEdit.addEventListener('click', fecharModalEdicaoTorneio);
+    if (btnCancelarModalEdit) btnCancelarModalEdit.addEventListener('click', fecharModalEdicaoTorneio);
+    if (modalEditarTorneio) {
+      modalEditarTorneio.addEventListener('click', (e) => {
+        if (e.target === modalEditarTorneio) fecharModalEdicaoTorneio();
+      });
+    }
+
+    function abrirModalEdicaoTorneio() {
+      if (!modalEditarTorneio) return;
+
+      document.getElementById('customEditId').value = torneio.id;
+      document.getElementById('customEditNome').value = torneio.nome || '';
+      document.getElementById('customEditJogo').value = torneio.jogo || '';
+      document.getElementById('customEditData').value = torneio.data || '';
+      document.getElementById('customEditStatus').value = torneio.status || 'Inscrições abertas';
+      document.getElementById('customEditModalidade').value = torneio.modalidade || 'online';
+      document.getElementById('customEditLocalizacao').value = torneio.localizacao || '';
+      document.getElementById('customEditCategoria').value = (torneio.categoria || 'fps').toLowerCase();
+      document.getElementById('customEditPlataforma').value = torneio.plataforma || 'PC';
+      document.getElementById('customEditLimite').value = torneio.limite || '';
+      document.getElementById('customEditLink').value = torneio.link || '';
+      document.getElementById('customEditDescricao').value = torneio.descricao || '';
+      document.getElementById('customEditRegras').value = torneio.regras || '';
+      document.getElementById('customEditRequisitos').value = torneio.requisitos || '';
+
+      const editTipoInscricao = document.getElementById('customEditTipoInscricao');
+      const editMaxIntegrantes = document.getElementById('customEditMaxIntegrantes');
+      if (editTipoInscricao) editTipoInscricao.value = torneio.tipoInscricao || torneio.tipo_inscricao || 'Solo ou Equipe';
+      if (editMaxIntegrantes) editMaxIntegrantes.value = parseInt(torneio.maxIntegrantes || torneio.max_integrantes || 5, 10) || 5;
+
+      customEditBannerDataUrl = '';
+      if (fileInputBanner) fileInputBanner.value = '';
+      if (previewBannerImg) {
+        previewBannerImg.src = torneio.banner || '/images/cerradocup.jpg';
+        previewBannerImg.onerror = () => { previewBannerImg.src = '/images/cerradocup.jpg'; };
+      }
+
+      modalEditarTorneio.style.display = 'flex';
+    }
+
+    if (btnAbrirModalEdit) {
+      btnAbrirModalEdit.addEventListener('click', abrirModalEdicaoTorneio);
+    }
+
+    if (formEditarTorneio) {
+      formEditarTorneio.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const btnSave = document.getElementById('btnSalvarModalEditarTorneio');
+        if (btnSave) {
+          btnSave.disabled = true;
+          btnSave.textContent = 'Salvando...';
+        }
+
+        const bannerNovo = customEditBannerDataUrl || torneio.banner || '/images/cerradocup.jpg';
+        const statusNovo = document.getElementById('customEditStatus').value;
+        let statusClassNovo = 'status-aberto';
+        if (statusNovo === 'Em andamento' || statusNovo === 'Ao Vivo') statusClassNovo = 'status-andamento';
+        else if (statusNovo === 'Encerrado') statusClassNovo = 'status-encerrado';
+
+        const editTipo = document.getElementById('customEditTipoInscricao');
+        const editMax = document.getElementById('customEditMaxIntegrantes');
+        const novoTipoInscricao = editTipo ? editTipo.value : (torneio.tipoInscricao || 'Solo ou Equipe');
+        const novoMaxIntegrantes = editMax ? (parseInt(editMax.value, 10) || 5) : (parseInt(torneio.maxIntegrantes, 10) || 5);
+
+        const updatePayload = {
+          nome: document.getElementById('customEditNome').value.trim(),
+          jogo: document.getElementById('customEditJogo').value.trim(),
+          data: document.getElementById('customEditData').value.trim(),
+          status: statusNovo,
+          statusClass: statusClassNovo,
+          modalidade: document.getElementById('customEditModalidade').value,
+          localizacao: document.getElementById('customEditLocalizacao').value.trim(),
+          categoria: document.getElementById('customEditCategoria').value,
+          plataforma: document.getElementById('customEditPlataforma').value,
+          limite: document.getElementById('customEditLimite').value.trim(),
+          link: document.getElementById('customEditLink').value.trim(),
+          descricao: document.getElementById('customEditDescricao').value.trim(),
+          regras: document.getElementById('customEditRegras').value.trim(),
+          requisitos: document.getElementById('customEditRequisitos').value.trim(),
+          tipoInscricao: novoTipoInscricao,
+          tipo_inscricao: novoTipoInscricao,
+          maxIntegrantes: novoMaxIntegrantes,
+          max_integrantes: novoMaxIntegrantes,
+          banner: bannerNovo
+        };
+
+        try {
+          // 1. Atualização no Supabase com fallback resiliente de colunas
+          let { error } = await supabase
+            .from('torneios')
+            .update(updatePayload)
+            .eq('id', torneio.id);
+
+          if (error) {
+            console.warn('Tentativa com payload completo falhou ao atualizar, tentando alternativas:', error);
+            const payloadCamel = { ...updatePayload };
+            delete payloadCamel.tipo_inscricao;
+            delete payloadCamel.max_integrantes;
+            const resCamel = await supabase.from('torneios').update(payloadCamel).eq('id', torneio.id);
+            if (!resCamel.error) {
+              error = null;
+            } else {
+              const payloadSnake = { ...updatePayload };
+              delete payloadSnake.tipoInscricao;
+              delete payloadSnake.maxIntegrantes;
+              const resSnake = await supabase.from('torneios').update(payloadSnake).eq('id', torneio.id);
+              if (!resSnake.error) {
+                error = null;
+              } else {
+                const payloadBase = { ...updatePayload };
+                delete payloadBase.tipoInscricao;
+                delete payloadBase.tipo_inscricao;
+                delete payloadBase.maxIntegrantes;
+                delete payloadBase.max_integrantes;
+                const resBase = await supabase.from('torneios').update(payloadBase).eq('id', torneio.id);
+                error = resBase.error;
+              }
+            }
+          }
+
+          if (error) {
+            console.error('Erro ao salvar torneio no Supabase:', error);
+            showToast('Erro ao salvar alterações no banco de dados.');
+            return;
+          }
+
+          // 2. Atualiza objeto em memória
+          Object.assign(torneio, updatePayload);
+
+          // 3. Atualiza cache local vh_createdTournaments
+          try {
+            const allCreated = JSON.parse(localStorage.getItem('vh_createdTournaments') || '[]');
+            const idx = allCreated.findIndex(t => String(t.id) === String(torneio.id));
+            if (idx !== -1) {
+              allCreated[idx] = { ...allCreated[idx], ...updatePayload };
+              localStorage.setItem('vh_createdTournaments', JSON.stringify(allCreated));
+            }
+          } catch (e) {}
+
+          // 4. Atualiza os elementos visuais na página atual
+          if (detBanner) detBanner.src = torneio.banner;
+          if (detNome) detNome.textContent = torneio.nome;
+          document.title = `${torneio.nome || 'Torneio'} - VersusHub`;
+          if (detMeta) detMeta.textContent = torneio.jogo;
+          if (detData) detData.textContent = torneio.data;
+
+          if (detStatusBadge) {
+            detStatusBadge.textContent = torneio.status;
+            detStatusBadge.className = 'torneio-status-badge ' + (torneio.statusClass || 'status-aberto');
+          }
+          if (textoStatus) {
+            textoStatus.textContent = torneio.status;
+          }
+          if (textoTipoInscricao) {
+            textoTipoInscricao.textContent = torneio.tipoInscricao;
+          }
+          if (liMaxIntegrantes && textoMaxIntegrantes) {
+            if (torneio.tipoInscricao === 'Apenas Solo (1v1)') {
+              liMaxIntegrantes.style.display = 'none';
+            } else {
+              liMaxIntegrantes.style.display = 'flex';
+              textoMaxIntegrantes.textContent = `Até ${torneio.maxIntegrantes} jogadores`;
+            }
+          }
+
+          if (detDescricao) {
+            detDescricao.textContent = torneio.descricao || 'Nenhuma descrição informada.';
+          }
+
+          if (listaRegras) {
+            listaRegras.innerHTML = '';
+            if (torneio.regras && torneio.regras.trim()) {
+              torneio.regras.split('\n').forEach(linha => {
+                const texto = linha.trim();
+                if (!texto) return;
+                const li = document.createElement('li');
+                li.textContent = texto;
+                listaRegras.appendChild(li);
+              });
+            } else {
+              const li = document.createElement('li');
+              li.textContent = 'Nenhuma regra específica cadastrada.';
+              listaRegras.appendChild(li);
+            }
+          }
+
+          if (detRequisitos) {
+            detRequisitos.textContent = torneio.requisitos || 'Nenhum requisito especial informado.';
+          }
+
+          if (tagCategoria) {
+            if (torneio.categoria) {
+              tagCategoria.textContent = `Categoria: ${torneio.categoria.toUpperCase()}`;
+              tagCategoria.style.display = 'inline-block';
+            } else {
+              tagCategoria.style.display = 'none';
+            }
+          }
+
+          if (tagPlataforma) {
+            if (torneio.plataforma) {
+              tagPlataforma.textContent = `Plataforma: ${torneio.plataforma.toUpperCase()}`;
+              tagPlataforma.style.display = 'inline-block';
+            } else {
+              tagPlataforma.style.display = 'none';
+            }
+          }
+
+          const modTexto = (torneio.modalidade === 'presencial') ? 'Presencial' : 'Online';
+          if (tagModalidade) tagModalidade.textContent = `Modalidade: ${modTexto}`;
+          if (infoModalidade) infoModalidade.textContent = modTexto;
+
+          const locTexto = torneio.localizacao || 'Online';
+          if (tagLocalizacao) tagLocalizacao.textContent = `Localização: ${locTexto}`;
+          if (infoLocal) infoLocal.textContent = locTexto;
+
+          fecharModalEdicaoTorneio();
+          showToast('Torneio atualizado com sucesso!');
+        } catch (err) {
+          console.error('Erro ao atualizar torneio:', err);
+          showToast('Ocorreu um erro ao atualizar o torneio.');
+        } finally {
+          if (btnSave) {
+            btnSave.disabled = false;
+            btnSave.textContent = 'Salvar Alterações';
+          }
+        }
       });
     }
   }
@@ -662,24 +914,28 @@ function salvarInscricaoLocal(inscricao, torneio) {
 }
 
 // AÇÃO 2: Exibir Participantes Confirmados
-async function carregarParticipantesConfirmados(torneioId) {
+async function carregarParticipantesConfirmados(torneioId, preloadedInscricoes = null) {
   const listaEl = document.getElementById('listaParticipantes');
   if (!listaEl) return;
 
   try {
     let aceitos = [];
-    try {
-      const { data, error } = await supabase
-        .from('inscricoes')
-        .select('*')
-        .eq('torneio_id', String(torneioId))
-        .eq('status', 'Aceito');
+    if (Array.isArray(preloadedInscricoes)) {
+      aceitos = preloadedInscricoes;
+    } else {
+      try {
+        const { data, error } = await supabase
+          .from('inscricoes')
+          .select('*')
+          .eq('torneio_id', String(torneioId))
+          .eq('status', 'Aceito');
 
-      if (!error && Array.isArray(data)) {
-        aceitos = data;
+        if (!error && Array.isArray(data)) {
+          aceitos = data;
+        }
+      } catch (e) {
+        console.warn('Aviso ao consultar inscrições aceitas:', e);
       }
-    } catch (e) {
-      console.warn('Aviso ao consultar inscrições aceitas:', e);
     }
 
     // Mescla com cache local vh_inscricoes
@@ -801,34 +1057,94 @@ async function carregarParticipantesConfirmados(torneioId) {
   }
 }
 
-// AÇÃO 1: Modal de Escolha do Tipo de Inscrição (Individual ou Equipe)
+// AÇÃO 1.1: Inscrição Solo Direta (quando o torneio for Apenas Solo)
+async function realizarInscricaoSoloDireta(torneio, loggedUser, onSucesso) {
+  const btnInscrever = document.getElementById('btnInscrever');
+  const textoOriginal = btnInscrever ? btnInscrever.textContent : 'Inscrever-se';
+  if (btnInscrever) {
+    btnInscrever.disabled = true;
+    btnInscrever.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Inscrevendo...';
+  }
+
+  const novaInscricao = {
+    torneio_id: String(torneio.id),
+    user_email: loggedUser.email,
+    tipo: 'individual',
+    id_participante: loggedUser.email,
+    status: 'Pendente',
+    created_at: new Date().toISOString()
+  };
+
+  try {
+    try {
+      const { error: insErr } = await supabase
+        .from('inscricoes')
+        .insert([novaInscricao]);
+
+      if (insErr) {
+        console.warn('Aviso no Supabase inscricoes:', insErr);
+      }
+    } catch (errDb) {
+      console.warn('Banco remoto inacessível, prosseguindo com cache local:', errDb);
+    }
+
+    salvarInscricaoLocal(novaInscricao, torneio);
+    showToast('Inscrição individual confirmada com sucesso! Aguarde a aprovação do organizador.');
+
+    if (typeof onSucesso === 'function') {
+      onSucesso(novaInscricao);
+    }
+  } catch (err) {
+    console.error('Erro na inscrição solo direta:', err);
+    showToast('Ocorreu um erro ao realizar a inscrição. Tente novamente.');
+    if (btnInscrever) {
+      btnInscrever.disabled = false;
+      btnInscrever.textContent = textoOriginal;
+    }
+  }
+}
+
+// AÇÃO 1.2: Modal de Inscrição e Escalação de Line-up (Apenas Equipe ou Solo ou Equipe)
 function abrirModalEscolhaInscricao(torneio, loggedUser, onSucesso) {
   const overlay = document.createElement('div');
   overlay.className = 'modal-inscricao-overlay';
   overlay.id = 'modalEscolhaInscricaoOverlay';
 
+  const tipoTorneio = torneio.tipoInscricao || torneio.tipo_inscricao || 'Solo ou Equipe';
+  const maxIntegrantes = parseInt(torneio.maxIntegrantes || torneio.max_integrantes || 5, 10) || 5;
+  const apenasEquipe = tipoTorneio === 'Apenas Equipe';
+
   overlay.innerHTML = `
-    <div class="modal-inscricao-content">
+    <div class="modal-inscricao-content" style="max-width: 580px;">
       <div class="modal-inscricao-header">
-        <h3><i class="fa-solid fa-trophy" style="color: #ef4444;"></i> Inscrição no Torneio</h3>
+        <h3>
+          <i class="fa-solid ${apenasEquipe ? 'fa-shield-halved' : 'fa-trophy'}" style="color: #ef4444;"></i>
+          ${apenasEquipe ? 'Inscrição de Equipe no Torneio' : 'Inscrição no Torneio'}
+        </h3>
         <button type="button" class="btn-close-modal" id="btnFecharModalInscricao" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
       </div>
 
-      <p style="font-size: 14px; color: #b1b1cf; margin-top: 0; margin-bottom: 16px;">Como deseja participar deste campeonato?</p>
+      <p style="font-size: 14px; color: #b1b1cf; margin-top: 0; margin-bottom: 16px;">
+        ${apenasEquipe
+          ? `Este torneio é exclusivo para equipes. Escale até <strong>${maxIntegrantes}</strong> integrantes:`
+          : 'Como deseja participar deste campeonato?'}
+      </p>
 
-      <div class="modal-inscricao-opcoes">
-        <div class="opcao-card card-ind selected" id="opcaoIndividual" role="button" tabindex="0">
-          <i class="fa-solid fa-user"></i>
-          <strong>Individual</strong>
-          <span>Inscreva-se com seu perfil individual de jogador</span>
-        </div>
+      ${!apenasEquipe ? `
+        <div class="modal-inscricao-opcoes">
+          <div class="opcao-card card-ind selected" id="opcaoIndividual" role="button" tabindex="0">
+            <i class="fa-solid fa-user"></i>
+            <strong>Individual</strong>
+            <span>Inscreva-se com seu perfil individual de jogador</span>
+          </div>
 
-        <div class="opcao-card card-eq" id="opcaoEquipe" role="button" tabindex="0">
-          <i class="fa-solid fa-shield-halved"></i>
-          <strong>Equipe</strong>
-          <span>Inscreva uma equipe na qual você é capitão / líder</span>
+          <div class="opcao-card card-eq" id="opcaoEquipe" role="button" tabindex="0">
+            <i class="fa-solid fa-shield-halved"></i>
+            <strong>Equipe</strong>
+            <span>Inscreva e escale os membros da sua equipe</span>
+          </div>
         </div>
-      </div>
+      ` : ''}
 
       <div id="areaDetalhesInscricao" style="background: #181824; border: 1px solid #28283a; border-radius: 12px; padding: 16px; margin-bottom: 20px;">
         <!-- Injetado dinamicamente dependendo da opção selecionada -->
@@ -859,14 +1175,14 @@ function abrirModalEscolhaInscricao(torneio, loggedUser, onSucesso) {
   const areaDetalhes = overlay.querySelector('#areaDetalhesInscricao');
   const btnConfirmar = overlay.querySelector('#btnConfirmarInscricaoModal');
 
-  let tipoSelecionado = 'individual';
+  let tipoSelecionado = apenasEquipe ? 'equipe' : 'individual';
   let equipeSelecionadaId = null;
   let equipesLideradas = [];
 
   function renderDetalhesIndividual() {
     tipoSelecionado = 'individual';
-    optInd.classList.add('selected');
-    optEq.classList.remove('selected');
+    if (optInd) optInd.classList.add('selected');
+    if (optEq) optEq.classList.remove('selected');
     btnConfirmar.disabled = false;
 
     areaDetalhes.innerHTML = `
@@ -883,29 +1199,36 @@ function abrirModalEscolhaInscricao(torneio, loggedUser, onSucesso) {
         </div>
       </div>
       <p style="font-size: 13px; color: #b1b1cf; margin: 12px 0 0 0; line-height: 1.4;">
-        Sua inscrição será enviada ao organizador como participante individual.
+        Sua inscrição será enviada ao organizador como participante solo individual.
       </p>
     `;
   }
 
   async function renderDetalhesEquipe() {
     tipoSelecionado = 'equipe';
-    optEq.classList.add('selected');
-    optInd.classList.remove('selected');
+    if (optEq) optEq.classList.add('selected');
+    if (optInd) optInd.classList.remove('selected');
 
     areaDetalhes.innerHTML = `
-      <div style="text-align: center; padding: 14px 0; color: #9ca3af;">
-        <i class="fa-solid fa-spinner fa-spin" style="font-size: 20px; color: #3b82f6;"></i>
-        <span style="display: block; margin-top: 8px; font-size: 13px;">Buscando equipes em que você é líder...</span>
+      <div style="text-align: center; padding: 20px 0; color: #9ca3af;">
+        <i class="fa-solid fa-spinner fa-spin" style="font-size: 24px; color: #ef4444;"></i>
+        <span style="display: block; margin-top: 10px; font-size: 13px; font-weight: 500;">Carregando equipes e line-up...</span>
       </div>
     `;
 
     try {
       let teams = [];
+      const userEmail = (loggedUser.email || '').trim().toLowerCase();
+      const userNome = (loggedUser.nome || '').trim();
+      let orFilter = `leaderEmail.ilike.${userEmail}`;
+      if (userNome) {
+        orFilter += `,leaderName.eq.${userNome}`;
+      }
+
       const { data, error } = await supabase
         .from('equipes')
         .select('*')
-        .eq('leaderEmail', loggedUser.email);
+        .or(orFilter);
 
       if (!error && Array.isArray(data)) {
         teams = data;
@@ -927,14 +1250,14 @@ function abrirModalEscolhaInscricao(torneio, loggedUser, onSucesso) {
       if (equipesLideradas.length === 0) {
         btnConfirmar.disabled = true;
         areaDetalhes.innerHTML = `
-          <div style="text-align: center; padding: 10px 0;">
-            <i class="fa-solid fa-shield-halved" style="font-size: 28px; color: #f59e0b; margin-bottom: 8px; display: block;"></i>
-            <strong style="color: #ffffff; font-size: 14px; display: block;">Nenhuma equipe encontrada</strong>
-            <p style="font-size: 12px; color: #9ca3af; margin: 6px 0 10px 0;">
-              Você ainda não é capitão ou líder de nenhuma equipe cadastrada.
+          <div style="text-align: center; padding: 14px 0;">
+            <i class="fa-solid fa-shield-halved" style="font-size: 32px; color: #f59e0b; margin-bottom: 10px; display: block;"></i>
+            <strong style="color: #ffffff; font-size: 15px; display: block;">Nenhuma equipe liderada encontrada</strong>
+            <p style="font-size: 13px; color: #9ca3af; margin: 8px 0 14px 0; line-height: 1.5;">
+              Para inscrever uma equipe, você precisa ser o capitão ou líder de uma equipe cadastrada.
             </p>
-            <a href="/equipes/equipes.html" style="color: #60a5fa; text-decoration: underline; font-size: 13px; font-weight: 600;">
-              <i class="fa-solid fa-plus"></i> Criar uma equipe agora
+            <a href="/cria_equipe/criar_equipe.html" style="display: inline-flex; align-items: center; gap: 6px; background: #ef4444; color: #ffffff; text-decoration: none; padding: 8px 18px; border-radius: 8px; font-size: 13px; font-weight: 700;">
+              <i class="fa-solid fa-plus"></i> Criar uma Equipe Agora
             </a>
           </div>
         `;
@@ -942,47 +1265,208 @@ function abrirModalEscolhaInscricao(torneio, loggedUser, onSucesso) {
       }
 
       equipeSelecionadaId = String(equipesLideradas[0].id);
-      btnConfirmar.disabled = false;
 
       areaDetalhes.innerHTML = `
         <label for="selectEquipeInscricao" style="display: block; font-size: 13px; font-weight: 600; color: #e5e5ff; margin-bottom: 8px;">
           Selecione a equipe para disputar o torneio:
         </label>
-        <select id="selectEquipeInscricao" style="width: 100%; background: #12121a; border: 1px solid #3b3b4f; color: #ffffff; padding: 10px 12px; border-radius: 8px; font-size: 14px; margin-bottom: 12px;">
+        <select id="selectEquipeInscricao" style="width: 100%; background: #12121a; border: 1.5px solid #3b3b4f; color: #ffffff; padding: 10px 12px; border-radius: 8px; font-size: 14px; margin-bottom: 14px;">
           ${equipesLideradas.map(eq => `
             <option value="${escapeHtml(eq.id)}">${escapeHtml(eq.nome)} ${eq.tag ? '[' + escapeHtml(eq.tag) + ']' : ''}</option>
           `).join('')}
         </select>
-        <div id="previewEquipeSelecionada" style="display: flex; align-items: center; gap: 10px; margin-top: 4px;">
-          <!-- Detalhes da equipe selecionada -->
+
+        <div id="containerLineupEscalacao">
+          <!-- Renderizado dinamicamente via carregarLineupEquipe -->
         </div>
       `;
 
       const selectEl = areaDetalhes.querySelector('#selectEquipeInscricao');
-      const previewEl = areaDetalhes.querySelector('#previewEquipeSelecionada');
 
-      const atualizarPreview = () => {
-        const teamId = selectEl.value;
-        equipeSelecionadaId = teamId;
+      const carregarLineupEquipe = async (teamId) => {
         const eq = equipesLideradas.find(t => String(t.id) === String(teamId));
-        if (eq && previewEl) {
-          previewEl.innerHTML = `
-            <img
-              src="${eq.logo || '/equipes/image/the%20caras.png'}"
-              alt="${escapeHtml(eq.nome)}"
-              onerror="this.src='/equipes/image/the%20caras.png'"
-              style="width: 36px; height: 36px; border-radius: 8px; object-fit: cover; border: 1px solid #3b82f6;"
-            />
-            <div>
-              <span style="font-size: 13px; font-weight: 600; color: #ffffff;">${escapeHtml(eq.nome)}</span>
-              <span style="display: block; font-size: 11px; color: #9ca3af;">Líder: ${escapeHtml(eq.leaderName || loggedUser.nome || loggedUser.email)}</span>
+        if (!eq) return;
+
+        const containerLineup = areaDetalhes.querySelector('#containerLineupEscalacao');
+        if (!containerLineup) return;
+
+        containerLineup.innerHTML = `
+          <div style="text-align: center; padding: 14px 0; color: #9ca3af;">
+            <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 20px; color: #ef4444;"></i>
+            <span style="display: block; margin-top: 8px; font-size: 12px;">Buscando integrantes com status 'Aceito'...</span>
+          </div>
+        `;
+
+        btnConfirmar.disabled = true;
+
+        try {
+          // 1. Consulta membros com status = 'Aceito'
+          const { data: membrosDb } = await supabase
+            .from('membros_equipe')
+            .select('id, equipe_id, user_email, status')
+            .or(`equipe_id.eq.${eq.id},equipe_id.eq.${eq.nome}`)
+            .eq('status', 'Aceito');
+
+          const membrosAceitos = Array.isArray(membrosDb) ? membrosDb : [];
+
+          // 2. Monta lista de participantes da equipe (Líder + Membros Aceitos)
+          const leaderEmail = (eq.leaderEmail || loggedUser.email || '').toLowerCase().trim();
+          const uniqueEmails = new Set();
+          if (leaderEmail) uniqueEmails.add(leaderEmail);
+
+          membrosAceitos.forEach(m => {
+            const em = (m.user_email || '').toLowerCase().trim();
+            if (em) uniqueEmails.add(em);
+          });
+
+          const emailsArr = Array.from(uniqueEmails);
+
+          // 3. Busca detalhes de perfil (nome, avatar) na tabela usuarios
+          let usuariosMap = new Map();
+          if (emailsArr.length > 0) {
+            try {
+              const { data: usersDb } = await supabase
+                .from('usuarios')
+                .select('email, nome, avatar')
+                .in('email', emailsArr);
+
+              (usersDb || []).forEach(u => {
+                usuariosMap.set((u.email || '').toLowerCase().trim(), u);
+              });
+            } catch (uErr) {
+              console.warn('Aviso ao consultar perfis de usuários da line-up:', uErr);
+            }
+          }
+
+          // 4. Constrói o roster final para exibição das checkboxes
+          const roster = emailsArr.map(email => {
+            const isLeader = email === leaderEmail;
+            const profile = usuariosMap.get(email);
+            let nome = isLeader ? (eq.leaderName || profile?.nome || loggedUser.nome || 'Líder') : (profile?.nome || email.split('@')[0]);
+            let avatar = isLeader ? (eq.leaderAvatar || profile?.avatar || loggedUser.avatar || '/image/boneco_logo_ofc.png') : (profile?.avatar || '/image/boneco_logo_ofc.png');
+
+            return {
+              email,
+              nome,
+              avatar,
+              isLeader
+            };
+          });
+
+          // Renderiza o painel de Escalação de Line-up (Abordagem B)
+          containerLineup.innerHTML = `
+            <div style="background: #111118; border: 1px solid #28283a; border-radius: 10px; padding: 14px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+                <div>
+                  <strong style="color: #ffffff; font-size: 14px; display: flex; align-items: center; gap: 6px;">
+                    <i class="fa-solid fa-list-check" style="color: #ef4444;"></i> Escalação da Line-up
+                  </strong>
+                  <span style="font-size: 12px; color: #9ca3af; display: block; margin-top: 2px;">
+                    Marque quem vai jogar neste torneio (membros com status 'Aceito').
+                  </span>
+                </div>
+                <div id="badgeLineupContador" style="background: #1c1c28; border: 1.5px solid #3b82f6; color: #93c5fd; padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 700;">
+                  Escalados: <span id="escaladosCount">0</span> / ${maxIntegrantes}
+                </div>
+              </div>
+
+              <!-- TRAVA DE VAGAS: ALERTA OBRIGATÓRIO -->
+              <div id="lineupWarningTrava" style="display: none; background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; color: #fca5a5; padding: 10px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; margin-bottom: 12px; align-items: center; gap: 8px;">
+                <i class="fa-solid fa-circle-exclamation" style="color: #ef4444; font-size: 16px;"></i>
+                <span>Este torneio permite no máximo ${maxIntegrantes} integrantes por equipe.</span>
+              </div>
+
+              <div class="lineup-membros-lista" style="max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 4px;">
+                ${roster.map(m => `
+                  <label class="item-membro-checkbox" style="display: flex; align-items: center; justify-content: space-between; background: #161622; border: 1px solid #28283a; padding: 8px 12px; border-radius: 8px; cursor: pointer; transition: background 0.2s;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                      <input 
+                        type="checkbox" 
+                        class="chk-membro-lineup" 
+                        value="${escapeHtml(m.email)}" 
+                        data-nome="${escapeHtml(m.nome)}"
+                        data-avatar="${escapeHtml(m.avatar)}"
+                        style="width: 18px; height: 18px; accent-color: #ef4444; cursor: pointer;"
+                      >
+                      <img 
+                        src="${m.avatar}" 
+                        alt="${escapeHtml(m.nome)}" 
+                        onerror="this.src='/image/boneco_logo_ofc.png'" 
+                        style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;"
+                      >
+                      <div>
+                        <strong style="color: #ffffff; font-size: 13px; display: block;">${escapeHtml(m.nome)}</strong>
+                        <span style="font-size: 11px; color: #9ca3af;">${escapeHtml(m.email)}</span>
+                      </div>
+                    </div>
+                    <span style="font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; ${m.isLeader ? 'background: rgba(239, 68, 68, 0.2); color: #f87171;' : 'background: rgba(59, 130, 246, 0.2); color: #60a5fa;'}">
+                      ${m.isLeader ? 'Capitão' : 'Aceito'}
+                    </span>
+                  </label>
+                `).join('')}
+              </div>
             </div>
+          `;
+
+          // Configura a Trava Estrita de Vagas nas checkboxes
+          const checkboxes = containerLineup.querySelectorAll('.chk-membro-lineup');
+          const warningEl = containerLineup.querySelector('#lineupWarningTrava');
+          const countEl = containerLineup.querySelector('#escaladosCount');
+
+          const atualizarContadorETrava = (checkboxClicada) => {
+            const marcados = Array.from(checkboxes).filter(c => c.checked);
+
+            // TRAVA DE VAGAS: Se ultrapassar o máximo permitido pelo torneio
+            if (marcados.length > maxIntegrantes) {
+              if (checkboxClicada) {
+                checkboxClicada.checked = false; // Bloqueia a marcação
+              }
+              if (warningEl) {
+                warningEl.style.display = 'flex';
+              }
+              showToast(`Este torneio permite no máximo ${maxIntegrantes} integrantes por equipe.`);
+              return;
+            } else {
+              if (warningEl) {
+                warningEl.style.display = 'none';
+              }
+            }
+
+            const totalAtuais = Array.from(checkboxes).filter(c => c.checked).length;
+            if (countEl) countEl.textContent = totalAtuais;
+            btnConfirmar.disabled = (totalAtuais === 0);
+          };
+
+          checkboxes.forEach(chk => {
+            chk.addEventListener('change', () => atualizarContadorETrava(chk));
+          });
+
+          // Seleciona automaticamente o capitão/líder por padrão se houver vaga
+          if (checkboxes.length > 0 && maxIntegrantes >= 1) {
+            checkboxes[0].checked = true;
+            if (countEl) countEl.textContent = '1';
+            btnConfirmar.disabled = false;
+          } else {
+            btnConfirmar.disabled = true;
+          }
+
+        } catch (errLineup) {
+          console.error('Erro ao montar escalação da equipe:', errLineup);
+          containerLineup.innerHTML = `
+            <p style="font-size: 13px; color: #ef4444; margin: 0;">
+              <i class="fa-solid fa-triangle-exclamation"></i> Erro ao carregar integrantes da equipe.
+            </p>
           `;
         }
       };
 
-      selectEl.addEventListener('change', atualizarPreview);
-      atualizarPreview();
+      selectEl.addEventListener('change', () => {
+        equipeSelecionadaId = selectEl.value;
+        carregarLineupEquipe(selectEl.value);
+      });
+
+      // Carrega a line-up da primeira equipe
+      carregarLineupEquipe(equipeSelecionadaId);
 
     } catch (err) {
       console.error('Falha ao carregar equipes:', err);
@@ -994,11 +1478,15 @@ function abrirModalEscolhaInscricao(torneio, loggedUser, onSucesso) {
     }
   }
 
-  optInd.addEventListener('click', renderDetalhesIndividual);
-  optEq.addEventListener('click', renderDetalhesEquipe);
+  if (optInd) optInd.addEventListener('click', renderDetalhesIndividual);
+  if (optEq) optEq.addEventListener('click', renderDetalhesEquipe);
 
-  // Inicializa com Individual
-  renderDetalhesIndividual();
+  // Inicialização condicional: se for Apenas Equipe vai direto para Equipe, senão Individual
+  if (apenasEquipe) {
+    renderDetalhesEquipe();
+  } else {
+    renderDetalhesIndividual();
+  }
 
   // Ação de confirmação
   btnConfirmar.addEventListener('click', async () => {
@@ -1006,12 +1494,42 @@ function abrirModalEscolhaInscricao(torneio, loggedUser, onSucesso) {
     btnConfirmar.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Inscrevendo...';
 
     const idParticipante = tipoSelecionado === 'equipe' ? String(equipeSelecionadaId) : loggedUser.email;
+    let equipeNome = '';
+    let lineupEscalados = [];
+
+    if (tipoSelecionado === 'equipe') {
+      const eq = equipesLideradas.find(t => String(t.id) === String(equipeSelecionadaId));
+      if (eq) equipeNome = eq.nome;
+
+      const checkboxesMarcados = Array.from(areaDetalhes.querySelectorAll('.chk-membro-lineup:checked'));
+      lineupEscalados = checkboxesMarcados.map(c => ({
+        email: c.value,
+        nome: c.getAttribute('data-nome') || c.value,
+        avatar: c.getAttribute('data-avatar') || '/image/boneco_logo_ofc.png'
+      }));
+
+      if (lineupEscalados.length === 0) {
+        showToast('Selecione pelo menos 1 integrante para a line-up da equipe.');
+        btnConfirmar.disabled = false;
+        btnConfirmar.innerHTML = '<i class="fa-solid fa-check"></i> Confirmar Inscrição';
+        return;
+      }
+
+      if (lineupEscalados.length > maxIntegrantes) {
+        showToast(`Este torneio permite no máximo ${maxIntegrantes} integrantes por equipe.`);
+        btnConfirmar.disabled = false;
+        btnConfirmar.innerHTML = '<i class="fa-solid fa-check"></i> Confirmar Inscrição';
+        return;
+      }
+    }
 
     const novaInscricao = {
       torneio_id: String(torneio.id),
       user_email: loggedUser.email,
       tipo: tipoSelecionado,
       id_participante: idParticipante,
+      equipe_nome: equipeNome,
+      lineup: lineupEscalados,
       status: 'Pendente',
       created_at: new Date().toISOString()
     };
@@ -1024,7 +1542,17 @@ function abrirModalEscolhaInscricao(torneio, loggedUser, onSucesso) {
           .insert([novaInscricao]);
 
         if (insErr) {
-          console.warn('Aviso na gravação no Supabase inscricoes:', insErr);
+          console.warn('Aviso no Supabase inscricoes, tentando payload base:', insErr);
+          // Fallback caso a tabela no Supabase não tenha as colunas equipe_nome ou lineup
+          const payloadBase = {
+            torneio_id: String(torneio.id),
+            user_email: loggedUser.email,
+            tipo: tipoSelecionado,
+            id_participante: idParticipante,
+            status: 'Pendente',
+            created_at: new Date().toISOString()
+          };
+          await supabase.from('inscricoes').insert([payloadBase]);
         }
       } catch (errDb) {
         console.warn('Banco remoto inacessível, prosseguindo com cache local:', errDb);
@@ -1036,7 +1564,7 @@ function abrirModalEscolhaInscricao(torneio, loggedUser, onSucesso) {
       fechar();
       showToast(
         tipoSelecionado === 'equipe'
-          ? 'Inscrição da equipe enviada! Aguarde a aprovação do organizador.'
+          ? `Inscrição da equipe enviada com ${lineupEscalados.length} jogador(es) escalado(s)! Aguarde a aprovação do organizador.`
           : 'Inscrição individual enviada! Aguarde a aprovação do organizador.'
       );
 

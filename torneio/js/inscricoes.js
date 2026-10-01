@@ -4,9 +4,9 @@
 import { supabase } from '/supabaseClient.js';
 
 /**
- * Obtém o usuário logado a partir do localStorage
+ * Obtém o usuário logado a partir do localStorage ou valida com Supabase Auth
  */
-export function getLoggedUser() {
+export async function getLoggedUser() {
   const raw = localStorage.getItem('vh_loggedUser');
   if (raw) {
     try {
@@ -14,6 +14,25 @@ export function getLoggedUser() {
     } catch (e) {
       console.error('Erro ao ler usuário logado:', e);
     }
+  }
+
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session && session.user) {
+      const email = session.user.email;
+      const { data: profile } = await supabase.from('usuarios').select('id, nome, email, "dataNasc", bio, avatar, regiao, "jogosFavoritos", plataformas, banner, stats, conquistas').eq('email', email).maybeSingle();
+      const userObj = {
+        id: profile?.id || session.user.id,
+        nome: profile?.nome || session.user.user_metadata?.nome || email.split('@')[0],
+        email: email,
+        avatar: profile?.avatar || '/image/boneco_logo_ofc.png',
+        auth_id: session.user.id
+      };
+      localStorage.setItem('vh_loggedUser', JSON.stringify(userObj));
+      return userObj;
+    }
+  } catch (err) {
+    console.warn('Erro ao checar autenticação em inscricoes:', err);
   }
   return null;
 }
@@ -146,7 +165,7 @@ export async function configurarBotaoInscricao(btnElement, torneioInfo) {
   if (!btnElement || !torneioInfo) return;
 
   const torneioId = torneioInfo.id || torneioInfo.nome;
-  const user = getLoggedUser();
+  const user = await getLoggedUser();
 
   // Estado visual padrão de carregamento discreto
   if (user) {
@@ -163,7 +182,7 @@ export async function configurarBotaoInscricao(btnElement, torneioInfo) {
 
   btnElement.addEventListener('click', async (e) => {
     e.preventDefault();
-    const currentUser = getLoggedUser();
+    const currentUser = await getLoggedUser();
     if (!currentUser) {
       showToast('Você precisa estar logado para se inscrever! Redirecionando...', 'warning');
       setTimeout(() => {

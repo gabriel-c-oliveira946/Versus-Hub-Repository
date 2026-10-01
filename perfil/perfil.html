@@ -16,71 +16,89 @@
 </head>
 <body class="perfil-body">
 
-<!-- HEADER (mesmo padrão das outras páginas) -->
-<header>
-  <nav class="navbar">
-    <div class="header-left">
-      <button id="menuToggle" class="menu-button">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="menu-svg"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-      </button>
+  <!-- HEADER -->
+  <header>
+    <nav class="navbar">
 
-      <div class="logo_header">
-        <a href="/pagina_inicial/index.html">
-          <img referrerpolicy="no-referrer" src="/image/logo%20plus%20tipo%20textura.png" alt="VersusHub">
-        </a>
+      <!-- ESQUERDA: menu + logo -->
+      <div class="header-left">
+
+        <!-- Botão do menu lateral (hambúrguer) -->
+        <button id="menuToggle" class="menu-button" aria-label="Abrir menu lateral">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="menu-svg"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+
+        <!-- LOGO -->
+        <div class="logo_header">
+          <a href="/pagina_inicial/index.html">
+            <img referrerpolicy="no-referrer" src="/image/logo%20plus%20tipo%20textura.png" alt="VersusHub">
+          </a>
+        </div>
+
       </div>
-    </div>
 
-    <div class="botoes_header">
-      <a href="/aovivo/aovivo.html"><button id="aovivo_header">Ao Vivo</button></a>
-      <a href="/criar_torneio/criar_torneio.html"><button id="criar_header">Criar Torneio</button></a>
-      <a href="/equipes/equipes.html"><button id="equipes_header">Equipes</button></a>
-    </div>
-
-    <div class="header-right">
-      <form class="search-header" action="#" onsubmit="return false">
-        <input type="text" placeholder="Buscar torneios, jogos..." id="searchInput">
-        <button type="submit" id="searchBtn" aria-label="Buscar"><i class="fa-solid fa-magnifying-glass"></i></button>
-      </form>
-
-      <a href="/login/login.html" id="btentrar">Entrar</a>
-      <a href="/cadastro/cadastro.html" id="btcadastrar">Cadastrar-se</a>
-
-      <div class="user-icon">
-        <img referrerpolicy="no-referrer" src="/image/boneco_logo_ofc.png" alt="Usuário" id="userBtn">
-        <ul id="menuUser" class="hidden">
-          <li><a href="/login/login.html">Login</a></li>
-          <hr>
-          <li><a href="/cadastro/cadastro.html">Cadastro</a></li>
-        </ul>
+      <!-- CENTRO: botões principais -->
+      <div class="botoes_header">
+        <a href="/aovivo/aovivo.html"><button id="aovivo_header">Ao Vivo</button></a>
+        <a href="/criar_torneio/criar_torneio.html"><button id="criar_header">Criar Torneio</button></a>
+        <a href="/equipes/equipes.html"><button id="equipes_header">Equipes</button></a>
       </div>
-    </div>
-  </nav>
-</header>
-<!-- FIM HEADER -->
 
-<!-- SIDEBAR -->
-<aside id="sidebar" class="sidebar">
-  <h2 class="sidebar-title"></h2>
-  <nav class="sidebar-nav">
-    <a href="/pagina_inicial/index.html"><i class="fa-solid fa-house" style="margin-right: 10px; width: 16px; text-align: center;"></i>Início</a>
-    <a href="/pagina_inicial/torneios.html"><i class="fa-solid fa-trophy" style="margin-right: 10px; width: 16px; text-align: center;"></i>Todos os torneios</a>
-    <a href="/aovivo/aovivo.html"><i class="fa-solid fa-tower-broadcast" style="margin-right: 10px; width: 16px; text-align: center;"></i>Torneios ao vivo</a>
-    <a href="/criar_torneio/criar_torneio.html"><i class="fa-solid fa-award" style="margin-right: 10px; width: 16px; text-align: center;"></i>Criar Torneio</a>
-    <a href="/equipes/equipes.html"><i class="fa-solid fa-users" style="margin-right: 10px; width: 16px; text-align: center;"></i>Equipes</a>
-    <a href="/ranking.html"><i class="fa-solid fa-users-viewfinder" style="margin-right: 10px; width: 16px; text-align: center;"></i>Jogadores e Ranking</a>
-    <a href="/gerenciartorneios/gerentornindex.html"><i class="fa-solid fa-file-invoice" style="margin-right: 10px; width: 16px; text-align: center;"></i>Gerenciar torneios</a>
-    <a href="/equipes/gerenciar_equipes.html"><i class="fa-solid fa-list-check" style="margin-right: 10px; width: 16px; text-align: center;"></i>Gerenciar Equipes</a>
-    <a href="/termos/termos.html"><i class="fa-solid fa-briefcase" style="margin-right: 10px; width: 16px; text-align: center;"></i>Termos de Uso</a>
-    <a href="/feedback/feedback.html"><i class="fa-solid fa-star" style="margin-right: 10px; width: 16px; text-align: center;"></i>Enviar feedback / Sugestão</a>
-  </nav>
-</aside>
+      <!-- DIREITA: pesquisa + entrar + cadastrar + usuário -->
+      <div class="header-right">
+
+        <!-- BOTÕES À DIREITA -->
+        <a href="/login/login.html" id="btentrar">Entrar</a>
+        <a href="/cadastro/cadastro.html" id="btcadastrar">Cadastrar-se</a>
+
+        <!-- ÍCONE DO USUÁRIO -->
+        <div class="user-icon">
+          <img referrerpolicy="no-referrer" src="/image/boneco_logo_ofc.png" alt="Usuário" id="userBtn">
+
+          <ul id="menuUser" class="hidden">
+            <li>
+              <a href="/login/login.html"><i class="fa-solid fa-right-to-bracket" style="margin-right: 8px;"></i>Login</a>
+            </li>
+            <hr>
+            <li>
+              <a href="/cadastro/cadastro.html"><i class="fa-solid fa-user-plus" style="margin-right: 8px;"></i>Cadastro</a>
+            </li>
+            <hr>
+            <li>
+              <a href="/gerenciartorneios/gerentornindex.html"><i class="fa-solid fa-file-invoice" style="margin-right: 8px;"></i>Gerenciar Torneios</a>
+            </li>
+            <li>
+              <a href="/equipes/gerenciar_equipes.html"><i class="fa-solid fa-list-check" style="margin-right: 8px;"></i>Gerenciar Equipes</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+    </nav>
+  </header>
+  <!-- FIM HEADER -->
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar" class="sidebar">
+    <h2 class="sidebar-title"></h2>
+    <nav class="sidebar-nav">
+      <a href="/pagina_inicial/index.html"><i class="fa-solid fa-house" style="margin-right: 10px; width: 16px; text-align: center;"></i>Início</a>
+      <a href="/pagina_inicial/torneios.html"><i class="fa-solid fa-trophy" style="margin-right: 10px; width: 16px; text-align: center;"></i>Todos os torneios</a>
+      <a href="/aovivo/aovivo.html"><i class="fa-solid fa-tower-broadcast" style="margin-right: 10px; width: 16px; text-align: center;"></i>Torneios ao vivo</a>
+      <a href="/criar_torneio/criar_torneio.html"><i class="fa-solid fa-award" style="margin-right: 10px; width: 16px; text-align: center;"></i>Criar Torneio</a>
+      <a href="/equipes/equipes.html"><i class="fa-solid fa-users" style="margin-right: 10px; width: 16px; text-align: center;"></i>Equipes</a>
+      <a href="/ranking.html"><i class="fa-solid fa-users-viewfinder" style="margin-right: 10px; width: 16px; text-align: center;"></i>Jogadores e Ranking</a>
+      <a href="/gerenciartorneios/gerentornindex.html"><i class="fa-solid fa-file-invoice" style="margin-right: 10px; width: 16px; text-align: center;"></i>Gerenciar torneios</a>
+      <a href="/equipes/gerenciar_equipes.html"><i class="fa-solid fa-list-check" style="margin-right: 10px; width: 16px; text-align: center;"></i>Gerenciar Equipes</a>
+      <a href="/termos/termos.html"><i class="fa-solid fa-briefcase" style="margin-right: 10px; width: 16px; text-align: center;"></i>Termos de Uso</a>
+      <a href="/feedback/feedback.html"><i class="fa-solid fa-star" style="margin-right: 10px; width: 16px; text-align: center;"></i>Enviar feedback / Sugestão</a>
+    </nav>
+  </aside>
 
   <!-- efeito da tela ficar escura no fundo -->
-
-<div id="sidebarOverlay" class="sidebar-overlay"></div>
-
-<!-- FIM SIDEBAR -->
+  <div id="sidebarOverlay" class="sidebar-overlay"></div>
+  <!-- FIM SIDEBAR -->
 
 
 <!-- CONTEÚDO PERFIL -->
@@ -135,10 +153,15 @@
         </div>
       </div>
 
-      <!-- BOTÃO VISUALIZAR PERFIL PÚBLICO -->
-      <a href="/perfil/perfil-publico.html" class="btn-view-public">
-        <i class="fa-solid fa-eye"></i> Visualizar Perfil Público
-      </a>
+      <!-- BOTÃO VISUALIZAR PERFIL PÚBLICO E ALTERAR SENHA -->
+      <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
+        <a href="/perfil/perfil-publico.html" class="btn-view-public">
+          <i class="fa-solid fa-eye"></i> Visualizar Perfil Público
+        </a>
+        <button type="button" class="btn-change-password-sidebar" id="btnOpenChangePassword">
+          <i class="fa-solid fa-key"></i> Alterar Senha
+        </button>
+      </div>
     </div>
 
     <!-- COLUNA DA DIREITA: CONFIGURAÇÕES E FORMULÁRIOS COM ABAS -->
@@ -154,6 +177,9 @@
         </button>
         <button type="button" class="tab-btn-perfil" data-target="aba-historico">
           <i class="fa-solid fa-trophy"></i> Conquistas
+        </button>
+        <button type="button" class="tab-btn-perfil" data-target="aba-seguranca">
+          <i class="fa-solid fa-shield-halved"></i> Segurança
         </button>
       </div>
 
@@ -372,6 +398,45 @@
         </div>
       </div>
 
+      <!-- ========================================== -->
+      <!-- ABA 4: SEGURANÇA E ALTERAÇÃO DE SENHA      -->
+      <!-- ========================================== -->
+      <div id="aba-seguranca" class="tab-container-perfil" style="display: none;">
+        <div class="section-header-block">
+          <h2 class="section-title"><i class="fa-solid fa-shield-halved"></i> Segurança da Conta & Alteração de Senha</h2>
+        </div>
+        
+        <div class="section">
+          <p style="color: #9ca3af; font-size: 14px; margin-top: 0; margin-bottom: 20px; line-height: 1.5;">
+            Atualize sua senha de acesso ao VersusHub com total segurança. A nova senha deve conter no mínimo <strong>6 caracteres</strong>.
+          </p>
+
+          <form id="formAlterarSenhaPerfil" autocomplete="off">
+            <div class="form-grid">
+              <div class="form-block">
+                <label for="inputNovaSenha">Nova Senha *</label>
+                <input class="input-box" id="inputNovaSenha" type="password" placeholder="Digite sua nova senha (mínimo 6 caracteres)" minlength="6" required>
+                <div id="novaSenhaErrorMsg" class="form-error-hint" style="display: none;"></div>
+              </div>
+
+              <div class="form-block">
+                <label for="inputConfirmarSenha">Confirmar Nova Senha *</label>
+                <input class="input-box" id="inputConfirmarSenha" type="password" placeholder="Repita a nova senha" minlength="6" required>
+                <div id="confirmarSenhaErrorMsg" class="form-error-hint" style="display: none;"></div>
+              </div>
+            </div>
+
+            <div id="senhaStatusMsg" class="form-feedback-box" style="display: none; margin-top: 18px;"></div>
+
+            <div style="margin-top: 24px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+              <button type="submit" id="btnSalvarNovaSenha" class="btn-save-profile" style="background: #d41111;">
+                <i class="fa-solid fa-key"></i> Atualizar Senha
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
       <!-- BOTÃO SALVAR ALTERAÇÕES GLOBAL -->
       <div class="save-row">
         <button id="btnSaveProfile" class="btn-save-profile" type="button">
@@ -383,6 +448,33 @@
   </div>
 </div>
 <!-- FIM CONTEÚDO PERFIL -->
+
+<!-- MODAL FLUTUANTE DE ALTERAÇÃO DE SENHA -->
+<div id="modalAlterarSenha" class="modal-overlay" style="display: none;">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3><i class="fa-solid fa-key" style="color: #ff3b30;"></i> Alterar Senha</h3>
+      <button type="button" class="modal-close" id="btnFecharModalSenha" aria-label="Fechar">&times;</button>
+    </div>
+    <form id="formModalAlterarSenha" autocomplete="off">
+      <div class="form-group">
+        <label for="modalNovaSenha">Nova Senha *</label>
+        <input type="password" id="modalNovaSenha" placeholder="Mínimo 6 caracteres" minlength="6" required>
+        <div id="modalNovaSenhaError" class="form-error-hint" style="display: none;"></div>
+      </div>
+      <div class="form-group">
+        <label for="modalConfirmarSenha">Confirmar Nova Senha *</label>
+        <input type="password" id="modalConfirmarSenha" placeholder="Repita a nova senha" minlength="6" required>
+        <div id="modalConfirmarSenhaError" class="form-error-hint" style="display: none;"></div>
+      </div>
+      <div id="modalSenhaStatus" class="form-feedback-box" style="display: none; margin-top: 12px;"></div>
+      <div class="modal-buttons" style="margin-top: 24px;">
+        <button type="button" class="btn-cancel" id="btnCancelarModalSenha">Cancelar</button>
+        <button type="submit" class="btn-save" id="btnSalvarModalSenha">Atualizar Senha</button>
+      </div>
+    </form>
+  </div>
+</div>
 
 
  <!-- PARTE DE BAIXO DO SITE< CHAMADA DE FOOTER -->
