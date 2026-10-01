@@ -64,7 +64,10 @@
 
     @media (max-width: 960px) {
       .manage-grid {
-        grid-template-columns: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        max-width: 100% !important;
         gap: 20px !important;
       }
     }
@@ -75,6 +78,8 @@
       border-radius: 16px;
       padding: 20px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+      min-width: 0;
+      box-sizing: border-box;
     }
 
     .teams-section-title {
@@ -97,14 +102,16 @@
       background: #181820;
       border: 1px solid #272735;
       border-radius: 12px;
-      padding: 12px 14px;
-      margin-bottom: 10px;
+      padding: 14px;
+      margin-bottom: 12px;
       cursor: pointer;
       transition: all 0.2s ease;
       display: flex;
-      align-items: center;
-      justify-content: space-between;
+      flex-direction: column;
+      align-items: stretch;
       gap: 12px;
+      width: 100%;
+      box-sizing: border-box;
     }
 
     .team-select-card:hover {
@@ -164,41 +171,46 @@
       background: rgba(239, 68, 68, 0.12);
       color: #ef4444;
       border: 1px solid rgba(239, 68, 68, 0.3);
-      padding: 7px 12px;
+      padding: 9px 14px;
       border-radius: 8px;
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 700;
       cursor: pointer;
-      display: inline-flex;
+      display: flex;
       align-items: center;
-      gap: 6px;
+      justify-content: center;
+      gap: 8px;
       transition: all 0.2s ease;
       white-space: nowrap;
-      flex-shrink: 0;
+      width: 100%;
+      min-height: 40px;
+      box-sizing: border-box;
     }
 
     .btn-team-delete:hover {
       background: #ef4444;
       color: #ffffff;
       border-color: #ef4444;
-      transform: scale(1.03);
     }
 
     .btn-team-leave {
       background: rgba(245, 158, 11, 0.12);
       color: #f59e0b;
       border: 1px solid rgba(245, 158, 11, 0.3);
-      padding: 7px 12px;
+      padding: 9px 14px;
       border-radius: 8px;
-      font-size: 12px;
+      font-size: 13px;
       font-weight: 700;
       cursor: pointer;
-      display: inline-flex;
+      display: flex;
       align-items: center;
-      gap: 6px;
+      justify-content: center;
+      gap: 8px;
       transition: all 0.2s ease;
       white-space: nowrap;
-      flex-shrink: 0;
+      width: 100%;
+      min-height: 40px;
+      box-sizing: border-box;
     }
 
     .btn-team-leave:hover {
@@ -661,19 +673,24 @@
        ============================================================================== */
     @media (max-width: 960px) {
       .manage-grid {
-        grid-template-columns: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        max-width: 100% !important;
         gap: 20px !important;
       }
 
       .teams-sidebar-panel {
         width: 100% !important;
         max-width: 100% !important;
+        min-width: 0 !important;
         box-sizing: border-box !important;
       }
 
       #teamDetailsPanel {
         width: 100% !important;
         max-width: 100% !important;
+        min-width: 0 !important;
         box-sizing: border-box !important;
       }
     }

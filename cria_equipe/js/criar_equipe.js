@@ -137,7 +137,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         leaderName: loggedUser?.nome || 'Líder',
         leaderAvatar: loggedUser?.avatar || '/image/boneco_logo_ofc.png',
         leaderEmail: loggedUser?.email || '',
-        leaderId: loggedUser?.auth_id || (loggedUser?.id && String(loggedUser.id).length === 36 ? loggedUser.id : null),
 
         torneiosGanhos: [],
         torneiosAtuais: [],

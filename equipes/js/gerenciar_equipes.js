@@ -219,13 +219,28 @@ document.addEventListener('DOMContentLoaded', async () => {
           const card = document.createElement('div');
           card.className = `team-select-card ${equipeSelecionada && String(equipeSelecionada.id) === String(eq.id) ? 'active' : ''}`;
           card.innerHTML = `
-            <img referrerpolicy="no-referrer" src="${eq.logo || '/image/logo.png'}" alt="${eq.nome}" onerror="this.src='/image/logo.png'">
             <div class="team-select-info">
-              <h3>${eq.nome} ${eq.tag ? `[${eq.tag}]` : ''}</h3>
-              <p>${eq.jogos || 'Geral'} • ${eq.plataforma || 'Todas'}</p>
+              <img referrerpolicy="no-referrer" src="${eq.logo || '/image/logo.png'}" alt="${eq.nome}" class="team-select-logo" onerror="this.src='/image/logo.png'">
+              <div class="team-select-text">
+                <h4>${eq.nome} ${eq.tag ? `<span style="color:#ef4444; font-size:12px;">[${eq.tag}]</span>` : ''}</h4>
+                <p>${eq.jogos || 'Multi-jogos'}</p>
+              </div>
             </div>
+            <button type="button" class="btn-team-delete" title="Excluir Equipe Permanentemente" data-id="${eq.id}">
+              <i class="fa-solid fa-trash-can"></i> Excluir
+            </button>
           `;
-          card.addEventListener('click', () => selecionarEquipe(eq));
+          card.addEventListener('click', (e) => {
+            if (e.target.closest('.btn-team-delete')) return;
+            selecionarEquipe(eq);
+          });
+          const btnDel = card.querySelector('.btn-team-delete');
+          if (btnDel) {
+            btnDel.addEventListener('click', (e) => {
+              e.stopPropagation();
+              confirmarExclusaoEquipe(eq);
+            });
+          }
           minhasEquipesList.appendChild(card);
         });
         selecionarEquipe(equipesLideradas[0]);
