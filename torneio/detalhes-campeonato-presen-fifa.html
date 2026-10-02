@@ -367,12 +367,28 @@ document.addEventListener('DOMContentLoaded', async () => {
       } catch (e) {}
     }
     
-    if (isJoined) {
-      btn.textContent = 'Já inscrito';
-      btn.disabled = true;
-      btn.style.background = '#2c2c3b';
-      btn.style.cursor = 'not-allowed';
-    }
+    const atualizarBotao = (inscrito) => {
+      isJoined = inscrito;
+      if (inscrito) {
+        btn.disabled = false;
+        btn.className = 'btn-principal btn-cancelar-inscricao';
+        btn.innerHTML = '<i class="fa-solid fa-user-xmark" style="margin-right: 6px;"></i> Cancelar Inscrição';
+        btn.style.background = '#dc2626';
+        btn.style.border = '2px solid #ef4444';
+        btn.style.color = '#ffffff';
+        btn.style.cursor = 'pointer';
+      } else {
+        btn.className = 'btn-principal';
+        btn.disabled = false;
+        btn.innerHTML = 'Inscrever-se';
+        btn.style.background = '#d41111';
+        btn.style.border = '2px solid #d41111';
+        btn.style.color = '#ffffff';
+        btn.style.cursor = 'pointer';
+      }
+    };
+
+    atualizarBotao(isJoined);
 
     btn.addEventListener('click', async () => {
       const loggedUser = getLoggedUser();
@@ -384,6 +400,41 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
       }
 
+      // Fluxo de Cancelar Inscrição
+      if (isJoined) {
+        const confirmar = window.confirm('Tem certeza de que deseja cancelar sua inscrição neste torneio?');
+        if (!confirmar) return;
+
+        btn.disabled = true;
+        const textoOriginal = btn.innerHTML;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Cancelando...';
+
+        try {
+          await supabase
+            .from('inscricoes')
+            .delete()
+            .eq('torneio_id', TORNEIO_INFO.id)
+            .eq('user_email', loggedUser.email);
+
+          try {
+            const storageKey = `vh_joinedTournaments_${loggedUser.email}`;
+            const arr = JSON.parse(localStorage.getItem(storageKey) || '[]');
+            const filtrado = arr.filter(t => t.id !== TORNEIO_INFO.id);
+            localStorage.setItem(storageKey, JSON.stringify(filtrado));
+          } catch (eC) {}
+
+          atualizarBotao(false);
+          showToast('Inscrição cancelada com sucesso!');
+        } catch (errCancel) {
+          console.error('Erro ao cancelar inscrição:', errCancel);
+          showToast('Não foi possível cancelar sua inscrição. Tente novamente.');
+          btn.disabled = false;
+          btn.innerHTML = textoOriginal;
+        }
+        return;
+      }
+
+      // Fluxo de Inscrição
       btn.disabled = true;
       btn.textContent = 'Inscrevendo...';
 
@@ -398,15 +449,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         addJoinedTournament(TORNEIO_INFO);
         showToast('Inscrição confirmada! Veja em "Participando" na aba Gerenciar Torneios.');
-        btn.textContent = 'Já inscrito';
-        btn.disabled = true;
-        btn.style.background = '#2c2c3b';
-        btn.style.cursor = 'not-allowed';
+        atualizarBotao(true);
       } catch (e) {
         console.error('Erro na inscrição:', e);
         showToast('Não foi possível concluir sua inscrição. Tente novamente.');
-        btn.disabled = false;
-        btn.textContent = 'Inscrever-se';
+        atualizarBotao(false);
       }
     });
   }

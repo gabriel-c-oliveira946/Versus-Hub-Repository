@@ -1288,3 +1288,448 @@ label {
   }
 }
 
+/* ==========================================================================
+   GERENCIAMENTO DE TORNEIOS NO PERFIL (ABAS, CARDS E EMPTY STATES)
+   ========================================================================== */
+
+.btn-subnav-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #e5e7eb;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.btn-subnav-action:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+}
+
+.btn-subnav-action.btn-primary {
+  background: #d41111;
+  color: #ffffff;
+  border-color: #ef4444;
+  box-shadow: 0 4px 14px rgba(212, 17, 17, 0.3);
+}
+
+.btn-subnav-action.btn-primary:hover {
+  background: #ef4444;
+  box-shadow: 0 6px 18px rgba(239, 68, 68, 0.45);
+}
+
+/* Sub-abas na Área de Torneios */
+.perfil-torneios-subtabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 14px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.subtab-btn-perfil {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #9ca3af;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.subtab-btn-perfil:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.subtab-btn-perfil.active {
+  background: #d41111;
+  color: #ffffff;
+  border-color: #ef4444;
+  box-shadow: 0 4px 14px rgba(212, 17, 17, 0.35);
+}
+
+.subtab-badge {
+  background: rgba(0, 0, 0, 0.35);
+  color: #cbd5e1;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.subtab-btn-perfil.active .subtab-badge {
+  background: rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+}
+
+/* Grid de Torneios */
+.perfil-torneios-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 22px;
+  width: 100%;
+}
+
+@media (max-width: 640px) {
+  .perfil-torneios-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Card de Torneio no Perfil */
+.card-torneio-perfil {
+  background: #171720;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25);
+}
+
+.card-torneio-perfil:hover {
+  transform: translateY(-4px);
+  border-color: rgba(239, 68, 68, 0.45);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+}
+
+.card-torneio-banner {
+  position: relative;
+  width: 100%;
+  height: 145px;
+  background: #0d0d12;
+  overflow: hidden;
+}
+
+.card-torneio-banner img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.35s ease;
+}
+
+.card-torneio-perfil:hover .card-torneio-banner img {
+  transform: scale(1.06);
+}
+
+.card-torneio-status-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 4px 10px;
+  border-radius: 6px;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+
+.card-torneio-status-badge.status-aberto {
+  background: rgba(16, 185, 129, 0.85);
+  color: #ffffff;
+  border: 1px solid #10b981;
+}
+
+.card-torneio-status-badge.status-andamento {
+  background: rgba(239, 68, 68, 0.85);
+  color: #ffffff;
+  border: 1px solid #ef4444;
+}
+
+.card-torneio-status-badge.status-encerrado {
+  background: rgba(107, 114, 128, 0.85);
+  color: #f3f4f6;
+  border: 1px solid #6b7280;
+}
+
+.card-torneio-info {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 8px;
+}
+
+.card-torneio-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-torneio-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  color: #9ca3af;
+  flex-wrap: wrap;
+}
+
+.card-torneio-meta-row span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.card-torneio-meta-row i {
+  color: #ef4444;
+}
+
+.card-torneio-role-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: rgba(59, 130, 246, 0.12);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.28);
+  margin-top: 2px;
+  align-self: flex-start;
+}
+
+.card-torneio-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 14px;
+}
+
+.btn-card-torneio-primary {
+  flex: 1;
+  background: #d41111;
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 10px 14px;
+  border-radius: 8px;
+  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.btn-card-torneio-primary:hover {
+  background: #ef4444;
+  transform: translateY(-1px);
+  color: #ffffff;
+}
+
+.btn-card-torneio-secondary {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #e5e7eb;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 10px 14px;
+  border-radius: 8px;
+  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.btn-card-torneio-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+/* Empty State Amigável */
+.empty-state-torneios {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 48px 24px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+}
+
+.empty-state-icon-box {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: rgba(212, 17, 17, 0.1);
+  border: 1px solid rgba(212, 17, 17, 0.28);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ef4444;
+  font-size: 28px;
+  margin-bottom: 18px;
+}
+
+.empty-state-title {
+  font-size: 18px;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 8px 0;
+}
+
+.empty-state-desc {
+  font-size: 14px;
+  color: #9ca3af;
+  max-width: 480px;
+  line-height: 1.55;
+  margin: 0 0 22px 0;
+}
+
+.btn-perfil-empty-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #d41111;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(212, 17, 17, 0.35);
+  transition: all 0.2s ease;
+}
+
+.btn-perfil-empty-cta:hover {
+  background: #ef4444;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.45);
+  color: #ffffff;
+}
+
+/* BANNER MODO VISITANTE E ESTILOS PÚBLICOS */
+.banner-modo-visitante {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.16) 0%, rgba(26, 26, 36, 0.95) 100%);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  border-radius: 12px;
+  padding: 16px 22px;
+  margin-bottom: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.35);
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.banner-visitante-conteudo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.banner-visitante-conteudo i {
+  font-size: 26px;
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.15);
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.banner-visitante-titulo {
+  display: block;
+  font-size: 16px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.3px;
+}
+
+.banner-visitante-sub {
+  display: block;
+  font-size: 13px;
+  color: #9ca3af;
+  margin-top: 3px;
+}
+
+.btn-banner-visitante {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #1f1f2b;
+  color: #ffffff;
+  border: 1px solid #3b3b4f;
+  padding: 9px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.btn-banner-visitante:hover {
+  background: #2e2e3f;
+  border-color: #ef4444;
+  color: #ef4444;
+  transform: translateY(-1px);
+}
+
+.email-display-visitor {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #9ca3af;
+  font-size: 13px;
+  background: #171720;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 10px 14px;
+  border-radius: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.email-display-visitor i {
+  color: #ef4444;
+}
+
+.tab-btn-highlight {
+  border-color: rgba(239, 68, 68, 0.35) !important;
+}
+
+.tab-btn-highlight.active {
+  background: rgba(239, 68, 68, 0.15) !important;
+  border-color: #ef4444 !important;
+  color: #ffffff !important;
+}
+
+

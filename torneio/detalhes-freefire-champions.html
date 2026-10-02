@@ -348,12 +348,28 @@
         } catch (e) {}
       }
 
-      if (isJoined) {
-        btnInscreverFF.textContent = 'Já inscrito';
-        btnInscreverFF.disabled = true;
-        btnInscreverFF.style.background = '#2c2c3b';
-        btnInscreverFF.style.cursor = 'not-allowed';
-      }
+      const atualizarBotao = (inscrito) => {
+        isJoined = inscrito;
+        if (inscrito) {
+          btnInscreverFF.disabled = false;
+          btnInscreverFF.className = 'btn-principal btn-cancelar-inscricao';
+          btnInscreverFF.innerHTML = '<i class="fa-solid fa-user-xmark" style="margin-right: 6px;"></i> Cancelar Inscrição';
+          btnInscreverFF.style.background = '#dc2626';
+          btnInscreverFF.style.border = '2px solid #ef4444';
+          btnInscreverFF.style.color = '#ffffff';
+          btnInscreverFF.style.cursor = 'pointer';
+        } else {
+          btnInscreverFF.className = 'btn-principal';
+          btnInscreverFF.disabled = false;
+          btnInscreverFF.innerHTML = 'Inscrever equipe';
+          btnInscreverFF.style.background = '#d41111';
+          btnInscreverFF.style.border = '2px solid #d41111';
+          btnInscreverFF.style.color = '#ffffff';
+          btnInscreverFF.style.cursor = 'pointer';
+        }
+      };
+
+      atualizarBotao(isJoined);
 
       btnInscreverFF.addEventListener('click', async () => {
         const loggedUser = getLoggedUser();
@@ -365,6 +381,41 @@
           return;
         }
 
+        // Fluxo de Cancelar Inscrição
+        if (isJoined) {
+          const confirmar = window.confirm('Tem certeza de que deseja cancelar sua inscrição neste torneio?');
+          if (!confirmar) return;
+
+          btnInscreverFF.disabled = true;
+          const textoOriginal = btnInscreverFF.innerHTML;
+          btnInscreverFF.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Cancelando...';
+
+          try {
+            await supabase
+              .from('inscricoes')
+              .delete()
+              .eq('torneio_id', FF_TORNEIO_INFO.id)
+              .eq('user_email', loggedUser.email);
+
+            try {
+              const storageKey = `vh_joinedTournaments_${loggedUser.email}`;
+              const arr = JSON.parse(localStorage.getItem(storageKey) || '[]');
+              const filtrado = arr.filter(t => t.id !== FF_TORNEIO_INFO.id);
+              localStorage.setItem(storageKey, JSON.stringify(filtrado));
+            } catch (eC) {}
+
+            atualizarBotao(false);
+            showToast('Inscrição cancelada com sucesso!');
+          } catch (errCancel) {
+            console.error('Erro ao cancelar inscrição:', errCancel);
+            showToast('Não foi possível cancelar sua inscrição. Tente novamente.');
+            btnInscreverFF.disabled = false;
+            btnInscreverFF.innerHTML = textoOriginal;
+          }
+          return;
+        }
+
+        // Fluxo de Inscrição
         btnInscreverFF.disabled = true;
         btnInscreverFF.textContent = 'Inscrevendo...';
 
@@ -379,15 +430,11 @@
 
           addJoinedTournament(FF_TORNEIO_INFO);
           showToast('Inscrição realizada com sucesso! Confira na aba "Participando" em Gerenciar Torneios.');
-          btnInscreverFF.textContent = 'Já inscrito';
-          btnInscreverFF.disabled = true;
-          btnInscreverFF.style.background = '#2c2c3b';
-          btnInscreverFF.style.cursor = 'not-allowed';
+          atualizarBotao(true);
         } catch (err) {
           console.error('Erro na inscrição:', err);
           showToast('Não foi possível registrar sua inscrição. Tente novamente.');
-          btnInscreverFF.disabled = false;
-          btnInscreverFF.textContent = 'Inscrever equipe';
+          atualizarBotao(false);
         }
       });
     }

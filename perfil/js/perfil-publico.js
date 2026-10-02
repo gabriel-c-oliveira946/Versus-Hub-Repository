@@ -345,7 +345,18 @@ async function renderPublicProfile(userData) {
         teamsContainer.appendChild(card);
       });
     } else {
-      teamsContainer.innerHTML = '<div class="bento-card" style="grid-column: 1/-1; text-align: center; color: #9ca3af; font-size: 14px;">Jogador Solo - Nenhuma equipe registrada.</div>';
+      teamsContainer.innerHTML = `
+        <div style="grid-column: 1 / -1; background: #111116; border: 1px solid #2a2a38; border-radius: 14px; padding: 36px 20px; text-align: center; color: #9ca3af;">
+          <i class="fa-solid fa-users-slash" style="font-size: 32px; color: #4b5563; margin-bottom: 12px; display: block;"></i>
+          <h4 style="color: #ffffff; margin: 0 0 6px; font-size: 15px;">Jogador Solo</h4>
+          <p style="margin: 0; font-size: 13px;">Este jogador ainda não está associado a nenhuma equipe registrada.</p>
+        </div>
+      `;
+    }
+
+    const publicTeamsCountBadge = document.getElementById('publicTeamsCountBadge');
+    if (publicTeamsCountBadge) {
+      publicTeamsCountBadge.textContent = String(userTeams.length);
     }
   }
 
@@ -389,6 +400,94 @@ async function renderPublicProfile(userData) {
       achContainer.appendChild(item);
     });
   }
+
+  // 5.5 Torneios Criados pelo Jogador / Organizador
+  const tournamentsGrid = document.getElementById('publicTournamentsGrid');
+  const countBadge = document.getElementById('publicTournamentsCountBadge');
+  if (tournamentsGrid) {
+    try {
+      const userEmail = (userData.email || '').toLowerCase().trim();
+      let createdTournaments = [];
+      if (userEmail) {
+        const { data, error } = await supabase
+          .from('torneios')
+          .select('*')
+          .ilike('criadorEmail', userEmail)
+          .order('created_at', { ascending: false });
+
+        if (!error && Array.isArray(data)) {
+          createdTournaments = data;
+        }
+      }
+
+      if (countBadge) {
+        countBadge.textContent = String(createdTournaments.length);
+      }
+
+      if (createdTournaments.length === 0) {
+        tournamentsGrid.innerHTML = `
+          <div style="grid-column: 1 / -1; background: #111116; border: 1px solid #2a2a38; border-radius: 14px; padding: 36px 20px; text-align: center; color: #9ca3af;">
+            <i class="fa-solid fa-trophy" style="font-size: 32px; color: #4b5563; margin-bottom: 12px; display: block;"></i>
+            <h4 style="color: #ffffff; margin: 0 0 6px; font-size: 15px;">Nenhum torneio criado ainda</h4>
+            <p style="margin: 0; font-size: 13px;">Este jogador ainda não organizou nenhum campeonato público no VersusHub.</p>
+          </div>
+        `;
+      } else {
+        tournamentsGrid.innerHTML = createdTournaments.map(t => {
+          const isLive = t.ao_vivo === true || (t.status && t.status.toLowerCase().includes('vivo'));
+          let statusBadgeClass = t.statusClass || 'status-aberto';
+          let statusText = t.status || 'Inscrições abertas';
+          if (isLive) {
+            statusBadgeClass = 'status-andamento';
+            statusText = '<i class="fa-solid fa-tower-broadcast"></i> Ao Vivo';
+          }
+          const link = t.link || ('/torneio/custom.html?id=' + encodeURIComponent(t.id));
+          return `
+            <article class="card-torneio-publico">
+              <div class="card-torneio-publico-banner">
+                <img referrerpolicy="no-referrer" src="${t.banner || '/images/cerradocup.jpg'}" alt="${t.nome || ''}" onerror="this.src='/images/cerradocup.jpg'">
+                <span class="card-torneio-publico-badge ${statusBadgeClass}">${statusText}</span>
+              </div>
+              <div class="card-torneio-publico-info">
+                <h3 class="card-torneio-publico-title">${t.nome || 'Torneio'}</h3>
+                <div class="card-torneio-publico-meta">
+                  <span><i class="fa-solid fa-gamepad"></i> ${t.jogo || 'Competitivo'}</span>
+                  <span><i class="fa-regular fa-calendar"></i> ${t.data || 'A definir'}</span>
+                </div>
+                <a href="${link}" class="btn-card-torneio-publico">
+                  <i class="fa-solid fa-arrow-up-right-from-square"></i> Ver Detalhes
+                </a>
+              </div>
+            </article>
+          `;
+        }).join('');
+      }
+    } catch (errTorn) {
+      console.warn('Erro ao carregar torneios públicos no perfil público:', errTorn);
+    }
+  }
+
+  // 5.6 Controle de Abas no Perfil Público: "Torneios do Jogador" e "Equipes do Jogador"
+  const publicTabBtns = document.querySelectorAll('.public-tab-btn');
+  const publicTabPanels = document.querySelectorAll('.public-tab-panel');
+
+  publicTabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetId = btn.getAttribute('data-target');
+      if (!targetId) return;
+
+      publicTabBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      publicTabPanels.forEach(p => {
+        if (p.id === targetId) {
+          p.style.display = 'block';
+        } else {
+          p.style.display = 'none';
+        }
+      });
+    });
+  });
 
   // 6. Assegura perfil estritamente Somente Leitura (remove eventuais botoes de edicao legados)
   document.querySelectorAll('.edit-btn, .btn-salvar, #btnSaveProfile, #inputPhoto, .change-photo-btn, .change-banner-btn').forEach(el => {
@@ -620,7 +719,7 @@ async function fetchUserProfile(idParam) {
 // Inicialização assíncrona consumindo o Supabase e suporte a múltiplos identificadores
 async function initPublicProfile() {
   const params = new URLSearchParams(window.location.search);
-  const id = params.get('id');
+  const id = params.get('id') || params.get('email') || params.get('user');
 
   try {
     const userData = await fetchUserProfile(id);

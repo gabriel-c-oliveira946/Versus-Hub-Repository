@@ -155,29 +155,89 @@ export async function cancelarInscricao(torneioId, userEmail) {
     .eq('user_email', userEmail);
 
   if (error) throw error;
+
+  // Limpa também do cache local se existir
+  try {
+    const storageKey = `vh_joinedTournaments_${userEmail}`;
+    const arr = JSON.parse(localStorage.getItem(storageKey) || '[]');
+    const filtrado = arr.filter(t => String(t.id) !== String(torneioId));
+    localStorage.setItem(storageKey, JSON.stringify(filtrado));
+
+    const localInsc = JSON.parse(localStorage.getItem('vh_inscricoes') || '[]');
+    const localFiltrado = localInsc.filter(i => !(String(i.torneio_id) === String(torneioId) && i.user_email === userEmail));
+    localStorage.setItem('vh_inscricoes', JSON.stringify(localFiltrado));
+  } catch (e) {}
+
   return true;
 }
 
+function torneioPermiteCancelamento(torneioInfo) {
+  const st = (torneioInfo?.status || 'Inscrições abertas').toLowerCase().trim();
+  return st.includes('abert') || st.includes('inscri');
+}
+
 /**
- * Configura automaticamente um botão de inscrição com verificação em tempo real
+ * Configura automaticamente um botão de inscrição com verificação em tempo real e cancelamento
  */
 export async function configurarBotaoInscricao(btnElement, torneioInfo) {
   if (!btnElement || !torneioInfo) return;
 
   const torneioId = torneioInfo.id || torneioInfo.nome;
+  let userInscrito = false;
+
+  const aplicarEstiloBotao = (inscrito) => {
+    userInscrito = inscrito;
+    if (inscrito) {
+      if (torneioPermiteCancelamento(torneioInfo)) {
+        btnElement.disabled = false;
+        btnElement.removeAttribute('disabled');
+        btnElement.className = 'btn-principal btn-cancelar-inscricao';
+        btnElement.innerHTML = '<i class="fa-solid fa-user-xmark" style="margin-right: 6px;"></i> Cancelar Inscrição';
+        btnElement.style.background = '#dc2626';
+        btnElement.style.borderColor = '#ef4444';
+        btnElement.style.color = '#ffffff';
+        btnElement.style.boxShadow = '0 4px 15px rgba(220, 38, 38, 0.4)';
+        btnElement.style.cursor = 'pointer';
+      } else {
+        btnElement.className = 'btn-principal';
+        btnElement.textContent = 'Já inscrito';
+        btnElement.disabled = true;
+        btnElement.style.background = '#1f2937';
+        btnElement.style.borderColor = '#374151';
+        btnElement.style.color = '#9ca3af';
+        btnElement.style.cursor = 'not-allowed';
+        btnElement.style.boxShadow = 'none';
+      }
+    } else {
+      btnElement.className = 'btn-principal';
+      btnElement.disabled = false;
+      btnElement.removeAttribute('disabled');
+      btnElement.textContent = torneioInfo.tipoInscricao === 'Apenas Equipe' ? 'Inscrever Equipe' : 'Inscrever-se';
+      btnElement.style.background = '#d41111';
+      btnElement.style.borderColor = '#d41111';
+      btnElement.style.color = '#ffffff';
+      btnElement.style.cursor = 'pointer';
+      btnElement.style.boxShadow = '0 0 14px rgba(212, 17, 17, 0.35)';
+    }
+  };
+
   const user = await getLoggedUser();
 
-  // Estado visual padrão de carregamento discreto
+  // Estado visual inicial
   if (user) {
     try {
       const { inscrita } = await verificarInscricao(torneioId, user.email);
       if (inscrita) {
-        definirBotaoComoInscrito(btnElement);
-        return;
+        aplicarEstiloBotao(true);
+      } else {
+        aplicarEstiloBotao(false);
       }
     } catch (e) {
       console.warn('Erro ao checar estado inicial de inscrição:', e);
+      aplicarEstiloBotao(false);
     }
+  } else {
+    aplicarEstiloBotao(false);
   }
 
   btnElement.addEventListener('click', async (e) => {
@@ -191,24 +251,48 @@ export async function configurarBotaoInscricao(btnElement, torneioInfo) {
       return;
     }
 
-    // Previne duplo clique
+    // Fluxo de Cancelar Inscrição
+    if (userInscrito) {
+      if (!torneioPermiteCancelamento(torneioInfo)) {
+        showToast('As inscrições deste torneio já estão encerradas e não podem ser canceladas.', 'warning');
+        return;
+      }
+
+      const confirmar = window.confirm('Tem certeza de que deseja cancelar sua inscrição neste torneio?');
+      if (!confirmar) return;
+
+      btnElement.disabled = true;
+      const textoOriginal = btnElement.innerHTML;
+      btnElement.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Cancelando...';
+
+      try {
+        await cancelarInscricao(torneioId, currentUser.email);
+        aplicarEstiloBotao(false);
+        showToast('Inscrição cancelada com sucesso!');
+      } catch (err) {
+        console.error('Erro ao cancelar inscrição:', err);
+        btnElement.disabled = false;
+        btnElement.innerHTML = textoOriginal;
+        showToast('Não foi possível cancelar sua inscrição. Tente novamente.', 'error');
+      }
+      return;
+    }
+
+    // Fluxo de Inscrever-se
     btnElement.disabled = true;
     const textoOriginal = btnElement.textContent;
     btnElement.textContent = 'Processando...';
 
     try {
-      // Checa duplicidade
       const { inscrita } = await verificarInscricao(torneioId, currentUser.email);
       if (inscrita) {
-        definirBotaoComoInscrito(btnElement);
+        aplicarEstiloBotao(true);
         showToast('Você já está inscrito neste torneio!');
         return;
       }
 
-      // Salva no banco de dados via Supabase
       await inscreverTorneio(torneioId, currentUser.email, 'Pendente');
 
-      // Atualiza cache local para compatibilidade
       try {
         const storageKey = `vh_joinedTournaments_${currentUser.email}`;
         const arr = JSON.parse(localStorage.getItem(storageKey) || '[]');
@@ -229,7 +313,7 @@ export async function configurarBotaoInscricao(btnElement, torneioInfo) {
         console.warn('Erro ao sincronizar cache local:', err);
       }
 
-      definirBotaoComoInscrito(btnElement);
+      aplicarEstiloBotao(true);
       showToast('Inscrição confirmada! Você pode acompanhar em Gerenciar Torneios.');
     } catch (err) {
       console.error('Erro ao realizar inscrição:', err);

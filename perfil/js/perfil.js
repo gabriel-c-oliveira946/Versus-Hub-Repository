@@ -80,30 +80,217 @@ document.addEventListener("DOMContentLoaded", () => {
     syncUserWithSupabase(u);
   }
 
-  let user = loadUser();
+  // 1. Identificação do Dono do Perfil (via URL ?id=... ou ?email=..., ou usuário logado)
+  const urlParams = new URLSearchParams(window.location.search);
+  const paramId = urlParams.get('id');
+  const paramEmail = urlParams.get('email') || urlParams.get('user');
+  const hasUrlTarget = Boolean(paramId || paramEmail);
 
-  // Sincroniza dados com a sessão do Supabase Auth
+  let loggedUser = loadUser();
+  let user = { ...loggedUser };
+  let isOwner = !hasUrlTarget;
+
+  // Atualiza interface gráfica conforme o dono do perfil e o modo de visualização (visitante vs dono)
+  function atualizarInterfaceDonoPerfil(targetUser, isOwnerMode) {
+    if (!targetUser) return;
+    const nome = targetUser.nome || (targetUser.email ? targetUser.email.split('@')[0] : 'Organizador');
+    const email = targetUser.email || '';
+
+    // Atualiza título da página
+    if (!isOwnerMode) {
+      document.title = `${nome} - Perfil Público | VersusHub`;
+    } else {
+      document.title = 'Meu Perfil - VersusHub';
+    }
+
+    // Preenche dados visuais do sidebar
+    if (displayName) displayName.textContent = nome;
+    if (inputUsername) inputUsername.value = nome;
+    if (emailInput) emailInput.value = email;
+
+    const emailDisplayVisitor = document.getElementById('emailDisplayVisitor');
+    const emailBoxContainer = document.getElementById('emailBoxContainer');
+    const spanEmailVisitor = document.getElementById('spanEmailVisitor');
+
+    if (spanRegiao) spanRegiao.textContent = targetUser.regiao || 'Brasil';
+    if (selectRegiao) selectRegiao.value = targetUser.regiao || 'Brasil';
+
+    // Plataformas
+    atualizarTextoPlataformas();
+
+    // Avatar
+    if (targetUser.avatar) {
+      if (imgProfile) imgProfile.style.backgroundImage = `url('${targetUser.avatar}')`;
+      if (headerUserImg) headerUserImg.src = targetUser.avatar;
+      if (avatarPreviewImg) avatarPreviewImg.src = targetUser.avatar;
+    } else {
+      if (imgProfile) imgProfile.style.backgroundImage = "url('/image/boneco_logo_ofc.png')";
+    }
+
+    // Banner
+    if (targetUser.banner && bannerPreviewImg) {
+      bannerPreviewImg.src = targetUser.banner;
+      bannerPreviewImg.style.display = "block";
+      if (bannerPlaceholder) bannerPlaceholder.style.display = "none";
+    }
+
+    // Biografia
+    if (bioTextarea) bioTextarea.value = targetUser.bio || '';
+
+    // Jogos preferidos
+    renderTags();
+
+    // Conquistas
+    renderAchievementsList();
+
+    // Link do perfil público
+    const btnLinkPerfilPublico = document.getElementById('btnLinkPerfilPublico');
+    if (btnLinkPerfilPublico) {
+      if (targetUser.id) {
+        btnLinkPerfilPublico.href = `/perfil/perfil-publico.html?id=${encodeURIComponent(targetUser.id)}`;
+      } else if (targetUser.email) {
+        btnLinkPerfilPublico.href = `/perfil/perfil-publico.html?email=${encodeURIComponent(targetUser.email)}`;
+      } else {
+        btnLinkPerfilPublico.href = '/perfil/perfil-publico.html';
+      }
+    }
+
+    // Descrição da seção de torneios criados
+    const descTorneiosCriados = document.getElementById('descTorneiosCriados');
+    if (descTorneiosCriados) {
+      if (isOwnerMode) {
+        descTorneiosCriados.textContent = 'Campeonatos organizados por você na comunidade VersusHub.';
+      } else {
+        descTorneiosCriados.textContent = `Campeonatos organizados por ${nome} na comunidade VersusHub.`;
+      }
+    }
+
+    const bannerModoVisitante = document.getElementById('bannerModoVisitante');
+    const bannerVisitanteSub = document.getElementById('bannerVisitanteSub');
+    const saveRow = document.getElementById('saveProfileRow');
+    const editOnlyTabs = document.querySelectorAll('.tab-edit-only');
+    const ownerOnlyElements = document.querySelectorAll('.btn-owner-only');
+    const btnCriarTorneioHeader = document.getElementById('btnCriarTorneioHeader');
+    const labelTabInfo = document.getElementById('labelTabInfo');
+    const addAchBox = document.querySelector('.add-conquista-box');
+
+    if (!isOwnerMode) {
+      // MODO VISITANTE (SEÇÃO PÚBLICA)
+      if (bannerModoVisitante) bannerModoVisitante.style.display = 'flex';
+      if (bannerVisitanteSub) bannerVisitanteSub.textContent = `Visualizando informações públicas e histórico de torneios organizados por ${nome}.`;
+
+      // Oculta botões exclusivos do dono
+      ownerOnlyElements.forEach(el => el.style.display = 'none');
+      if (emailBoxContainer) emailBoxContainer.style.display = 'none';
+      if (emailDisplayVisitor) {
+        emailDisplayVisitor.style.display = 'flex';
+        if (spanEmailVisitor) spanEmailVisitor.textContent = email || 'Não informado';
+      }
+      if (btnCriarTorneioHeader) btnCriarTorneioHeader.style.display = 'none';
+      if (saveRow) saveRow.style.display = 'none';
+
+      // Oculta abas privadas de edição (Aparência, Segurança)
+      editOnlyTabs.forEach(t => t.style.display = 'none');
+
+      if (labelTabInfo) labelTabInfo.textContent = 'Sobre o Jogador';
+
+      // Campos de formulário em modo somente leitura para visitante
+      if (inputUsername) inputUsername.readOnly = true;
+      if (bioTextarea) bioTextarea.readOnly = true;
+      if (selectRegiao) selectRegiao.disabled = true;
+      const platInputs = document.querySelectorAll('.platform-options input');
+      platInputs.forEach(inp => inp.disabled = true);
+      const labelJogoInput = document.getElementById('labelJogoInput');
+      const hintJogoInput = document.getElementById('hintJogoInput');
+      if (jogoInput) jogoInput.style.display = 'none';
+      if (labelJogoInput) labelJogoInput.textContent = 'Jogos Preferidos';
+      if (hintJogoInput) hintJogoInput.style.display = 'none';
+
+      if (addAchBox) addAchBox.style.display = 'none';
+
+      // Para visitantes, ativa por padrão a aba de Torneios Criados!
+      const tabTorneios = document.getElementById('tabBtnTorneiosCriados');
+      if (tabTorneios) {
+        tabTorneios.click();
+      }
+    } else {
+      // MODO DONO
+      if (bannerModoVisitante) bannerModoVisitante.style.display = 'none';
+      ownerOnlyElements.forEach(el => el.style.display = '');
+      if (emailBoxContainer) emailBoxContainer.style.display = 'flex';
+      if (emailDisplayVisitor) emailDisplayVisitor.style.display = 'none';
+      if (btnCriarTorneioHeader) btnCriarTorneioHeader.style.display = 'inline-flex';
+      editOnlyTabs.forEach(t => t.style.display = 'inline-flex');
+      if (labelTabInfo) labelTabInfo.textContent = 'Informações';
+      if (inputUsername) inputUsername.readOnly = false;
+      if (bioTextarea) bioTextarea.readOnly = false;
+      if (selectRegiao) selectRegiao.disabled = false;
+      const platInputs = document.querySelectorAll('.platform-options input');
+      platInputs.forEach(inp => inp.disabled = false);
+      if (jogoInput) jogoInput.style.display = 'block';
+      if (addAchBox) addAchBox.style.display = 'flex';
+    }
+  }
+
+  // Sincroniza dados com o Supabase (Dono alvo do perfil via URL ou Sessão do Usuário Logado)
   import('/supabaseClient.js').then(async ({ supabase }) => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session && session.user) {
-        const email = session.user.email;
-        const { data: dbUser } = await supabase
-          .from('usuarios')
-          .select('id, nome, email, "dataNasc", bio, avatar, regiao, "jogosFavoritos", plataformas, banner, stats, conquistas')
-          .eq('email', email)
-          .maybeSingle();
+      if (hasUrlTarget) {
+        let dbUser = null;
+        if (paramId) {
+          const { data } = await supabase
+            .from('usuarios')
+            .select('id, nome, email, "dataNasc", bio, avatar, regiao, "jogosFavoritos", plataformas, banner, stats, conquistas')
+            .eq('id', paramId)
+            .maybeSingle();
+          if (data) dbUser = data;
+        }
+        if (!dbUser && paramEmail) {
+          const { data } = await supabase
+            .from('usuarios')
+            .select('id, nome, email, "dataNasc", bio, avatar, regiao, "jogosFavoritos", plataformas, banner, stats, conquistas')
+            .ilike('email', paramEmail.trim())
+            .maybeSingle();
+          if (data) dbUser = data;
+        }
+
         if (dbUser) {
           user = { ...user, ...dbUser };
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
-          if (inputUsername) inputUsername.value = user.nome || "";
-          if (displayName) displayName.textContent = user.nome || "";
-          if (emailInput) emailInput.value = user.email || "";
-          if (bioTextarea) bioTextarea.value = user.bio || "";
-          if (imgProfile && user.avatar) imgProfile.src = user.avatar;
-          if (typeof renderTags === 'function') renderTags();
+        } else if (paramEmail) {
+          user = {
+            ...user,
+            email: paramEmail.trim(),
+            nome: paramEmail.split('@')[0],
+            regiao: 'Brasil',
+            plataformas: ['PC']
+          };
+        }
+
+        isOwner = Boolean(
+          loggedUser && user && (
+            (user.id && loggedUser.id && String(loggedUser.id) === String(user.id)) ||
+            (user.email && loggedUser.email && loggedUser.email.toLowerCase() === user.email.toLowerCase())
+          )
+        );
+      } else {
+        isOwner = true;
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session && session.user) {
+          const email = session.user.email;
+          const { data: dbUser } = await supabase
+            .from('usuarios')
+            .select('id, nome, email, "dataNasc", bio, avatar, regiao, "jogosFavoritos", plataformas, banner, stats, conquistas')
+            .eq('email', email)
+            .maybeSingle();
+          if (dbUser) {
+            user = { ...user, ...dbUser };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+          }
         }
       }
+
+      atualizarInterfaceDonoPerfil(user, isOwner);
+      carregarTorneiosCriadosEAtualizarUI(true);
     } catch (e) {
       console.warn("Aviso ao sincronizar perfil do banco:", e);
     }
@@ -180,6 +367,20 @@ document.addEventListener("DOMContentLoaded", () => {
           container.style.display = "none";
         }
       });
+
+      // Visibilidade do botão Salvar Perfil (apenas para o dono nas abas de formulário)
+      const saveRow = document.getElementById("saveProfileRow");
+      if (saveRow) {
+        if (isOwner && (targetId === "aba-info" || targetId === "aba-aparencia" || targetId === "aba-historico")) {
+          saveRow.style.display = "flex";
+        } else {
+          saveRow.style.display = "none";
+        }
+      }
+
+      if (targetId === "aba-torneios-criados") {
+        carregarTorneiosCriadosEAtualizarUI();
+      }
     });
   });
 
@@ -471,8 +672,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (novoNome) {
         if (novoNome.length < 2 || novoNome.length > 33) {
-          alert("O nome de usuário deve conter no mínimo 2 e no máximo 33 caracteres.");
           inputUsername.focus();
+          btnSaveProfile.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> Nome deve ter 2 a 33 caracteres';
+          btnSaveProfile.style.background = "#ef4444";
+          setTimeout(() => {
+            btnSaveProfile.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Salvar Perfil';
+            btnSaveProfile.style.background = "";
+          }, 3000);
           return;
         }
         user.nome = novoNome;
@@ -646,7 +852,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const desc = newAchDesc.value.trim();
 
       if (!title) {
-        alert("Digite um título para a conquista!");
+        newAchTitle.focus();
+        newAchTitle.classList.add("input-invalid");
+        setTimeout(() => newAchTitle.classList.remove("input-invalid"), 2000);
         return;
       }
 
@@ -1126,6 +1334,268 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 1800);
       }
     });
+  }
+
+  // ==============================================================================
+  // GERENCIAMENTO DE TORNEIOS NO PERFIL: TORNEIOS QUE PARTICIPO & CRIADOS
+  // ==============================================================================
+
+  let cachedSupabaseInstance = null;
+  async function getSupabase() {
+    if (!cachedSupabaseInstance) {
+      try {
+        const mod = await import('/supabaseClient.js');
+        cachedSupabaseInstance = mod.supabase;
+      } catch (err) {
+        console.warn('Erro ao importar supabaseClient em perfil.js:', err);
+      }
+    }
+    return cachedSupabaseInstance;
+  }
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  // ==============================================================================
+  // SEÇÃO PÚBLICA DE TORNEIOS CRIADOS NO PERFIL
+  // ==============================================================================
+
+  const badgeNavCriados = document.getElementById('badgeNavCriados');
+  const listaTorneiosCriadosEl = document.getElementById('listaTorneiosCriados');
+
+  let dadosTorneiosCriados = null;
+  let isCarregandoCriados = false;
+
+  function atualizarBadgeTorneiosCriados(total) {
+    if (badgeNavCriados) {
+      badgeNavCriados.textContent = String(total);
+    }
+  }
+
+  // Renderizador de Card de Torneio (Tema escuro VersusHub - Seção Pública)
+  function renderCardTorneio(t, isOwnerMode) {
+    const isLive = t.ao_vivo === true || (t.status && t.status.toLowerCase().includes('vivo'));
+    let statusBadgeClass = t.statusClass || 'status-aberto';
+    let statusText = t.status || 'Inscrições abertas';
+
+    if (isLive) {
+      statusBadgeClass = 'status-andamento';
+      statusText = '<i class="fa-solid fa-tower-broadcast"></i> Ao Vivo';
+    }
+
+    const actionsHtml = isOwnerMode
+      ? `
+        <div class="card-torneio-actions">
+          <a href="/gerenciartorneios/gerentornindex.html?id=${encodeURIComponent(t.id)}" class="btn-card-torneio-primary" title="Gerenciar torneio e inscrições">
+            <i class="fa-solid fa-sliders"></i> Gerenciar
+          </a>
+          <a href="${t.link}" class="btn-card-torneio-secondary" title="Página do torneio">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> Detalhes
+          </a>
+        </div>
+      `
+      : `
+        <div class="card-torneio-actions">
+          <a href="${t.link}" class="btn-card-torneio-primary" style="width: 100%; text-align: center;">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> Ver Detalhes do Torneio
+          </a>
+        </div>
+      `;
+
+    return `
+      <article class="card-torneio-perfil" data-id="${escapeHtml(t.id)}">
+        <div class="card-torneio-banner">
+          <img referrerpolicy="no-referrer" src="${t.banner || '/images/cerradocup.jpg'}" alt="${escapeHtml(t.nome)}" onerror="this.src='/images/cerradocup.jpg'">
+          <span class="card-torneio-status-badge ${statusBadgeClass}">${statusText}</span>
+        </div>
+        <div class="card-torneio-info">
+          <h3 class="card-torneio-title">${escapeHtml(t.nome)}</h3>
+          <div class="card-torneio-meta-row">
+            <span><i class="fa-solid fa-gamepad"></i> ${escapeHtml(t.jogo)}</span>
+            <span><i class="fa-regular fa-calendar"></i> ${escapeHtml(t.data)}</span>
+          </div>
+          ${actionsHtml}
+        </div>
+      </article>
+    `;
+  }
+
+  // Consulta torneios organizados pelo dono do perfil no Supabase
+  async function consultarTorneiosCriados(targetUser) {
+    if (!targetUser) return [];
+    const targetEmail = (targetUser.email || '').trim().toLowerCase();
+    const targetId = targetUser.id ? String(targetUser.id) : null;
+
+    let criadosDb = [];
+    const supabase = await getSupabase();
+
+    if (supabase && (targetEmail || targetId)) {
+      // 1. Consulta segura na tabela 'torneios' por criadorEmail
+      try {
+        if (targetEmail) {
+          const { data, error } = await supabase
+            .from('torneios')
+            .select('*')
+            .ilike('criadorEmail', targetEmail)
+            .order('created_at', { ascending: false });
+
+          if (!error && Array.isArray(data)) {
+            criadosDb.push(...data);
+          } else if (error) {
+            console.warn('Aviso ao consultar torneios criados por criadorEmail:', error);
+          }
+        }
+      } catch (errEmail) {
+        console.warn('Exceção ao consultar torneios por criadorEmail:', errEmail);
+      }
+
+      // 2. Fallback complementar por criador_id se disponível
+      if (criadosDb.length === 0 && targetId) {
+        try {
+          const { data: idData } = await supabase
+            .from('torneios')
+            .select('*')
+            .eq('criador_id', targetId)
+            .order('created_at', { ascending: false });
+
+          if (Array.isArray(idData)) {
+            idData.forEach(d => {
+              if (!criadosDb.some(x => String(x.id) === String(d.id))) {
+                criadosDb.push(d);
+              }
+            });
+          }
+        } catch (errId) {}
+      }
+    }
+
+    // 3. Se for o dono do perfil, mescla com cache local de torneios criados recentemente
+    if (isOwner) {
+      try {
+        const allLocal = JSON.parse(localStorage.getItem('vh_createdTournaments') || '[]');
+        const userLocal = allLocal.filter(t => {
+          const cEmail = (t.criadorEmail || t.criador_email || t.organizador_email || t.user_email || '').toLowerCase().trim();
+          return !cEmail || cEmail === targetEmail;
+        });
+
+        userLocal.forEach(loc => {
+          if (!criadosDb.some(d => String(d.id) === String(loc.id))) {
+            criadosDb.push(loc);
+          }
+        });
+      } catch (eLocalCriados) {}
+    }
+
+    return criadosDb.map(t => ({
+      id: t.id,
+      nome: t.nome || 'Torneio sem nome',
+      jogo: t.jogo || 'Competitivo',
+      data: t.data || 'Data a definir',
+      status: t.status || 'Inscrições abertas',
+      statusClass: t.statusClass || (
+        t.status && t.status.toLowerCase().includes('andamento') ? 'status-andamento' :
+        t.status && t.status.toLowerCase().includes('encerrado') ? 'status-encerrado' : 'status-aberto'
+      ),
+      banner: t.banner || '/images/cerradocup.jpg',
+      link: t.link || ('/torneio/custom.html?id=' + encodeURIComponent(t.id)),
+      ao_vivo: t.ao_vivo || false
+    }));
+  }
+
+  // Atualização de UI: Torneios Criados
+  async function carregarTorneiosCriadosEAtualizarUI(forceReload = false) {
+    if (!listaTorneiosCriadosEl) return;
+    if (isCarregandoCriados) return;
+    if (dadosTorneiosCriados !== null && !forceReload) {
+      atualizarBadgeTorneiosCriados(dadosTorneiosCriados.length);
+      return;
+    }
+
+    isCarregandoCriados = true;
+    listaTorneiosCriadosEl.innerHTML = `
+      <div style="grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 48px 20px; color: #9ca3af; text-align: center;">
+        <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 32px; color: #ef4444; margin-bottom: 12px; display: block;"></i>
+        <span style="font-size: 15px; font-weight: 600; color: #f3f4f6;">Carregando torneios criados...</span>
+      </div>
+    `;
+
+    try {
+      const lista = await consultarTorneiosCriados(user);
+      dadosTorneiosCriados = lista;
+      atualizarBadgeTorneiosCriados(lista.length);
+
+      if (lista.length === 0) {
+        if (isOwner) {
+          listaTorneiosCriadosEl.innerHTML = `
+            <div class="empty-state-torneios">
+              <div class="empty-state-icon-box">
+                <i class="fa-solid fa-trophy"></i>
+              </div>
+              <h3 class="empty-state-title">Você ainda não criou nenhum torneio</h3>
+              <p class="empty-state-desc">
+                Organize seus próprios campeonatos de e-sports, configure regras, aprove inscrições de jogadores e transmita partidas ao vivo!
+              </p>
+              <a href="/criar_torneio/criar_torneio.html" class="btn-perfil-empty-cta">
+                <i class="fa-solid fa-plus"></i> Criar Torneio Agora
+              </a>
+            </div>
+          `;
+        } else {
+          const nomeDono = user.nome || 'Este organizador';
+          listaTorneiosCriadosEl.innerHTML = `
+            <div class="empty-state-torneios">
+              <div class="empty-state-icon-box">
+                <i class="fa-solid fa-trophy"></i>
+              </div>
+              <h3 class="empty-state-title">Nenhum torneio criado ainda</h3>
+              <p class="empty-state-desc">
+                ${escapeHtml(nomeDono)} ainda não possui campeonatos públicos cadastrados no VersusHub.
+              </p>
+              <a href="/pagina_inicial/torneios.html" class="btn-perfil-empty-cta">
+                <i class="fa-solid fa-compass"></i> Explorar Catálogo de Torneios
+              </a>
+            </div>
+          `;
+        }
+      } else {
+        listaTorneiosCriadosEl.innerHTML = lista.map(t => renderCardTorneio(t, isOwner)).join('');
+      }
+    } catch (err) {
+      console.error('Erro ao carregar torneios criados:', err);
+      listaTorneiosCriadosEl.innerHTML = `
+        <div class="empty-state-torneios">
+          <div class="empty-state-icon-box" style="border-color: #ef4444; color: #ef4444;">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+          </div>
+          <h3 class="empty-state-title">Não foi possível carregar os torneios</h3>
+          <p class="empty-state-desc">Verifique sua conexão ou tente novamente mais tarde.</p>
+          <a href="/pagina_inicial/torneios.html" class="btn-perfil-empty-cta">
+            <i class="fa-solid fa-compass"></i> Explorar Torneios
+          </a>
+        </div>
+      `;
+    } finally {
+      isCarregandoCriados = false;
+    }
+  }
+
+  // Pré-carregamento em background para exibir as contagens nas abas do perfil
+  setTimeout(() => {
+    carregarTorneiosCriadosEAtualizarUI();
+  }, 100);
+
+  // Tratamento de hash direto na URL (ex: perfil.html#torneios-criados ou #criados)
+  const currentHash = window.location.hash.toLowerCase();
+  if (currentHash === '#criados' || currentHash === '#torneios-criados' || currentHash === '#torneios') {
+    const btn = document.querySelector(".tab-btn-perfil[data-target='aba-torneios-criados']");
+    if (btn) btn.click();
   }
 });
 

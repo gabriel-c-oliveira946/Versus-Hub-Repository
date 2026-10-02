@@ -103,6 +103,21 @@
 
 <!-- CONTEÚDO PERFIL -->
 <div class="perfil_container">
+
+  <!-- BANNER DE MODO VISITANTE (quando visualizando perfil de outro jogador/organizador) -->
+  <div id="bannerModoVisitante" class="banner-modo-visitante" style="display: none;">
+    <div class="banner-visitante-conteudo">
+      <i class="fa-solid fa-trophy"></i>
+      <div>
+        <span class="banner-visitante-titulo">Perfil Público do Organizador</span>
+        <span class="banner-visitante-sub" id="bannerVisitanteSub">Visualizando informações públicas e histórico de torneios.</span>
+      </div>
+    </div>
+    <a href="/pagina_inicial/torneios.html" class="btn-banner-visitante">
+      <i class="fa-solid fa-compass"></i> Todos os Torneios
+    </a>
+  </div>
+
   <div class="perfil-layout">
     
     <!-- COLUNA DA ESQUERDA: CARTÃO DE VISÃO GERAL -->
@@ -113,7 +128,7 @@
           <!-- INPUT DE ARQUIVO ESCONDIDO -->
           <input type="file" id="inputPhoto" accept="image/*" style="display:none">
           <!-- BOTÃO PARA TROCAR FOTO -->
-          <button class="btn-photo" id="btnPhoto" title="Alterar foto de perfil">
+          <button class="btn-photo btn-owner-only" id="btnPhoto" title="Alterar foto de perfil">
             <i class="fa-solid fa-camera"></i>
           </button>
         </div>
@@ -122,22 +137,28 @@
           <!-- NOME DE USUÁRIO VISÍVEL -->
           <div class="username-box">
             <span class="username" id="displayName">Usuário</span>
-            <button class="btn-edit" type="button" id="btnNameFocus" title="Editar Nome">
+            <button class="btn-edit btn-owner-only" type="button" id="btnNameFocus" title="Editar Nome">
               <i class="fa-solid fa-pen"></i>
             </button>
           </div>
 
-          <!-- EMAIL -->
-          <div class="email-box">
+          <!-- EMAIL PARA EDIÇÃO DO DONO -->
+          <div class="email-box owner-only-box" id="emailBoxContainer">
             <input
               type="text"
               placeholder="Seu email..."
               class="email-input"
               id="emailInput"
             >
-            <button class="icon-edit-small" type="button" id="btnEmailFocus" title="Editar Email">
+            <button class="icon-edit-small btn-owner-only" type="button" id="btnEmailFocus" title="Editar Email">
               <i class="fa-solid fa-pen"></i>
             </button>
+          </div>
+
+          <!-- EMAIL EM FORMATO EXIBIÇÃO PARA VISITANTES -->
+          <div id="emailDisplayVisitor" class="email-display-visitor" style="display: none;">
+            <i class="fa-regular fa-envelope"></i>
+            <span id="spanEmailVisitor">usuario@versushub.com</span>
           </div>
         </div>
 
@@ -154,11 +175,11 @@
       </div>
 
       <!-- BOTÃO VISUALIZAR PERFIL PÚBLICO E ALTERAR SENHA -->
-      <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
-        <a href="/perfil/perfil-publico.html" class="btn-view-public">
+      <div id="sidebarActionsBox" style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
+        <a href="/perfil/perfil-publico.html" class="btn-view-public" id="btnLinkPerfilPublico">
           <i class="fa-solid fa-eye"></i> Visualizar Perfil Público
         </a>
-        <button type="button" class="btn-change-password-sidebar" id="btnOpenChangePassword">
+        <button type="button" class="btn-change-password-sidebar btn-owner-only" id="btnOpenChangePassword">
           <i class="fa-solid fa-key"></i> Alterar Senha
         </button>
       </div>
@@ -169,16 +190,20 @@
       
       <!-- MENU DE NAVEGAÇÃO POR ABAS -->
       <div class="tabs-perfil" id="tabsPerfilNav">
-        <button type="button" class="tab-btn-perfil active" data-target="aba-info">
-          <i class="fa-solid fa-user"></i> Informações
+        <button type="button" class="tab-btn-perfil" data-target="aba-torneios-criados" id="tabBtnTorneiosCriados">
+          <i class="fa-solid fa-trophy"></i> Torneios Criados
+          <span class="subtab-badge" id="badgeNavCriados">0</span>
         </button>
-        <button type="button" class="tab-btn-perfil" data-target="aba-aparencia">
+        <button type="button" class="tab-btn-perfil active" data-target="aba-info" id="tabBtnInfo">
+          <i class="fa-solid fa-user"></i> <span id="labelTabInfo">Informações</span>
+        </button>
+        <button type="button" class="tab-btn-perfil tab-edit-only" data-target="aba-aparencia" id="tabBtnAparencia">
           <i class="fa-solid fa-palette"></i> Aparência
         </button>
-        <button type="button" class="tab-btn-perfil" data-target="aba-historico">
-          <i class="fa-solid fa-trophy"></i> Conquistas
+        <button type="button" class="tab-btn-perfil" data-target="aba-historico" id="tabBtnConquistas">
+          <i class="fa-solid fa-award"></i> Conquistas
         </button>
-        <button type="button" class="tab-btn-perfil" data-target="aba-seguranca">
+        <button type="button" class="tab-btn-perfil tab-edit-only" data-target="aba-seguranca" id="tabBtnSeguranca">
           <i class="fa-solid fa-shield-halved"></i> Segurança
         </button>
       </div>
@@ -245,7 +270,7 @@
         
         <div class="section">
           <div class="form-block">
-            <label for="jogoInput">Adicionar jogo preferido</label>
+            <label for="jogoInput" id="labelJogoInput">Adicionar jogo preferido</label>
             <input
               id="jogoInput"
               type="text"
@@ -255,7 +280,38 @@
             <div id="jogosTags" class="games-tags" style="margin-top: 15px;">
               <!-- JS vai criar as tags aqui -->
             </div>
-            <small class="games-hint">Pressione Enter para adicionar. Clique no "×" para remover.</small>
+            <small class="games-hint" id="hintJogoInput">Pressione Enter para adicionar. Clique no "×" para remover.</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================== -->
+      <!-- ABA: TORNEIOS CRIADOS (SEÇÃO PÚBLICA)      -->
+      <!-- ========================================== -->
+      <div id="aba-torneios-criados" class="tab-container-perfil" style="display: none;">
+        <div class="section-header-block" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+          <h2 class="section-title"><i class="fa-solid fa-trophy"></i> Torneios Criados</h2>
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <a href="/criar_torneio/criar_torneio.html" class="btn-subnav-action btn-primary" id="btnCriarTorneioHeader">
+              <i class="fa-solid fa-plus"></i> Criar Torneio
+            </a>
+            <a href="/pagina_inicial/torneios.html" class="btn-subnav-action" id="btnExplorarTorneiosHeader">
+              <i class="fa-solid fa-compass"></i> Todos os Torneios
+            </a>
+          </div>
+        </div>
+
+        <div class="section">
+          <p style="color: #9ca3af; font-size: 14px; margin-top: 0; margin-bottom: 20px; line-height: 1.5;" id="descTorneiosCriados">
+            Campeonatos organizados por este perfil na comunidade VersusHub.
+          </p>
+
+          <!-- Grid dos Torneios Criados -->
+          <div id="listaTorneiosCriados" class="perfil-torneios-grid">
+            <div style="grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 48px 20px; color: #9ca3af; text-align: center;">
+              <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 32px; color: #ef4444; margin-bottom: 12px; display: block;"></i>
+              <span style="font-size: 15px; font-weight: 600; color: #f3f4f6;">Carregando torneios criados...</span>
+            </div>
           </div>
         </div>
       </div>
@@ -438,7 +494,7 @@
       </div>
 
       <!-- BOTÃO SALVAR ALTERAÇÕES GLOBAL -->
-      <div class="save-row">
+      <div class="save-row" id="saveProfileRow">
         <button id="btnSaveProfile" class="btn-save-profile" type="button">
           <i class="fa-solid fa-floppy-disk"></i> Salvar Perfil
         </button>

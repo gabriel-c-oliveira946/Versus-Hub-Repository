@@ -166,7 +166,10 @@
 
         <!-- Participantes Confirmados -->
         <div class="torneio-card-box">
-          <h2><i class="fa-solid fa-users" style="color: #ef4444; margin-right: 8px;"></i> Participantes Confirmados</h2>
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
+            <h2 style="margin: 0;"><i class="fa-solid fa-users" style="color: #ef4444; margin-right: 8px;"></i> Participantes Confirmados</h2>
+            <span id="contadorParticipantes" style="font-size: 13px; font-weight: 700; color: #10b981; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); padding: 4px 12px; border-radius: 999px;">0 confirmados</span>
+          </div>
           <div id="listaParticipantes" class="grid-participantes">
             <!-- Renderizado dinamicamente via JS -->
           </div>
@@ -186,6 +189,7 @@
             <li><span>Status:</span> <span id="textoStatus">--</span></li>
             <li><span>Formato:</span> <span id="textoTipoInscricao">--</span></li>
             <li id="liMaxIntegrantes" style="display: none;"><span>Line-up:</span> <span id="textoMaxIntegrantes">--</span></li>
+            <li id="liVagas"><span>Vagas:</span> <span id="textoVagas">--</span></li>
             <li><span>Plataforma:</span> <span id="textoPlataforma">--</span></li>
             <li><span>Modalidade:</span> <span id="infoModalidade">--</span></li>
             <li><span>Local:</span> <span id="infoLocal">--</span></li>
