@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Perfil do Usuário - VersusHub</title>
+
+  <!-- ÍCONES FONT AWESOME -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- estilos globais -->
+  <link rel="stylesheet" href="/pagina_inicial/css/estilos.css">
+  <!-- estilos específicos do perfil -->
+  <link rel="stylesheet" href="/perfil/css/perfil.css">
+  <link rel="icon" href="/image/logo.png" sizes="32x32"> 
+</head>
+<body class="perfil-body">
+
+  <!-- HEADER -->
+  <header>
+    <nav class="navbar">
+
+      <!-- ESQUERDA: menu + logo -->
+      <div class="header-left">
+
+        <!-- Botão do menu lateral (hambúrguer) -->
+        <button id="menuToggle" class="menu-button" aria-label="Abrir menu lateral">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="menu-svg"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+
+        <!-- LOGO -->
+        <div class="logo_header">
+          <a href="/pagina_inicial/index.html">
+            <img referrerpolicy="no-referrer" src="/image/logo%20plus%20tipo%20textura.png" alt="VersusHub">
+          </a>
+        </div>
+
+      </div>
+
+      <!-- CENTRO: botões principais -->
+      <div class="botoes_header">
+        <a href="/aovivo/aovivo.html"><button id="aovivo_header">Ao Vivo</button></a>
+        <a href="/criar_torneio/criar_torneio.html"><button id="criar_header">Criar Torneio</button></a>
+        <a href="/equipes/equipes.html"><button id="equipes_header">Equipes</button></a>
+      </div>
+
+      <!-- DIREITA: pesquisa + entrar + cadastrar + usuário -->
+      <div class="header-right">
+
+        <!-- BOTÕES À DIREITA -->
+        <a href="/login/login.html" id="btentrar">Entrar</a>
+        <a href="/cadastro/cadastro.html" id="btcadastrar">Cadastrar-se</a>
+
+        <!-- ÍCONE DO USUÁRIO -->
+        <div class="user-icon">
+          <img referrerpolicy="no-referrer" src="/image/boneco_logo_ofc.png" alt="Usuário" id="userBtn">
+
+          <ul id="menuUser" class="hidden">
+            <li>
+              <a href="/login/login.html"><i class="fa-solid fa-right-to-bracket" style="margin-right: 8px;"></i>Login</a>
+            </li>
+            <hr>
+            <li>
+              <a href="/cadastro/cadastro.html"><i class="fa-solid fa-user-plus" style="margin-right: 8px;"></i>Cadastro</a>
+            </li>
+            <hr>
+            <li>
+              <a href="/gerenciartorneios/gerentornindex.html"><i class="fa-solid fa-file-invoice" style="margin-right: 8px;"></i>Gerenciar Torneios</a>
+            </li>
+            <li>
+              <a href="/equipes/gerenciar_equipes.html"><i class="fa-solid fa-list-check" style="margin-right: 8px;"></i>Gerenciar Equipes</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+    </nav>
+  </header>
+  <!-- FIM HEADER -->
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar" class="sidebar">
+    <h2 class="sidebar-title"></h2>
+    <nav class="sidebar-nav">
+      <a href="/pagina_inicial/index.html"><i class="fa-solid fa-house" style="margin-right: 10px; width: 16px; text-align: center;"></i>Início</a>
+      <a href="/pagina_inicial/torneios.html"><i class="fa-solid fa-trophy" style="margin-right: 10px; width: 16px; text-align: center;"></i>Todos os torneios</a>
+      <a href="/aovivo/aovivo.html"><i class="fa-solid fa-tower-broadcast" style="margin-right: 10px; width: 16px; text-align: center;"></i>Torneios ao vivo</a>
+      <a href="/criar_torneio/criar_torneio.html"><i class="fa-solid fa-award" style="margin-right: 10px; width: 16px; text-align: center;"></i>Criar Torneio</a>
+      <a href="/equipes/equipes.html"><i class="fa-solid fa-users" style="margin-right: 10px; width: 16px; text-align: center;"></i>Equipes</a>
+      <a href="/ranking.html"><i class="fa-solid fa-users-viewfinder" style="margin-right: 10px; width: 16px; text-align: center;"></i>Jogadores e Ranking</a>
+      <a href="/gerenciartorneios/gerentornindex.html"><i class="fa-solid fa-file-invoice" style="margin-right: 10px; width: 16px; text-align: center;"></i>Gerenciar torneios</a>
+      <a href="/equipes/gerenciar_equipes.html"><i class="fa-solid fa-list-check" style="margin-right: 10px; width: 16px; text-align: center;"></i>Gerenciar Equipes</a>
+      <a href="/termos/termos.html"><i class="fa-solid fa-briefcase" style="margin-right: 10px; width: 16px; text-align: center;"></i>Termos de Uso</a>
+      <a href="/feedback/feedback.html"><i class="fa-solid fa-star" style="margin-right: 10px; width: 16px; text-align: center;"></i>Enviar feedback / Sugestão</a>
+    </nav>
+  </aside>
+
+  <!-- efeito da tela ficar escura no fundo -->
+  <div id="sidebarOverlay" class="sidebar-overlay"></div>
+  <!-- FIM SIDEBAR -->
+
+
+<!-- CONTEÚDO PERFIL -->
+<div class="perfil_container">
+
+  <!-- BANNER DE MODO VISITANTE (quando visualizando perfil de outro jogador/organizador) -->
+  <div id="bannerModoVisitante" class="banner-modo-visitante" style="display: none;">
+    <div class="banner-visitante-conteudo">
+      <i class="fa-solid fa-trophy"></i>
+      <div>
+        <span class="banner-visitante-titulo">Perfil Público do Organizador</span>
+        <span class="banner-visitante-sub" id="bannerVisitanteSub">Visualizando informações públicas e histórico de torneios.</span>
+      </div>
+    </div>
+    <a href="/pagina_inicial/torneios.html" class="btn-banner-visitante">
+      <i class="fa-solid fa-compass"></i> Todos os Torneios
+    </a>
+  </div>
+
+  <div class="perfil-layout">
+    
+    <!-- COLUNA DA ESQUERDA: CARTÃO DE VISÃO GERAL -->
+    <div class="perfil-sidebar">
+      <div class="profile-card">
+        <div class="profile-image-wrapper">
+          <div class="profile-image" id="profileImage"></div>
+          <!-- INPUT DE ARQUIVO ESCONDIDO -->
+          <input type="file" id="inputPhoto" accept="image/*" style="display:none">
+          <!-- BOTÃO PARA TROCAR FOTO -->
+          <button class="btn-photo btn-owner-only" id="btnPhoto" aria-label="Alterar foto de perfil" title="Alterar foto de perfil">
+            <i class="fa-solid fa-camera"></i>
+          </button>
+        </div>
+
+        <div class="profile-user-info">
+          <!-- NOME DE USUÁRIO VISÍVEL -->
+          <div class="username-box">
+            <span class="username" id="displayName">Usuário</span>
+            <button class="btn-edit btn-owner-only" type="button" id="btnNameFocus" aria-label="Editar Nome" title="Editar Nome">
+              <i class="fa-solid fa-pen"></i>
+            </button>
+          </div>
+
+          <!-- BADGE DE PONTUAÇÃO E RANKING -->
+          <div class="user-header-ranking-badge" id="headerRankingBadge" style="margin-top: 8px; margin-bottom: 4px;">
+            <i class="fa-solid fa-trophy" style="color: #fbbf24;"></i>
+            <span id="headerPointsText">-- pts</span>
+            <span class="badge-divider">|</span>
+            <span id="headerRankPosition">#-- no Ranking</span>
+          </div>
+
+          <!-- EMAIL PARA EDIÇÃO DO DONO -->
+          <div class="email-box owner-only-box" id="emailBoxContainer">
+            <input
+              type="text"
+              placeholder="Seu email..."
+              class="email-input"
+              id="emailInput"
+            >
+            <button class="icon-edit-small btn-owner-only" type="button" id="btnEmailFocus" aria-label="Editar Email" title="Editar Email">
+              <i class="fa-solid fa-pen"></i>
+            </button>
+          </div>
+
+          <!-- EMAIL EM FORMATO EXIBIÇÃO PARA VISITANTES -->
+          <div id="emailDisplayVisitor" class="email-display-visitor" style="display: none;">
+            <i class="fa-regular fa-envelope"></i>
+            <span id="spanEmailVisitor">usuario@versushub.com</span>
+          </div>
+        </div>
+
+        <div class="profile-quick-meta">
+          <div class="meta-row">
+            <span class="meta-label"><i class="fa-solid fa-earth-americas"></i> Região</span>
+            <span class="meta-val" id="spanRegiao">Brasil</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label"><i class="fa-solid fa-gamepad"></i> Plataformas</span>
+            <span class="meta-val" id="spanPlataforma">Não informado</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTÃO VISUALIZAR PERFIL PÚBLICO E ALTERAR SENHA -->
+      <div id="sidebarActionsBox" style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
+        <a href="/perfil/perfil-publico.html" class="btn-view-public" id="btnLinkPerfilPublico">
+          <i class="fa-solid fa-eye"></i> Visualizar Perfil Público
+        </a>
+        <button type="button" class="btn-change-password-sidebar btn-owner-only" id="btnOpenChangePassword">
+          <i class="fa-solid fa-key"></i> Alterar Senha
+        </button>
+      </div>
+    </div>
+
+    <!-- COLUNA DA DIREITA: CONFIGURAÇÕES E FORMULÁRIOS COM ABAS -->
+    <div class="perfil-content">
+      
+      <!-- MENU DE NAVEGAÇÃO POR ABAS -->
+      <div class="tabs-perfil" id="tabsPerfilNav">
+        <button type="button" class="tab-btn-perfil" data-target="aba-torneios-criados" id="tabBtnTorneiosCriados">
+          <i class="fa-solid fa-trophy"></i> Torneios Criados
+          <span class="subtab-badge" id="badgeNavCriados">0</span>
+        </button>
+        <button type="button" class="tab-btn-perfil tab-edit-only" data-target="tabFavoritos" id="tabBtnFavoritos">
+          <i class="fa-solid fa-heart" style="color: #ef4444;"></i> Meus Torneios Favoritos
+          <span class="subtab-badge" id="badgeNavFavoritos" style="display: none;">0</span>
+        </button>
+        <button type="button" class="tab-btn-perfil active" data-target="aba-info" id="tabBtnInfo">
+          <i class="fa-solid fa-user"></i> <span id="labelTabInfo">Informações</span>
+        </button>
+        <button type="button" class="tab-btn-perfil tab-edit-only" data-target="aba-aparencia" id="tabBtnAparencia">
+          <i class="fa-solid fa-palette"></i> Aparência
+        </button>
+        <button type="button" class="tab-btn-perfil" data-target="aba-historico" id="tabBtnDesempenho">
+          <i class="fa-solid fa-chart-simple"></i> Desempenho
+        </button>
+        <button type="button" class="tab-btn-perfil tab-edit-only" data-target="aba-seguranca" id="tabBtnSeguranca">
+          <i class="fa-solid fa-shield-halved"></i> Segurança
+        </button>
+      </div>
+
+      <!-- ========================================== -->
+      <!-- ABA 1: INFORMAÇÕES                         -->
+      <!-- ========================================== -->
+      <div id="aba-info" class="tab-container-perfil">
+        <div class="section-header-block">
+          <h2 class="section-title"><i class="fa-solid fa-id-card"></i> Informações do Jogador</h2>
+        </div>
+        
+        <div class="section">
+          <div class="form-grid">
+            <div class="form-block">
+              <label for="inputUsername">Nome de usuário (2 a 33 caracteres)</label>
+              <input class="input-box" id="inputUsername" type="text" placeholder="Seu nome no VersusHub" minlength="2" maxlength="33">
+              <div id="usernameProfileErrorMsg" class="form-error-hint" style="display: none;"></div>
+            </div>
+
+            <div class="form-block">
+              <label for="inputEmailPerfil">E-mail</label>
+              <input class="input-box" id="inputEmailPerfil" type="email" placeholder="seuemail@exemplo.com">
+            </div>
+          </div>
+
+          <div class="form-grid" style="margin-top: 20px;">
+            <div class="form-block">
+              <label for="selectRegiao">Região</label>
+              <select class="input-box" id="selectRegiao">
+                <option value="Brasil">Brasil</option>
+                <option value="América do Norte">América do Norte</option>
+                <option value="Europa">Europa</option>
+                <option value="América Latina">América Latina</option>
+                <option value="Ásia">Ásia</option>
+                <option value="Outro">Outro</option>
+              </select>
+            </div>
+
+            <div class="form-block">
+              <label>Plataformas em que você joga</label>
+              <div class="platform-options">
+                <label><input type="checkbox" id="platPC" value="PC"> <i class="fa-solid fa-desktop"></i> PC</label>
+                <label><input type="checkbox" id="platConsole" value="Console"> <i class="fa-solid fa-gamepad"></i> Console</label>
+                <label><input type="checkbox" id="platMobile" value="Mobile"> <i class="fa-solid fa-mobile-screen-button"></i> Mobile</label>
+              </div>
+              <small class="games-hint">Você pode marcar mais de uma opção.</small>
+            </div>
+          </div>
+
+          <div class="form-block" style="margin-top: 20px;">
+            <label for="bioTextarea">Biografia</label>
+            <textarea
+              class="textarea-box"
+              id="bioTextarea"
+              placeholder="Conte um pouco sobre sua trajetória gamer..."
+            ></textarea>
+          </div>
+        </div>
+
+        <!-- JOGOS PREFERIDOS -->
+        <div class="section-header-block">
+          <h2 class="section-title"><i class="fa-solid fa-gamepad"></i> Jogos Preferidos</h2>
+        </div>
+        
+        <div class="section">
+          <div class="form-block">
+            <label for="jogoInput" id="labelJogoInput">Adicionar jogo preferido</label>
+            <input
+              id="jogoInput"
+              type="text"
+              class="input-box"
+              placeholder="Digite o nome do jogo e pressione Enter"
+            >
+            <div id="jogosTags" class="games-tags" style="margin-top: 15px;">
+              <!-- JS vai criar as tags aqui -->
+            </div>
+            <small class="games-hint" id="hintJogoInput">Pressione Enter para adicionar. Clique no "×" para remover.</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================== -->
+      <!-- ABA: TORNEIOS CRIADOS (SEÇÃO PÚBLICA)      -->
+      <!-- ========================================== -->
+      <div id="aba-torneios-criados" class="tab-container-perfil" style="display: none;">
+        <div class="section-header-block" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+          <h2 class="section-title"><i class="fa-solid fa-trophy"></i> Torneios Criados</h2>
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <a href="/criar_torneio/criar_torneio.html" class="btn-subnav-action btn-primary" id="btnCriarTorneioHeader">
+              <i class="fa-solid fa-plus"></i> Criar Torneio
+            </a>
+            <a href="/pagina_inicial/torneios.html" class="btn-subnav-action" id="btnExplorarTorneiosHeader">
+              <i class="fa-solid fa-compass"></i> Todos os Torneios
+            </a>
+          </div>
+        </div>
+
+        <div class="section">
+          <p style="color: #9ca3af; font-size: 14px; margin-top: 0; margin-bottom: 20px; line-height: 1.5;" id="descTorneiosCriados">
+            Campeonatos organizados por este perfil na comunidade VersusHub.
+          </p>
+
+          <!-- Grid dos Torneios Criados -->
+          <div id="listaTorneiosCriados" class="perfil-torneios-grid" aria-live="polite" aria-busy="true">
+            <div class="card-torneio skeleton-card" aria-hidden="true">
+              <div class="skeleton-shimmer skeleton-card-img"></div>
+              <div class="card-info">
+                <div class="skeleton-shimmer skeleton-card-line title"></div>
+                <div class="skeleton-shimmer skeleton-card-line short"></div>
+                <div class="skeleton-shimmer skeleton-card-btn"></div>
+              </div>
+            </div>
+            <div class="card-torneio skeleton-card" aria-hidden="true">
+              <div class="skeleton-shimmer skeleton-card-img"></div>
+              <div class="card-info">
+                <div class="skeleton-shimmer skeleton-card-line title"></div>
+                <div class="skeleton-shimmer skeleton-card-line short"></div>
+                <div class="skeleton-shimmer skeleton-card-btn"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================== -->
+      <!-- ABA: MEUS TORNEIOS FAVORITOS (#tabFavoritos) -->
+      <!-- ========================================== -->
+      <div id="tabFavoritos" class="tab-container-perfil" style="display: none;">
+        <div class="section-header-block" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+          <h2 class="section-title"><i class="fa-solid fa-heart" style="color: #ef4444;"></i> Meus Torneios Favoritos</h2>
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <a href="/pagina_inicial/torneios.html" class="btn-subnav-action" id="btnExplorarFavoritos">
+              <i class="fa-solid fa-compass"></i> Explorar Torneios
+            </a>
+          </div>
+        </div>
+        <div class="section">
+          <p style="color: #9ca3af; font-size: 14px; margin-top: 0; margin-bottom: 20px; line-height: 1.5;" id="descTorneiosFavoritos">
+            Torneios que você favoritou na comunidade VersusHub.
+          </p>
+          <!-- Grid dos Torneios Favoritos -->
+          <div id="listaTorneiosFavoritos" class="perfil-torneios-grid" aria-live="polite">
+            <!-- Renderizado dinamicamente por carregarTorneiosFavoritos() -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================== -->
+      <!-- ABA 2: APARÊNCIA                           -->
+      <!-- ========================================== -->
+      <div id="aba-aparencia" class="tab-container-perfil" style="display: none;">
+        <!-- UPLOAD DE AVATAR -->
+        <div class="section-header-block">
+          <h2 class="section-title"><i class="fa-solid fa-user-gear"></i> Foto de Perfil (Avatar)</h2>
+        </div>
+        
+        <div class="section">
+          <div class="file-upload-card">
+            <div class="avatar-preview-box">
+              <img id="avatarPreviewImg" src="/image/boneco_logo_ofc.png" alt="Prévia do Avatar" referrerpolicy="no-referrer">
+            </div>
+            <div class="file-upload-info">
+              <label>Upload de Avatar</label>
+              <input type="file" id="inputAvatarUpload" accept="image/*" style="display:none;">
+              <button type="button" class="btn-file-select" id="btnChooseAvatar">
+                <i class="fa-solid fa-cloud-arrow-up"></i> Selecionar Imagem de Avatar
+              </button>
+              <span class="file-name-hint" id="avatarUploadHint">Formatos aceitos: JPG, PNG, GIF, WEBP.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- UPLOAD DE BANNER -->
+        <div class="section-header-block">
+          <h2 class="section-title"><i class="fa-solid fa-panorama"></i> Imagem do Banner (Capa de Perfil)</h2>
+        </div>
+        
+        <div class="section">
+          <div class="file-upload-card file-upload-card-banner">
+            <div class="banner-preview-box">
+              <img id="bannerPreviewImg" src="" alt="Prévia da Capa" style="display: none;" referrerpolicy="no-referrer">
+              <div id="bannerPlaceholder" class="banner-placeholder-box">
+                <i class="fa-regular fa-image"></i>
+                <span>Nenhum banner selecionado (Recomendado: 1200x300)</span>
+              </div>
+            </div>
+            <div class="file-upload-info" style="width: 100%;">
+              <label>Upload de Banner</label>
+              <input type="file" id="inputBannerUpload" accept="image/*" style="display:none;">
+              <button type="button" class="btn-file-select" id="btnChooseBanner">
+                <i class="fa-solid fa-cloud-arrow-up"></i> Selecionar Imagem de Banner
+              </button>
+              <span class="file-name-hint" id="bannerUploadHint">Selecione uma imagem para a capa do seu perfil (Recomendado: 1200x300).</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========================================== -->
+      <!-- ABA 3: HISTÓRICO E CONQUISTAS              -->
+      <!-- ========================================== -->
+      <div id="aba-historico" class="tab-container-perfil" style="display: none;">
+        <!-- PERSONALIZAÇÃO DE E-SPORTS E ESTATÍSTICAS -->
+        <div class="section-header-block">
+          <h2 class="section-title"><i class="fa-solid fa-chart-simple"></i> Estatísticas E-Sports</h2>
+        </div>
+        
+        <div class="section">
+          <div class="stats-form-grid">
+            <!-- Pontuação Global (Destaque) -->
+            <div class="form-block form-block-highlight" style="grid-column: 1 / -1; background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(20, 20, 28, 0.9) 100%); border: 1.5px solid rgba(239, 68, 68, 0.35); padding: 18px 22px; border-radius: 14px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 12px; box-shadow: 0 4px 20px rgba(239, 68, 68, 0.15);">
+              <div style="display: flex; align-items: center; gap: 14px;">
+                <div style="width: 46px; height: 46px; border-radius: 12px; background: rgba(239, 68, 68, 0.22); display: flex; align-items: center; justify-content: center; color: #ef4444; font-size: 22px;">
+                  <i class="fa-solid fa-fire"></i>
+                </div>
+                <div>
+                  <label style="color: #ffffff; font-weight: 700; font-size: 16px; margin: 0; display: block;">Pontuação Global no Ranking</label>
+                  <small style="color: #9cb1cf; font-size: 12px; margin-top: 2px; display: block;">Pontuação acumulada no VersusHub a partir das suas inscrições aceitas e vitórias</small>
+                </div>
+              </div>
+              <div style="text-align: right;">
+                <span id="statsPontosVal" style="font-size: 28px; font-weight: 800; color: #ef4444; display: block; line-height: 1;">0 pts</span>
+                <span id="statsRankPosVal" style="font-size: 12px; font-weight: 700; color: #10b981; margin-top: 6px; display: inline-flex; align-items: center; gap: 4px; background: rgba(16, 185, 129, 0.12); padding: 3px 10px; border-radius: 999px; border: 1px solid rgba(16, 185, 129, 0.3);"><i class="fa-solid fa-trophy" style="color: #fbbf24;"></i> <span id="statsRankPosValText">#-- no Ranking</span></span>
+              </div>
+            </div>
+
+            <div class="form-block">
+              <label for="statsDisputed" style="display: flex; justify-content: space-between; align-items: center;">
+                Torneios Disputados
+                <span class="badge-readonly"><i class="fa-solid fa-lock"></i> Calculado</span>
+              </label>
+              <input type="number" id="statsDisputed" class="input-box input-readonly" readonly value="0" title="Calculado automaticamente pelo sistema a partir das suas inscrições aceitas">
+            </div>
+            <div class="form-block">
+              <label for="statsWon" style="display: flex; justify-content: space-between; align-items: center;">
+                Torneios Vencidos
+                <span class="badge-readonly"><i class="fa-solid fa-lock"></i> Calculado</span>
+              </label>
+              <input type="number" id="statsWon" class="input-box input-readonly" readonly value="0" title="Calculado automaticamente pelo sistema a partir dos títulos conquistados">
+            </div>
+            <div class="form-block">
+              <label for="statsWins" style="display: flex; justify-content: space-between; align-items: center;">
+                Vitórias Individuais
+                <span class="badge-readonly"><i class="fa-solid fa-lock"></i> Calculado</span>
+              </label>
+              <input type="number" id="statsWins" class="input-box input-readonly" readonly value="0" title="Calculado automaticamente pelo sistema a partir dos resultados de partidas">
+            </div>
+            <div class="form-block">
+              <label for="statsLosses" style="display: flex; justify-content: space-between; align-items: center;">
+                Derrotas Individuais
+                <span class="badge-readonly"><i class="fa-solid fa-lock"></i> Calculado</span>
+              </label>
+              <input type="number" id="statsLosses" class="input-box input-readonly" readonly value="0" title="Calculado automaticamente pelo sistema a partir dos resultados de partidas">
+            </div>
+            <div class="form-block">
+              <label for="statsWinRate" style="display: flex; justify-content: space-between; align-items: center;">
+                Taxa de Vitória
+                <span class="badge-readonly"><i class="fa-solid fa-lock"></i> Calculado</span>
+              </label>
+              <input type="text" id="statsWinRate" class="input-box input-readonly" readonly value="0%" title="Taxa de aproveitamento calculada a partir do histórico de vitórias">
+            </div>
+          </div>
+          <small class="games-hint" style="display: flex; align-items: center; gap: 8px; margin-top: 12px; color: #94a3b8; background: rgba(59, 130, 246, 0.06); border: 1px solid rgba(59, 130, 246, 0.2); padding: 10px 14px; border-radius: 8px;">
+            <i class="fa-solid fa-shield-halved" style="color: #60a5fa; font-size: 16px;"></i>
+            <span>Estes valores são <strong>calculados automaticamente</strong> pelo VersusHub a partir das suas inscrições aceitas e vitórias confirmadas no banco de dados. A edição manual foi bloqueada para garantir a integridade do ranking.</span>
+          </small>
+        </div>
+
+        <!-- MINHAS EQUIPES -->
+        <div class="section-header-block">
+          <h2 class="section-title"><i class="fa-solid fa-users"></i> Minhas Equipes</h2>
+        </div>
+        
+        <div class="section">
+          <div id="minhasEquipesList" class="teams-list-profile" aria-live="polite" aria-busy="true">
+            <!-- Renderizado dinamicamente via perfil.js -->
+          </div>
+          <!-- Aqui vão aparecer as equipes criadas via "Criar Equipe" -->
+          <div id="dynamicTeams" style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;"></div>
+        </div>
+      </div>
+
+      <!-- ========================================== -->
+      <!-- ABA 4: SEGURANÇA E ALTERAÇÃO DE SENHA      -->
+      <!-- ========================================== -->
+      <div id="aba-seguranca" class="tab-container-perfil" style="display: none;">
+        <div class="section-header-block">
+          <h2 class="section-title"><i class="fa-solid fa-shield-halved"></i> Segurança da Conta & Alteração de Senha</h2>
+        </div>
+        
+        <div class="section">
+          <p style="color: #9ca3af; font-size: 14px; margin-top: 0; margin-bottom: 20px; line-height: 1.5;">
+            Atualize sua senha de acesso ao VersusHub com total segurança. A nova senha deve conter no mínimo <strong>6 caracteres</strong>.
+          </p>
+
+          <form id="formAlterarSenhaPerfil" autocomplete="off">
+            <div class="form-grid">
+              <div class="form-block">
+                <label for="inputNovaSenha">Nova Senha *</label>
+                <input class="input-box" id="inputNovaSenha" type="password" placeholder="Digite sua nova senha (mínimo 6 caracteres)" minlength="6" required>
+                <div id="novaSenhaErrorMsg" class="form-error-hint" style="display: none;"></div>
+              </div>
+
+              <div class="form-block">
+                <label for="inputConfirmarSenha">Confirmar Nova Senha *</label>
+                <input class="input-box" id="inputConfirmarSenha" type="password" placeholder="Repita a nova senha" minlength="6" required>
+                <div id="confirmarSenhaErrorMsg" class="form-error-hint" style="display: none;"></div>
+              </div>
+            </div>
+
+            <div id="senhaStatusMsg" class="form-feedback-box" style="display: none; margin-top: 18px;"></div>
+
+            <div style="margin-top: 24px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+              <button type="submit" id="btnSalvarNovaSenha" class="btn-save-profile" style="background: #d41111;">
+                <i class="fa-solid fa-key"></i> Atualizar Senha
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- BOTÃO SALVAR ALTERAÇÕES GLOBAL -->
+      <div class="save-row" id="saveProfileRow">
+        <button id="btnSaveProfile" class="btn-save-profile" type="button">
+          <i class="fa-solid fa-floppy-disk"></i> Salvar Perfil
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+<!-- FIM CONTEÚDO PERFIL -->
+
+<!-- MODAL FLUTUANTE DE ALTERAÇÃO DE SENHA -->
+<div id="modalAlterarSenha" class="modal-overlay" style="display: none;">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h3><i class="fa-solid fa-key" style="color: #ff3b30;"></i> Alterar Senha</h3>
+      <button type="button" class="modal-close" id="btnFecharModalSenha" aria-label="Fechar">&times;</button>
+    </div>
+    <form id="formModalAlterarSenha" autocomplete="off">
+      <div class="form-group">
+        <label for="modalNovaSenha">Nova Senha *</label>
+        <input type="password" id="modalNovaSenha" placeholder="Mínimo 6 caracteres" minlength="6" required>
+        <div id="modalNovaSenhaError" class="form-error-hint" style="display: none;"></div>
+      </div>
+      <div class="form-group">
+        <label for="modalConfirmarSenha">Confirmar Nova Senha *</label>
+        <input type="password" id="modalConfirmarSenha" placeholder="Repita a nova senha" minlength="6" required>
+        <div id="modalConfirmarSenhaError" class="form-error-hint" style="display: none;"></div>
+      </div>
+      <div id="modalSenhaStatus" class="form-feedback-box" style="display: none; margin-top: 12px;"></div>
+      <div class="modal-buttons" style="margin-top: 24px;">
+        <button type="button" class="btn-cancel" id="btnCancelarModalSenha">Cancelar</button>
+        <button type="submit" class="btn-save" id="btnSalvarModalSenha">Atualizar Senha</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+ <!-- PARTE DE BAIXO DO SITE< CHAMADA DE FOOTER -->
+
+    <footer>
+
+      <div id="footer_content">
+        <div id="footer_logo">
+          <img referrerpolicy="no-referrer" src="/image/logo.png" alt="" id="logofooter">
+
+        </div>
+      
+      <div id="footer_sobrenos">
+
+         <h1>Sobre Nós</h1>
+        <br>
+         <p>O Versus Hub é uma plataforma criada para conectar jogadores, organizadores e fãs de e-sports em um só lugar. Oferecemos torneios competitivos, rankings dinâmicos e recompensas exclusivas para quem ama competir. Nosso objetivo é tornar a experiência gamer mais acessível, divertida e profissional — seja você um iniciante ou um pro player.</p>
+
+      </div>
+
+      <div id="footer_versushub">
+
+         <h1>Versus Hub</h1>
+        <br>
+          <p>
+              Torneios e Rankings atualizados 
+              <br><br> 
+              Sistema seguro e fácil de participar 
+              <br><br>
+              Suporte ativo todos os dias
+          </p>
+
+
+      </div>
+      
+      <div id="footer_politicas">
+          <h1>Políticas</h1><br>
+          <ul class="footer-politicas-list">
+            <li><a href="/termos/termos.html#termos" style="text-decoration: none; color: inherit;">Termos de uso</a></li>
+            <li><a href="/termos/termos.html#privacidade" style="text-decoration: none; color: inherit;">Política de Privacidade</a></li>
+            <li><a href="/termos/termos.html#termos" style="text-decoration: none; color: inherit;">Regras e Premiações</a></li>
+          </ul>
+      </div>
+    </div>
+  
+   
+  </div>
+
+
+    
+    </footer>
+
+<!-- --------------------------------------------------- -->
+
+
+<!-- JS do perfil + JS global -->
+<script type="module" src="/supabaseClient.js"></script>
+<script src="/perfil/js/perfil.js"></script>
+<script src="/pagina_inicial/js/scrip.js"></script>
+</body>
+</html>
+

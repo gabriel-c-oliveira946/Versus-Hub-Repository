@@ -1,0 +1,4 @@
+scripts/
+*.py
+*.md
+.vscode/

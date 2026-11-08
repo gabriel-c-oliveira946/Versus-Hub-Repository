@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Detalhes do Torneio | VersusHub</title>
+  <meta name="description" content="Informações detalhadas, regras, participantes e chaveamento do torneio no VersusHub." />
+  <link rel="stylesheet" href="/pagina_inicial/css/estilos.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <script>
+    // Redireciona preservando parâmetros de consulta (ex: ?id=xxx) para o template oficial
+    const query = window.location.search || '';
+    window.location.replace('/torneio/custom.html' + query);
+  </script>
+</head>
+<body style="background: #0b0a12; color: #ffffff; display: flex; align-items: center; justify-content: center; min-height: 100vh; font-family: system-ui, sans-serif;">
+  <main aria-live="polite" aria-busy="true" style="text-align: center; padding: 24px;">
+    <i class="fa-solid fa-circle-notch fa-spin" style="font-size: 36px; color: #ff7300; margin-bottom: 16px;"></i>
+    <p style="font-size: 16px; color: #d4d4d8;">Carregando detalhes do torneio...</p>
+  </main>
+</body>
+</html>

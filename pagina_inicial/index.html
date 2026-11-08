@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VersusHub | Gestão Profissional de Torneios de E-sports</title>
+  <meta name="description" content="Plataforma completa para organização de campeonatos, chaveamentos automáticos, gestão de equipes e ranking global de e-sports. Participe ou crie seu torneio no VersusHub!" />
+  <meta name="keywords" content="e-sports, torneios, campeonatos, CS2, Valorant, League of Legends, ranking, gestão de equipes, versus hub" />
+  <meta name="author" content="VersusHub" />
+  <link rel="canonical" href="https://versus-hub-repository-jyb7.vercel.app/" />
+
+  <!-- Open Graph / Facebook / WhatsApp / Discord -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="VersusHub" />
+  <meta property="og:url" content="https://versus-hub-repository-jyb7.vercel.app/" />
+  <meta property="og:title" content="VersusHub | Gestão Profissional de Torneios de E-sports" />
+  <meta property="og:description" content="Plataforma completa para organização de campeonatos, chaveamentos automáticos, gestão de equipes e ranking global de e-sports." />
+  <meta property="og:image" content="https://versus-hub-repository-jyb7.vercel.app/image/logo.png" />
+  <meta property="og:image:alt" content="Logo VersusHub - Gestão de Torneios de E-sports" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:url" content="https://versus-hub-repository-jyb7.vercel.app/" />
+  <meta name="twitter:title" content="VersusHub | Gestão Profissional de Torneios de E-sports" />
+  <meta name="twitter:description" content="Plataforma completa para organização de campeonatos, chaveamentos automáticos, gestão de equipes e ranking global de e-sports." />
+  <meta name="twitter:image" content="https://versus-hub-repository-jyb7.vercel.app/image/logo.png" />
+
+  <!-- Schema.org JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "VersusHub",
+    "url": "https://versus-hub-repository-jyb7.vercel.app/",
+    "description": "Plataforma completa para organização de campeonatos, chaveamentos automáticos, gestão de equipes e ranking global de e-sports.",
+    "applicationCategory": "SportsApplication",
+    "operatingSystem": "All",
+    "logo": "https://versus-hub-repository-jyb7.vercel.app/image/logo.png"
+  }
+  </script>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="/pagina_inicial/css/estilos.css" />
+  <link rel="icon" href="/image/logo.png" sizes="32x32"> 
+</head>
+
+<body>
+
+      <!-- HEADER -->
+  <header>
+    <nav class="navbar">
+
+      <!-- ESQUERDA: menu + logo -->
+      <div class="header-left">
+
+        <!-- Botão do menu lateral (hambúrguer) -->
+        <button id="menuToggle" class="menu-button" aria-label="Abrir menu lateral">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="menu-svg"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+
+        <!-- LOGO -->
+        <div class="logo_header">
+          <a href="/pagina_inicial/index.html">
+            <img referrerpolicy="no-referrer" src="/image/logo%20plus%20tipo%20textura.png" alt="VersusHub">
+          </a>
+        </div>
+
+      </div>
+
+      <!-- CENTRO: botões principais -->
+      <div class="botoes_header">
+        <a href="/aovivo/aovivo.html"><button id="aovivo_header">Ao Vivo</button></a>
+        <a href="/criar_torneio/criar_torneio.html"><button id="criar_header">Criar Torneio</button></a>
+        <a href="/equipes/equipes.html"><button id="equipes_header">Equipes</button></a>
+      </div>
+
+      <!-- DIREITA: pesquisa + entrar + cadastrar + usuário -->
+      <div class="header-right">
+
+        <!-- BOTÕES À DIREITA -->
+        <a href="/login/login.html" id="btentrar">Entrar</a>
+        <a href="/cadastro/cadastro.html" id="btcadastrar">Cadastrar-se</a>
+
+        <!-- ÍCONE DO USUÁRIO -->
+        <div class="user-icon">
+          <img referrerpolicy="no-referrer" src="/image/boneco_logo_ofc.png" alt="Usuário" id="userBtn">
+
+          <ul id="menuUser" class="hidden">
+            <li>
+              <a href="/login/login.html"><i class="fa-solid fa-right-to-bracket" style="margin-right: 8px;"></i>Login</a>
+            </li>
+            <hr>
+            <li>
+              <a href="/cadastro/cadastro.html"><i class="fa-solid fa-user-plus" style="margin-right: 8px;"></i>Cadastro</a>
+            </li>
+            <hr>
+            <li>
+              <a href="/gerenciartorneios/gerentornindex.html"><i class="fa-solid fa-file-invoice" style="margin-right: 8px;"></i>Gerenciar Torneios</a>
+            </li>
+            <li>
+              <a href="/equipes/gerenciar_equipes.html"><i class="fa-solid fa-list-check" style="margin-right: 8px;"></i>Gerenciar Equipes</a>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+    </nav>
+  </header>
+  <!-- FIM HEADER -->
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar" class="sidebar">
+    <h2 class="sidebar-title"></h2>
+    <nav class="sidebar-nav">
+      <a href="/pagina_inicial/index.html"><i class="fa-solid fa-house" style="margin-right: 10px; width: 16px; text-align: center;"></i>Início</a>
+      <a href="/pagina_inicial/torneios.html"><i class="fa-solid fa-trophy" style="margin-right: 10px; width: 16px; text-align: center;"></i>Todos os torneios</a>
+      <a href="/aovivo/aovivo.html"><i class="fa-solid fa-tower-broadcast" style="margin-right: 10px; width: 16px; text-align: center;"></i>Torneios ao vivo</a>
+      <a href="/criar_torneio/criar_torneio.html"><i class="fa-solid fa-award" style="margin-right: 10px; width: 16px; text-align: center;"></i>Criar Torneio</a>
+      <a href="/equipes/equipes.html"><i class="fa-solid fa-users" style="margin-right: 10px; width: 16px; text-align: center;"></i>Equipes</a>
+      <a href="/ranking.html"><i class="fa-solid fa-users-viewfinder" style="margin-right: 10px; width: 16px; text-align: center;"></i>Jogadores e Ranking</a>
+      <a href="/gerenciartorneios/gerentornindex.html"><i class="fa-solid fa-file-invoice" style="margin-right: 10px; width: 16px; text-align: center;"></i>Gerenciar torneios</a>
+      <a href="/equipes/gerenciar_equipes.html"><i class="fa-solid fa-list-check" style="margin-right: 10px; width: 16px; text-align: center;"></i>Gerenciar Equipes</a>
+      <a href="/termos/termos.html"><i class="fa-solid fa-briefcase" style="margin-right: 10px; width: 16px; text-align: center;"></i>Termos de Uso</a>
+      <a href="/feedback/feedback.html"><i class="fa-solid fa-star" style="margin-right: 10px; width: 16px; text-align: center;"></i>Enviar feedback / Sugestão</a>
+    </nav>
+  </aside>
+
+  <!-- efeito da tela ficar escura no fundo -->
+  <div id="sidebarOverlay" class="sidebar-overlay"></div>
+  <!-- FIM SIDEBAR -->
+
+  <!-- HERO / CARROSSEL -->
+
+  <section class="hero">
+    <div class="carousel" id="carousel">
+
+
+
+
+      <!-- Slides dinâmicos carregados do banco de dados -->
+      <div id="carouselSlidesContainer" style="position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 16px; overflow: hidden;">
+        <div class="carousel-slide active" id="carouselLoading" style="display: flex; align-items: center; justify-content: center; background: #0d0c12;">
+          <div style="text-align: center; color: #a1a1aa; padding: 20px;">
+            <i class="fa-solid fa-spinner fa-spin" style="font-size: 32px; color: #ff3e3e; margin-bottom: 12px; display: inline-block;"></i>
+            <p style="font-size: 14px; font-weight: 600; color: #e4e4e7; margin: 0;">Carregando torneios em destaque...</p>
+          </div>
+        </div>
+      </div>
+
+
+
+
+      <!-- Setas (fora do card) -->
+      <button class="carousel-button prev" id="prevBtn" aria-label="Anterior"><i class="fa-solid fa-chevron-left"></i></button>
+      <button class="carousel-button next" id="nextBtn" aria-label="Próximo"><i class="fa-solid fa-chevron-right"></i></button>
+    </div>
+
+
+
+
+    <!-- Bolinhas -->
+    <div class="carousel-indicators" id="carouselIndicators"></div>
+  </section>
+
+
+
+
+  <!-- BOTÕES CATEGORIAS -->
+
+
+  <div class="btscategorias">
+
+    <!--  BOTÃO JOGOS DE MOBA-->
+    <button class="btn-filtro-categoria" data-categoria-filtro="moba" aria-label="Filtrar jogos MOBA" title="Jogos MOBA"> <img referrerpolicy="no-referrer" src="/image/moba.png" alt="MOBA"></button>
+
+    <!--  BOTÃO JOGOS DE LUTA-->
+    <button class="btn-filtro-categoria" data-categoria-filtro="luta" aria-label="Filtrar jogos de Luta" title="Jogos de Luta"><img referrerpolicy="no-referrer" src="/image/luta.png" alt="Luta"></button>
+
+    <!--  BOTÃO JOGOS DE TIRO-->
+    <button class="btn-filtro-categoria" data-categoria-filtro="fps" aria-label="Filtrar jogos FPS e Tiro" title="FPS / Tiro"><img referrerpolicy="no-referrer" src="/image/tiro.png" alt="FPS / Tiro"></button>
+
+    <!--  BOTÃO JOGOS DE ESPORTES-->
+    <button class="btn-filtro-categoria" data-categoria-filtro="esportes" aria-label="Filtrar jogos de Futebol e Esportes" title="Futebol / Esportes"><img referrerpolicy="no-referrer" src="/image/esportes.png" alt="Futebol e Esportes"></button>
+
+    <!--  BOTÃO JOGOS DE CARTA-->
+    <button class="btn-filtro-categoria" data-categoria-filtro="cartas" aria-label="Filtrar jogos de Cartas" title="Card Games"><img referrerpolicy="no-referrer" src="/image/card_game.png" alt="Card Game"></button>
+
+  </div>
+
+  <!-- SEÇÃO DINÂMICA DE TORNEIOS DA HOMEPAGE (CONSULTA EXCLUSIVA AO BANCO DE DADOS) -->
+  <section class="bloco-categoria" id="categorias">
+
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 8px;">
+      <h2 class="titulo-categoria" id="tituloSecaoTorneios" style="margin-bottom: 0;">Torneios em Destaque</h2>
+      <div id="statusFiltroAtivo" style="font-size: 13px; color: #a1a1aa; font-weight: 500; display: none;"></div>
+    </div>
+    <hr class="linha-categoria">
+
+    <!-- Container de Loading -->
+    <div id="homeLoading" style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 50px 20px; color: #9ca3af; text-align: center;">
+      <i class="fa-solid fa-spinner fa-spin" style="font-size: 32px; color: #ff3e3e; margin-bottom: 14px;"></i>
+      <span style="font-size: 15px; font-weight: 600; color: #f3f4f6;">Consultando torneios...</span>
+    </div>
+
+    <!-- Grid dinâmico onde os cards reais são injetados -->
+    <div class="grid-torneios" id="gridTorneiosHome" style="display: none;" aria-live="polite" aria-busy="true"></div>
+
+    <!-- Mensagem de nenhum torneio encontrado / sem resultados -->
+    <div id="no-tournaments-msg" style="display: none; text-align: center; padding: 50px 20px; background: #141419; border-radius: 16px; border: 1px dashed rgba(255, 255, 255, 0.12); max-width: 600px; margin: 30px auto; font-family: system-ui, sans-serif; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+      <span style="font-size: 48px; display: block; margin-bottom: 16px; color: #ff3e3e;"><i class="fa-solid fa-gamepad"></i></span>
+      <h3 id="no-tournaments-title" style="font-size: 20px; color: #ffffff; margin-bottom: 8px; font-weight: 700;">Nenhum Torneio Encontrado</h3>
+      <p id="no-tournaments-desc" style="font-size: 14px; color: #9ca3af; margin-bottom: 22px; max-width: 440px; margin-left: auto; margin-right: auto; line-height: 1.6;">Não encontramos torneios cadastrados com estes critérios no momento.</p>
+      <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+        <button id="btnLimparFiltrosHome" style="background: #27272a; color: #f4f4f5; border: 1px solid #3f3f46; border-radius: 999px; padding: 10px 24px; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s;">Ver todos os torneios</button>
+        <a href="/criar_torneio/criar_torneio.html" style="display: inline-flex; align-items: center; justify-content: center; background: #d41111; color: #ffffff; text-decoration: none; padding: 10px 26px; border-radius: 999px; font-size: 13px; font-weight: 700; gap: 8px; box-shadow: 0 4px 15px rgba(212, 17, 17, 0.4); transition: 0.2s;">Criar Torneio <i class="fa-solid fa-trophy" style="color: #ffd700; margin-left: 4px;"></i></a>
+      </div>
+    </div>
+
+  </section>
+
+    <!-- PARTE DE BAIXO DO SITE< CHAMADA DE FOOTER -->
+
+    <footer>
+
+      <div id="footer_content">
+        <div id="footer_logo">
+          <img referrerpolicy="no-referrer" src="/image/logo.png" alt="" id="logofooter">
+
+        </div>
+      
+      <div id="footer_sobrenos">
+
+         <h1>Sobre Nós</h1>
+        <br>
+         <p>O Versus Hub é uma plataforma criada para conectar jogadores, organizadores e fãs de e-sports em um só lugar. Oferecemos torneios competitivos, rankings dinâmicos e recompensas exclusivas para quem ama competir. Nosso objetivo é tornar a experiência gamer mais acessível, divertida e profissional — seja você um iniciante ou um pro player.</p>
+
+      </div>
+
+      <div id="footer_versushub">
+
+         <h1>Versus Hub</h1>
+        <br>
+          <p>
+              Torneios e Rankings atualizados 
+              <br><br> 
+              Sistema seguro e fácil de participar 
+              <br><br>
+              Suporte ativo todos os dias
+          </p>
+
+
+      </div>
+      
+      <div id="footer_politicas">
+          <h1>Políticas</h1><br>
+          <ul class="footer-politicas-list">
+            <li><a href="/termos/termos.html#termos" style="text-decoration: none; color: inherit;">Termos de uso</a></li>
+            <li><a href="/termos/termos.html#privacidade" style="text-decoration: none; color: inherit;">Política de Privacidade</a></li>
+            <li><a href="/termos/termos.html#termos" style="text-decoration: none; color: inherit;">Regras e Premiações</a></li>
+          </ul>
+      </div>
+    </div>
+
+  </div>
+
+    </footer>
+
+<!-- --------------------------------------------------- -->
+
+  </div>
+  </div>
+
+
+  <script src="/pagina_inicial/js/scrip.js"></script>
+</body>
+
+
+</html>
+
+
