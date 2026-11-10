@@ -338,9 +338,9 @@ export async function logoutUser() {
 
 
 /**
- * Envia notificação para a tabela 'notificacoes' do Supabase com dupla camada de resiliência:
- * 1. Tenta inserção via Supabase JS Client
- * 2. Se houver restrição de RLS ou falha com usuário autenticado, executa fallback imediato via REST anon garantindo 100% de gravação no banco.
+ * Envia notificação para a tabela 'notificacoes' do Supabase.
+ * Exige usuário logado (regra de segurança do banco). Não usa .select() porque
+ * o remetente não tem permissão de ler a notificação de outra pessoa.
  */
 export async function enviarNotificacao({ user_email, titulo, mensagem, tipo = 'geral', link = '#' }) {
   if (!user_email) return null;
@@ -354,38 +354,14 @@ export async function enviarNotificacao({ user_email, titulo, mensagem, tipo = '
     lida: false
   };
   try {
-    const { data, error } = await supabase.from('notificacoes').insert([payload]).select();
+    const { error } = await supabase.from('notificacoes').insert([payload]);
     if (error) {
-      console.warn('[VersusHub Notificações] Aviso ao gravar via client, usando proxy:', error?.message || error);
-      try {
-        const resp = await fetch('/api/notificacoes', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-        if (resp.ok) {
-          const resJson = await resp.json();
-          return resJson.data || payload;
-        }
-      } catch (proxyErr) {}
-      return payload;
+      console.warn('[VersusHub Notificações] Aviso ao gravar notificação:', error?.message || error);
     }
-    return data && data[0] ? data[0] : payload;
   } catch (err) {
-    console.warn('[VersusHub Notificações] Exceção na gravação, usando fallback:', err?.message || err);
-    try {
-      const resp = await fetch('/api/notificacoes', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      if (resp.ok) {
-        const resJson = await resp.json();
-        return resJson.data || payload;
-      }
-    } catch (proxyErr) {}
-    return payload;
+    console.warn('[VersusHub Notificações] Exceção ao gravar notificação:', err?.message || err);
   }
+  return payload;
 }
 
 if (typeof window !== 'undefined') {

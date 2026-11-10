@@ -1,9 +1,19 @@
 {
   "buildCommand": null,
   "outputDirectory": ".",
+  "redirects": [
+    { "source": "/torneios.html", "destination": "/pagina_inicial/torneios.html", "permanent": true },
+    { "source": "/torneio.html", "destination": "/torneio/custom.html", "permanent": true },
+    { "source": "/torneio/torneio.html", "destination": "/torneio/custom.html", "permanent": true },
+    { "source": "/detalhes_torneio.html", "destination": "/torneio/custom.html", "permanent": true },
+    { "source": "/criar.html", "destination": "/criar_torneio/criar_torneio.html", "permanent": true },
+    { "source": "/gerenciar_equipe.html", "destination": "/equipes/gerenciar_equipes.html", "permanent": true },
+    { "source": "/gerenciar_equipes.html", "destination": "/equipes/gerenciar_equipes.html", "permanent": true },
+    { "source": "/equipes/gerenciar_equipe.html", "destination": "/equipes/gerenciar_equipes.html", "permanent": true }
+  ],
   "rewrites": [
     { "source": "/", "destination": "/pagina_inicial/index.html" },
-    { "source": "/torneios", "destination": "/torneios.html" },
+    { "source": "/torneios", "destination": "/pagina_inicial/torneios.html" },
     { "source": "/equipes", "destination": "/equipes/equipes.html" },
     { "source": "/gerenciar_equipes", "destination": "/equipes/gerenciar_equipes.html" },
     { "source": "/gerenciar_equipe", "destination": "/equipes/gerenciar_equipes.html" },

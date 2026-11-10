@@ -755,7 +755,7 @@ export async function recalcularEAtualizarStatusTorneio(torneioId) {
 
           if (notifRecords.length > 0) {
             try {
-              const { data: insData, error: insErr } = await supabase.from('notificacoes').insert(notifRecords).select();
+              const { error: insErr } = await supabase.from('notificacoes').insert(notifRecords);
               if (insErr) {
                 console.warn('[VersusHub Notificações] Aviso ao inserir notificações de encerramento via recalcularStatus:', insErr?.message || insErr);
               }

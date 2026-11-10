@@ -1400,26 +1400,11 @@ async function carregarNotificacoes(userEmail) {
       if (!error && Array.isArray(data)) {
         notificacoes = data;
       } else if (error) {
-        console.warn('[VersusHub Notificações] Aviso ao consultar via client (tentando proxy):', error?.message || error);
+        console.warn('[VersusHub Notificações] Aviso ao consultar via client:', error?.message || error);
       }
     }
   } catch (eClient) {
-    console.warn('[VersusHub Notificações] Exceção via client (tentando proxy):', eClient?.message || eClient);
-  }
-
-  // 3. Fallback: se não obteve via client, tenta via proxy /api/notificacoes
-  if (!notificacoes) {
-    try {
-      const resp = await fetch(`/api/notificacoes?email=${encodeURIComponent(currentNotifUserEmail)}`);
-      if (resp.ok) {
-        const json = await resp.json();
-        if (json && Array.isArray(json.data)) {
-          notificacoes = json.data;
-        }
-      }
-    } catch (eProxy) {
-      console.warn('[VersusHub Notificações] Aviso ao consultar via proxy:', eProxy?.message || eProxy);
-    }
+    console.warn('[VersusHub Notificações] Exceção via client:', eClient?.message || eClient);
   }
 
   // 4. Se obteve com sucesso, atualiza o cache local e a interface
@@ -1633,20 +1618,13 @@ async function excluirNotificacao(id) {
   if (!id) return;
   try {
     const supabase = await getSupabase();
-    let deletado = false;
     if (supabase) {
       const { error } = await supabase
         .from('notificacoes')
         .delete()
         .eq('id', id);
 
-      if (!error) deletado = true;
-      else console.warn('[VersusHub Notificações] Aviso ao excluir via client:', error?.message || error);
-    }
-    if (!deletado) {
-      try {
-        await fetch(`/api/notificacoes?id=${encodeURIComponent(id)}`, { method: 'DELETE' });
-      } catch (eProxy) {}
+      if (error) console.warn('[VersusHub Notificações] Aviso ao excluir via client:', error?.message || error);
     }
   } catch (err) {
     console.warn('[VersusHub Notificações] Aviso ao excluir notificação:', err?.message || err);
@@ -1668,20 +1646,13 @@ async function limparTodasNotificacoes() {
   if (!currentNotifUserEmail) return;
   try {
     const supabase = await getSupabase();
-    let limpo = false;
     if (supabase) {
       const { error } = await supabase
         .from('notificacoes')
         .delete()
         .ilike('user_email', currentNotifUserEmail);
 
-      if (!error) limpo = true;
-      else console.warn('[VersusHub Notificações] Aviso ao limpar via client:', error?.message || error);
-    }
-    if (!limpo) {
-      try {
-        await fetch(`/api/notificacoes?user_email=${encodeURIComponent(currentNotifUserEmail)}`, { method: 'DELETE' });
-      } catch (eProxy) {}
+      if (error) console.warn('[VersusHub Notificações] Aviso ao limpar via client:', error?.message || error);
     }
   } catch (err) {
     console.warn('[VersusHub Notificações] Aviso ao limpar notificações:', err?.message || err);
@@ -1700,23 +1671,12 @@ async function marcarComoLida(id) {
   if (!id) return;
   try {
     const supabase = await getSupabase();
-    let atualizado = false;
     if (supabase) {
       const { error } = await supabase
         .from('notificacoes')
         .update({ lida: true })
         .eq('id', id);
-      if (!error) atualizado = true;
-      else console.warn('[VersusHub Notificações] Aviso ao marcar como lida via client:', error?.message || error);
-    }
-    if (!atualizado) {
-      try {
-        await fetch('/api/notificacoes', {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id, lida: true })
-        });
-      } catch (eProxy) {}
+      if (error) console.warn('[VersusHub Notificações] Aviso ao marcar como lida via client:', error?.message || error);
     }
   } catch (e) {
     console.warn('[VersusHub Notificações] Aviso ao marcar como lida:', e?.message || e);
@@ -1736,24 +1696,13 @@ async function marcarTodasComoLidas() {
   if (!currentNotifUserEmail) return;
   try {
     const supabase = await getSupabase();
-    let atualizado = false;
     if (supabase) {
       const { error } = await supabase
         .from('notificacoes')
         .update({ lida: true })
         .ilike('user_email', currentNotifUserEmail)
         .eq('lida', false);
-      if (!error) atualizado = true;
-      else console.warn('[VersusHub Notificações] Aviso ao marcar todas como lidas via client:', error?.message || error);
-    }
-    if (!atualizado) {
-      try {
-        await fetch('/api/notificacoes', {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ user_email: currentNotifUserEmail, lida: true })
-        });
-      } catch (eProxy) {}
+      if (error) console.warn('[VersusHub Notificações] Aviso ao marcar todas como lidas via client:', error?.message || error);
     }
   } catch (e) {
     console.warn('[VersusHub Notificações] Aviso ao marcar todas como lidas:', e?.message || e);
