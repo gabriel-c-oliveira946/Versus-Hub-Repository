@@ -4142,15 +4142,8 @@ export async function abrirModalConfirmacaoEncerramentoTorneio({ torneioId, onCo
         if (ranking[1]) ranking[1].isVice = true;
       }
 
-      // 4. Verifica modalidade do Torneio (Solo vs Equipe)
-      const { data: dbTorneio } = await supabase.from('torneios').select('*').eq('id', String(torneioId)).maybeSingle();
-      const isTorneioEquipe = Boolean(
-        (dbTorneio && (
-          (dbTorneio.tipoInscricao && dbTorneio.tipoInscricao.toLowerCase().includes('equipe')) ||
-          (Number(dbTorneio.maxIntegrantes) > 1)
-        )) ||
-        confirmados.some(c => c.tipo === 'equipe' || Boolean(c.equipe_id))
-      );
+      // 4. A modalidade (jogador ou equipe) é decidida por participante logo
+      // abaixo: torneios "Solo ou Equipe" podem ter os dois tipos inscritos.
 
       const { data: usuariosDb } = await supabase.from('usuarios').select('*');
       const userList = Array.isArray(usuariosDb) ? usuariosDb : [];
@@ -4165,35 +4158,51 @@ export async function abrirModalConfirmacaoEncerramentoTorneio({ torneioId, onCo
       // torneio como 'Encerrado' de uma só vez.
       const resultados = [];
       const alvosVistos = new Set();
+      const acharEquipe = (data) => equipeList.find(eq =>
+        (data.equipe_id && String(eq.id) === String(data.equipe_id)) ||
+        (data.realId && String(eq.id) === String(data.realId)) ||
+        (data.nome && removerTagNome(eq.nome || '').toLowerCase() === data.nome.toLowerCase())
+      );
+      const acharUsuario = (data) => userList.find(u =>
+        (data.email && u.email && u.email.trim().toLowerCase() === data.email) ||
+        (data.realId && u.email && u.email.trim().toLowerCase() === data.realId.toLowerCase()) ||
+        (data.realId && u.id && String(u.id) === String(data.realId)) ||
+        (data.nome && u.nome && u.nome.trim().toLowerCase() === data.nome.toLowerCase())
+      );
+
+      const naoEncontrados = [];
       for (const data of ranking) {
         const colocacao = (data.isCampeao || data.isCoCampeao) ? 1 : (data.isVice ? 2 : 0);
         const vitorias = Number(data.wins) || 0;
         const derrotas = Number(data.losses) || 0;
 
-        if (isTorneioEquipe) {
-          const dbEquipe = equipeList.find(eq =>
-            (data.equipe_id && String(eq.id) === String(data.equipe_id)) ||
-            (data.realId && String(eq.id) === String(data.realId)) ||
-            (data.nome && removerTagNome(eq.nome).toLowerCase() === data.nome.toLowerCase())
-          );
-          if (!dbEquipe) continue;
+        // Inscrito como equipe -> pontua a equipe; inscrito sozinho -> pontua o jogador.
+        const inscritoComoEquipe = data.tipo === 'equipe' || Boolean(data.equipe_id);
+        let dbEquipe = inscritoComoEquipe ? acharEquipe(data) : null;
+        const dbUser = dbEquipe ? null : acharUsuario(data);
+        // Participante sem tipo definido (só aparece nas partidas): tenta como equipe
+        if (!dbEquipe && !dbUser && !inscritoComoEquipe) dbEquipe = acharEquipe(data);
+
+        if (dbEquipe) {
           const chave = 'equipe:' + String(dbEquipe.id);
           if (alvosVistos.has(chave)) continue;
           alvosVistos.add(chave);
           resultados.push({ tipo: 'equipe', equipe_id: String(dbEquipe.id), vitorias, derrotas, colocacao });
-        } else {
-          const dbUser = userList.find(u =>
-            (data.email && u.email && u.email.trim().toLowerCase() === data.email) ||
-            (data.realId && u.email && u.email.trim().toLowerCase() === data.realId.toLowerCase()) ||
-            (data.realId && u.id && String(u.id) === String(data.realId)) ||
-            (data.nome && u.nome && u.nome.trim().toLowerCase() === data.nome.toLowerCase())
-          );
-          if (!dbUser || !dbUser.email) continue;
+        } else if (dbUser && dbUser.email) {
           const chave = dbUser.email.trim().toLowerCase();
           if (alvosVistos.has(chave)) continue;
           alvosVistos.add(chave);
           resultados.push({ tipo: 'usuario', email: chave, vitorias, derrotas, colocacao });
+        } else {
+          naoEncontrados.push(data.nome || data.realId || '?');
         }
+      }
+
+      if (naoEncontrados.length > 0) {
+        console.warn('Participantes sem cadastro encontrado (não pontuados):', naoEncontrados);
+      }
+      if (resultados.length === 0) {
+        throw new Error('Nenhum participante cadastrado foi encontrado para receber a pontuação.');
       }
 
       const { error: rpcErr } = await supabase.rpc('vh_encerrar_torneio', {
