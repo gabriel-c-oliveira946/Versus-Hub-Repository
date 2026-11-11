@@ -354,13 +354,58 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
+  /**
+   * Inscrições do usuário logado: as feitas no próprio nome e as das equipes
+   * em que ele é líder ou membro aceito (a inscrição da equipe fica no e-mail
+   * do líder, então os outros membros não apareciam).
+   * Um torneio aparece uma vez só; a inscrição no próprio nome tem prioridade.
+   */
+  async function buscarInscricoesDoUsuario() {
+    const colunas = 'torneio_id, user_email, status, tipo, id_participante, lineup, created_at';
+    const email = String(loggedUser.email || '').trim();
+
+    const { data: proprias, error } = await supabase
+      .from('inscricoes')
+      .select(colunas)
+      .ilike('user_email', email);
+
+    let daEquipe = [];
+    try {
+      const [{ data: lideradas }, { data: membro }] = await Promise.all([
+        supabase.from('equipes').select('id').ilike('leaderEmail', email),
+        supabase.from('membros_equipe').select('equipe_id').ilike('user_email', email).eq('status', 'Aceito')
+      ]);
+      const idsEquipes = [...new Set([
+        ...(lideradas || []).map(e => String(e.id)),
+        ...(membro || []).map(m => String(m.equipe_id))
+      ].filter(Boolean))];
+
+      if (idsEquipes.length > 0) {
+        const { data: inscEquipes, error: errEq } = await supabase
+          .from('inscricoes')
+          .select(colunas)
+          .in('id_participante', idsEquipes);
+        if (errEq) console.warn('Erro ao consultar inscrições das equipes:', errEq);
+        daEquipe = inscEquipes || [];
+      }
+    } catch (eEq) {
+      console.warn('Erro ao consultar equipes do usuário:', eEq);
+    }
+
+    const porTorneio = new Map();
+    [...(proprias || []), ...daEquipe].forEach(i => {
+      const id = String(i?.torneio_id || '');
+      if (id && !porTorneio.has(id)) porTorneio.set(id, i);
+    });
+    const lista = [...porTorneio.values()]
+      .sort((a, b) => String(b.created_at || '').localeCompare(String(a.created_at || '')));
+
+    return { data: lista, error };
+  }
+
   async function carregarTorneiosInscritos() {
     try {
-      const { data: inscricoesDb, error } = await supabase
-        .from('inscricoes')
-        .select('torneio_id, user_email, status, tipo, id_participante, lineup, created_at')
-        .eq('user_email', loggedUser.email)
-        .order('created_at', { ascending: false });
+      const { data: inscricoesDb, error } = await buscarInscricoesDoUsuario();
 
       if (error) {
         console.warn('Erro ao consultar inscrições:', error);
@@ -408,7 +453,10 @@ document.addEventListener('DOMContentLoaded', async () => {
               statusClass: t.statusClass || 'status-aberto',
               banner: (t.banner && !t.banner.includes('cerradocup')) ? t.banner : '/images/logo_versushub.png',
               link: '/torneio/custom.html?id=' + encodeURIComponent(insc.torneio_id),
-              inscricaoStatus: insc.status || 'Pendente'
+              inscricaoStatus: (insc.status || 'Pendente') + (
+                String(insc.user_email || '').trim().toLowerCase() !== String(loggedUser.email || '').trim().toLowerCase()
+                  ? ' (pela equipe)' : ''
+              )
             };
           });
       }
@@ -440,11 +488,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
     try {
-      // 1. Consulte na tabela 'inscricoes' todas as inscrições do user_email logado
-      const { data: inscricoesDb, error } = await supabase
-        .from('inscricoes')
-        .select('torneio_id, user_email, status, tipo, id_participante, lineup, created_at')
-        .ilike('user_email', loggedUser.email);
+      // 1. Inscrições do usuário e das equipes dele
+      const { data: inscricoesDb, error } = await buscarInscricoesDoUsuario();
 
       if (error) {
         console.warn('Erro ao consultar inscrições para frequentados:', error);
