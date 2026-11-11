@@ -208,8 +208,14 @@ document.addEventListener("DOMContentLoaded", () => {
   async function syncUserWithSupabase(u) {
     if (!u) return { success: false };
     try {
-      const { supabase, ensureUserProfile } = await import('/supabaseClient.js');
+      const { supabase, ensureUserProfile, imagemParaStorage } = await import('/supabaseClient.js');
       const email = (u.email || '').toLowerCase().trim();
+
+      // Imagens novas (Base64) vão para o Storage; o perfil guarda só a URL
+      if (imagemParaStorage) {
+        u.avatar = await imagemParaStorage(u.avatar, 'avatares');
+        u.banner = await imagemParaStorage(u.banner, 'banners-perfil');
+      }
       const userId = u.id;
 
       // 1. Garante que a linha do usuário exista na tabela 'usuarios' antes de atualizar

@@ -1,7 +1,7 @@
 // /gerenciartorneios/js/Script.js
 // Gerenciamento completo de torneios com Supabase (Edição, Exclusão, Inscrições e Chaveamento)
 
-import { supabase, enviarNotificacao } from '/supabaseClient.js';
+import { supabase, enviarNotificacao, imagemParaStorage } from '/supabaseClient.js';
 import {
   gerarChaveamentoTorneio,
   carregarPartidasTorneio,
@@ -656,23 +656,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
-  function dataURLtoBlob(dataUrl) {
-    try {
-      const arr = dataUrl.split(',');
-      const mimeMatch = arr[0].match(/:(.*?);/);
-      const mime = mimeMatch ? mimeMatch[1] : 'image/jpeg';
-      const bstr = atob(arr[1]);
-      let n = bstr.length;
-      const u8arr = new Uint8Array(n);
-      while (n--) {
-        u8arr[n] = bstr.charCodeAt(n);
-      }
-      return new Blob([u8arr], { type: mime });
-    } catch (e) {
-      return null;
-    }
-  }
-
   // ==============================================================================
   // AÇÕES: EDITAR TORNEIO (MODAL COM SISTEMA DE ABAS E UPLOAD)
   // ==============================================================================
@@ -1011,36 +994,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         bannerFinal = bannerComprimidoDataUrl || bannerPreview.src;
 
-        // Se for data URL, tenta subir o blob comprimido para o Storage do Supabase
-        if (bannerFinal && bannerFinal.startsWith('data:')) {
-          try {
-            const blobComprimido = dataURLtoBlob(bannerFinal);
-            if (blobComprimido) {
-              const fileName = `banner_${torneio.id}_${Date.now()}.jpg`;
-              const filePath = `banners/${fileName}`;
-
-              const { data: uploadData, error: uploadErr } = await supabase.storage
-                .from('torneios')
-                .upload(filePath, blobComprimido, {
-                  contentType: 'image/jpeg',
-                  cacheControl: '3600',
-                  upsert: true
-                });
-
-              if (!uploadErr && uploadData) {
-                const { data: publicUrlData } = supabase.storage
-                  .from('torneios')
-                  .getPublicUrl(filePath);
-
-                if (publicUrlData && publicUrlData.publicUrl) {
-                  bannerFinal = publicUrlData.publicUrl;
-                }
-              }
-            }
-          } catch (storageErr) {
-            console.warn('Salvando banner comprimido JPEG diretamente no registro:', storageErr);
-          }
-        }
+        // Envia para o Storage (bucket 'imagens'); o torneio guarda só a URL
+        bannerFinal = await imagemParaStorage(bannerFinal, 'banners-torneio');
       }
 
       const novoNome = form.querySelector('#editNome').value.trim();

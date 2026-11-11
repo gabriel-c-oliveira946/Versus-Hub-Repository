@@ -217,6 +217,64 @@ export function comprimirImagemCanvas(fileOrDataUrl, maxWidth = 200, maxHeight =
 }
 
 /**
+ * ARMAZENAMENTO DE IMAGENS (Supabase Storage)
+ * As imagens ficam no bucket público 'imagens' e o banco guarda só o endereço.
+ * Antes, avatares, logos e banners eram salvos como texto Base64 dentro das
+ * tabelas, e cada listagem baixava todas as imagens de novo.
+ */
+export const BUCKET_IMAGENS = 'imagens';
+
+function dataUrlParaBlob(dataUrl) {
+  const [cabecalho, base64] = String(dataUrl).split(',');
+  const tipo = (cabecalho.match(/data:([^;]+)/) || [])[1] || 'image/jpeg';
+  const bin = atob(base64 || '');
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return new Blob([bytes], { type: tipo });
+}
+
+/**
+ * Se `valor` for uma imagem em Base64 (data:image/...), envia para o Storage e
+ * devolve a URL pública. Qualquer outro valor (URL, caminho, vazio) volta igual.
+ * Se o envio falhar (ex.: bucket ainda não criado), devolve o Base64 original
+ * para o site continuar funcionando como antes.
+ * @param {string} valor
+ * @param {'avatares'|'banners-perfil'|'logos'|'banners-torneio'} pasta
+ */
+export async function imagemParaStorage(valor, pasta = 'geral') {
+  if (typeof valor !== 'string' || !valor.startsWith('data:image/')) return valor;
+  try {
+    const session = await getActiveSession();
+    const uid = session?.user?.id;
+    if (!uid) return valor;
+
+    const blob = dataUrlParaBlob(valor);
+    const ext = blob.type === 'image/png' ? 'png' : (blob.type === 'image/webp' ? 'webp' : 'jpg');
+    const aleatorio = Math.random().toString(36).slice(2, 8);
+    // Caminho: <pasta>/<id do usuário>/<arquivo> (a regra do Storage exige o id na 2ª parte)
+    const caminho = `${pasta}/${uid}/${Date.now()}-${aleatorio}.${ext}`;
+
+    const { error } = await supabase.storage
+      .from(BUCKET_IMAGENS)
+      .upload(caminho, blob, { contentType: blob.type, cacheControl: '31536000', upsert: false });
+
+    if (error) {
+      console.warn('[VersusHub Imagens] Falha ao enviar para o Storage, mantendo Base64:', error?.message || error);
+      return valor;
+    }
+    const { data } = supabase.storage.from(BUCKET_IMAGENS).getPublicUrl(caminho);
+    return data?.publicUrl || valor;
+  } catch (err) {
+    console.warn('[VersusHub Imagens] Erro ao enviar imagem:', err?.message || err);
+    return valor;
+  }
+}
+
+if (typeof window !== 'undefined') {
+  window.imagemParaStorage = imagemParaStorage;
+}
+
+/**
  * Sanitiza o objeto de usuário removendo qualquer campo sensível de senha ou token
  */
 export function sanitizeUserForStorage(user) {

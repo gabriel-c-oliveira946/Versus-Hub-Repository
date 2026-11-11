@@ -1,7 +1,7 @@
 // /equipes/js/template_equipe.js
 // Detalhes da Equipe conectados diretamente ao Supabase
 
-import { supabase, enviarNotificacao } from '/supabaseClient.js';
+import { supabase, enviarNotificacao, imagemParaStorage, comprimirImagemCanvas } from '/supabaseClient.js';
 
 // Todas as equipes e membros são carregados exclusivamente do banco de dados (Supabase)
 
@@ -712,7 +712,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         const novosJogos = document.getElementById('tplEditTeamJogos').value.trim();
         const novaRegiao = document.getElementById('tplEditTeamRegiao').value.trim() || 'Brasil';
         const novoSobre = document.getElementById('tplEditTeamSobre').value.trim();
-        const novoLogo = tplEditLogoDataUrl || equipe.logo || '/image/logo.png';
+        let novoLogo = tplEditLogoDataUrl || equipe.logo || '/image/logo.png';
+        if (tplEditLogoDataUrl) {
+          // A imagem escolhida vinha sem compressão (podia ter vários MB)
+          try { novoLogo = await comprimirImagemCanvas(tplEditLogoDataUrl, 200, 200, 0.6); } catch (eComp) {}
+        }
+        novoLogo = await imagemParaStorage(novoLogo, 'logos');
 
         const btnSave = document.getElementById('btnSalvarModalTemplateEdit');
         if (btnSave) {

@@ -1,5 +1,5 @@
 // /equipes/js/gerenciar_equipes.js
-import { supabase, enviarNotificacao } from '/supabaseClient.js';
+import { supabase, enviarNotificacao, imagemParaStorage } from '/supabaseClient.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
   let loggedUser = null;
@@ -1137,7 +1137,7 @@ function abrirModalEdicao(equipe) {
       const logoAtual = (equipeSelecionada && String(equipeSelecionada.id) === String(teamId))
         ? equipeSelecionada.logo
         : (editTeamLogoImg ? editTeamLogoImg.src : '/image/logo.png');
-      const novoLogo = editTeamLogoDataUrl || logoAtual || '/image/logo.png';
+      const novoLogo = await imagemParaStorage(editTeamLogoDataUrl || logoAtual || '/image/logo.png', 'logos');
 
       const novaRegiao = document.getElementById('editTeamRegiao').value.trim() || 'Brasil';
       const novoSobre = document.getElementById('editTeamSobre').value.trim();

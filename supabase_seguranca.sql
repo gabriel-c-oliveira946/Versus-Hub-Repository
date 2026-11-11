@@ -16,6 +16,8 @@
 --   5. Cria a função vh_encerrar_torneio, que grava a pontuação final de
 --      todos os participantes (o organizador não pode alterar o perfil dos
 --      outros diretamente, então o banco faz isso depois de conferir tudo).
+--   6. Cria o bucket 'imagens' no Storage, onde ficam avatares, logos e
+--      banners (o banco guarda só o endereço da imagem).
 -- ==============================================================================
 
 -- ------------------------------------------------------------------------------
@@ -648,3 +650,38 @@ DROP TRIGGER IF EXISTS vh_proteger_pontos_consolidados ON public.torneios;
 CREATE TRIGGER vh_proteger_pontos_consolidados
     BEFORE INSERT OR UPDATE ON public.torneios
     FOR EACH ROW EXECUTE FUNCTION public.vh_proteger_pontos_consolidados();
+
+-- ------------------------------------------------------------------------------
+-- 6. ARMAZENAMENTO DE IMAGENS (Supabase Storage)
+--    Bucket público 'imagens': qualquer pessoa vê as imagens pelo link, mas só
+--    usuários logados enviam, e cada um só mexe nos próprios arquivos.
+--    Caminho dos arquivos: <pasta>/<id do usuário>/<arquivo>
+--    (pastas: avatares, banners-perfil, logos, banners-torneio)
+--    Limite: 2 MB por arquivo, apenas JPEG, PNG, WebP e GIF.
+-- ------------------------------------------------------------------------------
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES ('imagens', 'imagens', true, 2097152,
+        ARRAY['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
+ON CONFLICT (id) DO UPDATE SET
+    public = EXCLUDED.public,
+    file_size_limit = EXCLUDED.file_size_limit,
+    allowed_mime_types = EXCLUDED.allowed_mime_types;
+
+DROP POLICY IF EXISTS "imagens_insert_propria_pasta" ON storage.objects;
+CREATE POLICY "imagens_insert_propria_pasta" ON storage.objects
+    FOR INSERT TO authenticated
+    WITH CHECK (
+        bucket_id = 'imagens'
+        AND (storage.foldername(name))[2] = auth.uid()::text
+    );
+
+DROP POLICY IF EXISTS "imagens_update_proprias" ON storage.objects;
+CREATE POLICY "imagens_update_proprias" ON storage.objects
+    FOR UPDATE TO authenticated
+    USING (bucket_id = 'imagens' AND (storage.foldername(name))[2] = auth.uid()::text)
+    WITH CHECK (bucket_id = 'imagens' AND (storage.foldername(name))[2] = auth.uid()::text);
+
+DROP POLICY IF EXISTS "imagens_delete_proprias" ON storage.objects;
+CREATE POLICY "imagens_delete_proprias" ON storage.objects
+    FOR DELETE TO authenticated
+    USING (bucket_id = 'imagens' AND (storage.foldername(name))[2] = auth.uid()::text);
