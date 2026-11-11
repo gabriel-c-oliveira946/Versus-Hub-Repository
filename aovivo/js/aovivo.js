@@ -5,11 +5,6 @@
 
 import { supabase } from '/supabaseClient.js';
 
-// Limpeza preventiva total de torneios estáticos
-
-
-
-
 let cacheTorneiosAoVivo = [];
 
 /**
@@ -83,11 +78,11 @@ function renderizarTorneiosAoVivo(torneios, termoBusca = '') {
     const plataforma = (torneio.plataforma || 'Multi').toUpperCase();
     const dataInfo = torneio.data ? `Início: ${torneio.data}` : 'Transmissão em andamento';
 
-    // Determina o link da transmissão
-    let streamUrl = torneio.link || torneio.transmissao_url;
-    if (!streamUrl || streamUrl.startsWith('/')) {
-      streamUrl = `/torneio/custom.html?id=${encodeURIComponent(torneio.id)}`;
-    }
+    // Link da live da partida; sem link externo, abre a página do torneio
+    const linkExterno = isLinkExterno(torneio.transmissao_url);
+    const streamUrl = linkExterno
+      ? torneio.transmissao_url.trim()
+      : `/torneio/custom.html?id=${encodeURIComponent(torneio.id)}`;
 
     card.innerHTML = `
       <div class="badge-ao-vivo">
@@ -98,7 +93,7 @@ function renderizarTorneiosAoVivo(torneios, termoBusca = '') {
         <h2>${escapeHtml(nome)}</h2>
         <p class="jogo">Jogo: ${escapeHtml(jogo)} • ${escapeHtml(categoria)} • ${escapeHtml(plataforma)}</p>
         <p class="data">${escapeHtml(dataInfo)}</p>
-        <a href="${escapeHtml(streamUrl)}" target="_blank" rel="noopener noreferrer" style="text-decoration: none; width: 100%;">
+        <a href="${escapeHtml(streamUrl)}" ${linkExterno ? 'target="_blank" rel="noopener noreferrer"' : ''} style="text-decoration: none; width: 100%;">
           <button type="button" class="btn-detalhes btn-assistir" style="width: 100%;">
             <i class="fa-solid fa-play"></i> Assistir agora
           </button>
@@ -110,77 +105,82 @@ function renderizarTorneiosAoVivo(torneios, termoBusca = '') {
   });
 }
 
-// Removidas transmissões estáticas prontas: exibe apenas torneios ao vivo reais
-const transmissoesOficiais = [];
-
 /**
- * Avalia se um torneio possui transmissão ativa ou status ao vivo
+ * Um torneio está ao vivo quando alguma partida dele tem link de transmissão e
+ * ainda não tem vencedor. Quem calcula isso é recalcularEAtualizarStatusTorneio
+ * (torneio/js/brackets.js), que grava status = 'Ao Vivo' no torneio.
+ * Obs.: 'Em Andamento' usa a mesma classe visual, mas NÃO significa ao vivo.
  */
 function isTorneioAoVivo(t) {
   if (!t) return false;
   const status = (t.status || '').toLowerCase();
-  const statusClass = (t.statusClass || '').toLowerCase();
-  const link = (t.link || '').toLowerCase();
+  if (status.includes('encerrad') || status.includes('finalizado')) return false;
+  return status.includes('ao vivo') || t.ao_vivo === true || t.ao_vivo === 'true' || t.transmissao_status === 'ao_vivo';
+}
 
-  // Torneios encerrados não estão ao vivo
-  if (status.includes('encerrado') || status.includes('finalizado')) {
-    return false;
-  }
-
-  // 1. Marcados como Ao Vivo ou em andamento
-  if (status.includes('ao vivo') || statusClass === 'status-andamento') {
-    return true;
-  }
-
-  // 2. Flags booleanas
-  if (t.ao_vivo === true || t.ao_vivo === 'true' || t.transmissao_status === 'ao_vivo') {
-    return true;
-  }
-
-  // 3. Torneios com links de live externos válidos
-  if (link.includes('youtube.com') || link.includes('youtu.be') || link.includes('twitch.tv')) {
-    return true;
-  }
-
-  return false;
+function isLinkExterno(url) {
+  return /^https?:\/\//i.test(String(url || '').trim());
 }
 
 /**
- * Busca torneios no Supabase e localStorage que estejam ao vivo
+ * Busca no Supabase os torneios ao vivo e o link da partida que está sendo transmitida
  */
 async function buscarTorneiosAoVivo() {
   let listaDb = [];
+  let falhou = false;
 
   try {
-    // Consulta todos os torneios no Supabase sem cláusulas or() quebradas
+    // select('*'): pedir colunas específicas falhava quando alguma não existia no banco
     const { data, error } = await supabase
       .from('torneios')
-      .select('id, nome, jogo, status, data, modalidade, localizacao, banner, link')
+      .select('*')
       .order('created_at', { ascending: false });
 
     if (error) {
+      falhou = true;
       console.warn('Aviso ao consultar torneios no Supabase:', error);
     } else if (Array.isArray(data)) {
       listaDb = data.filter(isTorneioAoVivo);
     }
+
+    // Link da transmissão: o da partida com link e ainda sem vencedor
+    if (listaDb.length > 0) {
+      const { data: partidas, error: errP } = await supabase
+        .from('partidas')
+        .select('torneio_id, link_transmissao, vencedor_id, rodada, numero_partida')
+        .in('torneio_id', listaDb.map(t => String(t.id)));
+
+      if (errP) {
+        console.warn('Aviso ao consultar partidas ao vivo:', errP);
+      } else {
+        (partidas || [])
+          .filter(p => isLinkExterno(p.link_transmissao) && !String(p.vencedor_id || '').trim())
+          .sort((x, y) => (x.rodada || 0) - (y.rodada || 0) || (x.numero_partida || 0) - (y.numero_partida || 0))
+          .forEach(p => {
+            const t = listaDb.find(tt => String(tt.id) === String(p.torneio_id));
+            if (t && !t.transmissao_url) t.transmissao_url = p.link_transmissao.trim();
+          });
+      }
+    }
   } catch (err) {
+    falhou = true;
     console.error('Falha ao conectar com Supabase em buscarTorneiosAoVivo:', err);
   } finally {
     fecharLoader();
   }
 
-  // Mescla com torneios do localStorage (vh_createdTournaments)
-  try {
-    const locais = (JSON.parse(localStorage.getItem('vh_createdTournaments') || '[]')).filter(
-      l => l 
-    );
-    locais.forEach(loc => {
-      if (isTorneioAoVivo(loc) && !listaDb.some(t => String(t.id) === String(loc.id))) {
-        listaDb.unshift(loc);
-      }
-    });
-  } catch (err) {
-    console.warn('Erro ao ler torneios locais:', err);
+  // Cópia do navegador só quando o banco não respondeu (senão mostraria dados antigos)
+  if (falhou) {
+    try {
+      const locais = JSON.parse(localStorage.getItem('vh_createdTournaments') || '[]');
+      locais.forEach(loc => {
+        if (isTorneioAoVivo(loc) && !listaDb.some(t => String(t.id) === String(loc.id))) {
+          listaDb.unshift(loc);
+        }
+      });
+    } catch (err) {
+      console.warn('Erro ao ler torneios locais:', err);
+    }
   }
 
   cacheTorneiosAoVivo = listaDb;

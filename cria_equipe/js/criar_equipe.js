@@ -1,5 +1,5 @@
 // /cria_equipe/js/criar_equipe.js
-import { supabase } from '/supabaseClient.js';
+import { supabase, imagemParaStorage } from '/supabaseClient.js';
 
 
 
@@ -198,7 +198,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         regiao: regiaoEquipe.value.trim(),
         limite: limiteMembros.value,
         sobre: sobreEquipe.value.trim() || 'Nenhuma descrição informada.',
-        logo: logoDataUrl || '/image/logo.png',
+        logo: (await imagemParaStorage(logoDataUrl, 'logos')) || '/image/logo.png',
 
         // Atrelado ao usuário logado (líder)
         leaderName: loggedUser?.nome || 'Líder',

@@ -16,6 +16,9 @@
 --   5. Cria a função vh_encerrar_torneio, que grava a pontuação final de
 --      todos os participantes (o organizador não pode alterar o perfil dos
 --      outros diretamente, então o banco faz isso depois de conferir tudo).
+--   6. Cria o bucket 'imagens' no Storage, onde ficam avatares, logos e
+--      banners (o banco guarda só o endereço da imagem).
+--   7. Cria a tabela de comentários dos torneios, com regras e limite anti-spam.
 -- ==============================================================================
 
 -- ------------------------------------------------------------------------------
@@ -648,3 +651,100 @@ DROP TRIGGER IF EXISTS vh_proteger_pontos_consolidados ON public.torneios;
 CREATE TRIGGER vh_proteger_pontos_consolidados
     BEFORE INSERT OR UPDATE ON public.torneios
     FOR EACH ROW EXECUTE FUNCTION public.vh_proteger_pontos_consolidados();
+
+-- ------------------------------------------------------------------------------
+-- 6. ARMAZENAMENTO DE IMAGENS (Supabase Storage)
+--    Bucket público 'imagens': qualquer pessoa vê as imagens pelo link, mas só
+--    usuários logados enviam, e cada um só mexe nos próprios arquivos.
+--    Caminho dos arquivos: <pasta>/<id do usuário>/<arquivo>
+--    (pastas: avatares, banners-perfil, logos, banners-torneio)
+--    Limite: 2 MB por arquivo, apenas JPEG, PNG, WebP e GIF.
+-- ------------------------------------------------------------------------------
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES ('imagens', 'imagens', true, 2097152,
+        ARRAY['image/jpeg', 'image/png', 'image/webp', 'image/gif'])
+ON CONFLICT (id) DO UPDATE SET
+    public = EXCLUDED.public,
+    file_size_limit = EXCLUDED.file_size_limit,
+    allowed_mime_types = EXCLUDED.allowed_mime_types;
+
+DROP POLICY IF EXISTS "imagens_insert_propria_pasta" ON storage.objects;
+CREATE POLICY "imagens_insert_propria_pasta" ON storage.objects
+    FOR INSERT TO authenticated
+    WITH CHECK (
+        bucket_id = 'imagens'
+        AND (storage.foldername(name))[2] = auth.uid()::text
+    );
+
+DROP POLICY IF EXISTS "imagens_update_proprias" ON storage.objects;
+CREATE POLICY "imagens_update_proprias" ON storage.objects
+    FOR UPDATE TO authenticated
+    USING (bucket_id = 'imagens' AND (storage.foldername(name))[2] = auth.uid()::text)
+    WITH CHECK (bucket_id = 'imagens' AND (storage.foldername(name))[2] = auth.uid()::text);
+
+DROP POLICY IF EXISTS "imagens_delete_proprias" ON storage.objects;
+CREATE POLICY "imagens_delete_proprias" ON storage.objects
+    FOR DELETE TO authenticated
+    USING (bucket_id = 'imagens' AND (storage.foldername(name))[2] = auth.uid()::text);
+
+-- ------------------------------------------------------------------------------
+-- 7. COMENTÁRIOS NOS TORNEIOS
+--    Qualquer pessoa lê; só usuários logados comentam, sempre em nome próprio.
+--    Apagar: o autor do comentário ou o organizador do torneio.
+--    Limites: 1 a 500 caracteres e no máximo 5 comentários por minuto por pessoa.
+--    Ao apagar um torneio, os comentários dele são apagados junto.
+-- ------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS public.comentarios (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    torneio_id TEXT NOT NULL REFERENCES public.torneios(id) ON DELETE CASCADE,
+    user_email TEXT NOT NULL,
+    texto TEXT NOT NULL CHECK (char_length(btrim(texto)) BETWEEN 1 AND 500),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_comentarios_torneio ON public.comentarios(torneio_id, created_at DESC);
+ALTER TABLE public.comentarios ENABLE ROW LEVEL SECURITY;
+
+-- Normaliza os dados e bloqueia excesso de comentários em pouco tempo
+CREATE OR REPLACE FUNCTION public.vh_validar_comentario()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+    NEW.user_email := lower(btrim(NEW.user_email));
+    NEW.texto := btrim(NEW.texto);
+    NEW.created_at := timezone('utc'::text, now());
+    IF (SELECT count(*) FROM public.comentarios c
+        WHERE c.user_email = NEW.user_email
+          AND c.created_at > timezone('utc'::text, now()) - interval '1 minute') >= 5 THEN
+        RAISE EXCEPTION 'Muitos comentários em pouco tempo. Aguarde um instante e tente de novo.';
+    END IF;
+    RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS vh_validar_comentario ON public.comentarios;
+CREATE TRIGGER vh_validar_comentario
+    BEFORE INSERT ON public.comentarios
+    FOR EACH ROW EXECUTE FUNCTION public.vh_validar_comentario();
+
+DROP POLICY IF EXISTS "comentarios_select_publico" ON public.comentarios;
+CREATE POLICY "comentarios_select_publico" ON public.comentarios
+    FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "comentarios_insert_proprio" ON public.comentarios;
+CREATE POLICY "comentarios_insert_proprio" ON public.comentarios
+    FOR INSERT TO authenticated
+    WITH CHECK (lower(btrim(user_email)) = public.vh_email_logado());
+
+DROP POLICY IF EXISTS "comentarios_delete_autor_ou_organizador" ON public.comentarios;
+CREATE POLICY "comentarios_delete_autor_ou_organizador" ON public.comentarios
+    FOR DELETE TO authenticated
+    USING (
+        lower(btrim(user_email)) = public.vh_email_logado()
+        OR torneio_id IN (
+            SELECT t.id FROM public.torneios t
+            WHERE lower(trim(t."criadorEmail")) = public.vh_email_logado()
+        )
+    );

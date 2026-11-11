@@ -1,5 +1,5 @@
 // /torneio/js/custom.js
-import { supabase, enviarNotificacao } from '/supabaseClient.js';
+import { supabase, enviarNotificacao, imagemParaStorage } from '/supabaseClient.js';
 import {
   carregarPartidasTorneio,
   renderizarChaveamentoVisual,
@@ -1584,6 +1584,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           bannerNovo = customEditBannerDataUrl;
         }
       }
+      bannerNovo = await imagemParaStorage(bannerNovo, 'banners-torneio');
 
       const getVal = (id, def = '') => {
         const el = document.getElementById(id);

@@ -1,7 +1,7 @@
 // /gerenciartorneios/js/Script.js
 // Gerenciamento completo de torneios com Supabase (Edição, Exclusão, Inscrições e Chaveamento)
 
-import { supabase, enviarNotificacao } from '/supabaseClient.js';
+import { supabase, enviarNotificacao, imagemParaStorage } from '/supabaseClient.js';
 import {
   gerarChaveamentoTorneio,
   carregarPartidasTorneio,
@@ -316,7 +316,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       const { data, error } = await supabase
         .from('torneios')
-        .select('id, nome, jogo, status, statusClass, data, maxParticipantes, limite, modalidade, banner, link')
+        .select('*')
         .eq('criadorEmail', loggedUser.email)
         .order('created_at', { ascending: false });
 
@@ -325,16 +325,26 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
 
       let criadosDb = data || [];
-
-      // Une com os salvos localmente caso haja algum recente (apenas torneios válidos do usuário)
       const allLocal = JSON.parse(localStorage.getItem('vh_createdTournaments') || '[]');
       const userLocal = allLocal.filter(t => t  && (!t.criadorEmail || t.criadorEmail === loggedUser.email));
 
-      userLocal.forEach(loc => {
-        if (!criadosDb.some(d => String(d.id) === String(loc.id))) {
-          criadosDb.push(loc);
-        }
-      });
+      if (error) {
+        // Banco indisponível: usa a cópia salva no navegador
+        userLocal.forEach(loc => {
+          if (!criadosDb.some(d => String(d.id) === String(loc.id))) {
+            criadosDb.push(loc);
+          }
+        });
+      } else {
+        // O banco é a fonte oficial: remove da cópia local os torneios que não existem mais
+        try {
+          const idsDb = new Set(criadosDb.map(d => String(d.id)));
+          const limpo = allLocal.filter(t => t && (
+            (t.criadorEmail && t.criadorEmail !== loggedUser.email) || idsDb.has(String(t.id))
+          ));
+          localStorage.setItem('vh_createdTournaments', JSON.stringify(limpo));
+        } catch (eLimpa) {}
+      }
 
       userCreatedTournaments = criadosDb;
     } catch (e) {
@@ -344,13 +354,58 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
+  /**
+   * Inscrições do usuário logado: as feitas no próprio nome e as das equipes
+   * em que ele é líder ou membro aceito (a inscrição da equipe fica no e-mail
+   * do líder, então os outros membros não apareciam).
+   * Um torneio aparece uma vez só; a inscrição no próprio nome tem prioridade.
+   */
+  async function buscarInscricoesDoUsuario() {
+    const colunas = 'torneio_id, user_email, status, tipo, id_participante, lineup, created_at';
+    const email = String(loggedUser.email || '').trim();
+
+    const { data: proprias, error } = await supabase
+      .from('inscricoes')
+      .select(colunas)
+      .ilike('user_email', email);
+
+    let daEquipe = [];
+    try {
+      const [{ data: lideradas }, { data: membro }] = await Promise.all([
+        supabase.from('equipes').select('id').ilike('leaderEmail', email),
+        supabase.from('membros_equipe').select('equipe_id').ilike('user_email', email).eq('status', 'Aceito')
+      ]);
+      const idsEquipes = [...new Set([
+        ...(lideradas || []).map(e => String(e.id)),
+        ...(membro || []).map(m => String(m.equipe_id))
+      ].filter(Boolean))];
+
+      if (idsEquipes.length > 0) {
+        const { data: inscEquipes, error: errEq } = await supabase
+          .from('inscricoes')
+          .select(colunas)
+          .in('id_participante', idsEquipes);
+        if (errEq) console.warn('Erro ao consultar inscrições das equipes:', errEq);
+        daEquipe = inscEquipes || [];
+      }
+    } catch (eEq) {
+      console.warn('Erro ao consultar equipes do usuário:', eEq);
+    }
+
+    const porTorneio = new Map();
+    [...(proprias || []), ...daEquipe].forEach(i => {
+      const id = String(i?.torneio_id || '');
+      if (id && !porTorneio.has(id)) porTorneio.set(id, i);
+    });
+    const lista = [...porTorneio.values()]
+      .sort((a, b) => String(b.created_at || '').localeCompare(String(a.created_at || '')));
+
+    return { data: lista, error };
+  }
+
   async function carregarTorneiosInscritos() {
     try {
-      const { data: inscricoesDb, error } = await supabase
-        .from('inscricoes')
-        .select('torneio_id, user_email, status, tipo, id_participante, lineup, created_at')
-        .eq('user_email', loggedUser.email)
-        .order('created_at', { ascending: false });
+      const { data: inscricoesDb, error } = await buscarInscricoesDoUsuario();
 
       if (error) {
         console.warn('Erro ao consultar inscrições:', error);
@@ -362,15 +417,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         .filter(id => id && !id.startsWith('equipe:'));
 
       let torneiosCarregados = [];
+      let falhaConsulta = Boolean(error);
 
       if (torneiosIds.length > 0) {
         const { data: torneiosDb, error: errTorneios } = await supabase
           .from('torneios')
-          .select('id, nome, jogo, status, statusClass, data, maxParticipantes, limite, modalidade, banner, link')
+          .select('*')
           .in('id', torneiosIds);
 
         if (errTorneios) {
           console.warn('Erro ao consultar torneios das inscrições:', errTorneios);
+          falhaConsulta = true;
         }
 
         const mapaTorneios = {};
@@ -380,6 +437,8 @@ document.addEventListener('DOMContentLoaded', async () => {
           .filter(i => !i.torneio_id.startsWith('equipe:'))
           // Ignora inscrições de torneios que foram excluídos
           .filter(i => errTorneios || mapaTorneios[String(i.torneio_id)])
+          // Torneios encerrados saem de "Participando" e vão para "Torneios frequentados"
+          .filter(i => !String(mapaTorneios[String(i.torneio_id)]?.status || '').toLowerCase().includes('encerrad'))
           .map(insc => {
             const t = mapaTorneios[String(insc.torneio_id)] || {};
             return {
@@ -394,18 +453,27 @@ document.addEventListener('DOMContentLoaded', async () => {
               statusClass: t.statusClass || 'status-aberto',
               banner: (t.banner && !t.banner.includes('cerradocup')) ? t.banner : '/images/logo_versushub.png',
               link: '/torneio/custom.html?id=' + encodeURIComponent(insc.torneio_id),
-              inscricaoStatus: insc.status || 'Pendente'
+              inscricaoStatus: (insc.status || 'Pendente') + (
+                String(insc.user_email || '').trim().toLowerCase() !== String(loggedUser.email || '').trim().toLowerCase()
+                  ? ' (pela equipe)' : ''
+              )
             };
           });
       }
 
-      // Une com cache local por segurança
-      const localJoined = JSON.parse(localStorage.getItem(`vh_joinedTournaments_${loggedUser.email}`) || '[]');
-      localJoined.forEach(loc => {
-        if (!torneiosCarregados.some(j => String(j.id) === String(loc.id))) {
-          torneiosCarregados.push(loc);
-        }
-      });
+      const chaveLocal = `vh_joinedTournaments_${loggedUser.email}`;
+      if (falhaConsulta) {
+        // Banco indisponível: completa com a cópia salva no navegador
+        const localJoined = JSON.parse(localStorage.getItem(chaveLocal) || '[]');
+        localJoined.forEach(loc => {
+          if (!torneiosCarregados.some(j => String(j.id) === String(loc.id))) {
+            torneiosCarregados.push(loc);
+          }
+        });
+      } else {
+        // O banco é a fonte oficial: a cópia local passa a refletir só o que existe
+        try { localStorage.setItem(chaveLocal, JSON.stringify(torneiosCarregados)); } catch (eLimpa) {}
+      }
 
       userJoinedTournaments = torneiosCarregados;
     } catch (e) {
@@ -420,11 +488,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
     try {
-      // 1. Consulte na tabela 'inscricoes' todas as inscrições do user_email logado
-      const { data: inscricoesDb, error } = await supabase
-        .from('inscricoes')
-        .select('torneio_id, user_email, status, tipo, id_participante, lineup, created_at')
-        .ilike('user_email', loggedUser.email);
+      // 1. Inscrições do usuário e das equipes dele
+      const { data: inscricoesDb, error } = await buscarInscricoesDoUsuario();
 
       if (error) {
         console.warn('Erro ao consultar inscrições para frequentados:', error);
@@ -439,7 +504,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // 2. Consulte na tabela 'torneios' os torneios correspondentes
         const { data: torneiosDb, error: errT } = await supabase
           .from('torneios')
-          .select('id, nome, jogo, status, statusClass, data, maxParticipantes, limite, modalidade, banner, link')
+          .select('*')
           .in('id', torneiosIds);
 
         if (errT) {
@@ -452,6 +517,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         // 3. Filtra apenas torneios cujo status seja 'Encerrado'
         torneiosFrequentados = (torneiosDb || [])
           .filter(t => t.status && (t.status === 'Encerrado' || t.status.toLowerCase().includes('encerrad')))
+          // Só conta como frequentado se a inscrição foi aceita (pendente/recusada não jogou)
+          .filter(t => String(mapaInsc[String(t.id)]?.status || '').toLowerCase() === 'aceito')
           .map(t => {
             const insc = mapaInsc[String(t.id)] || {};
             return {
@@ -467,6 +534,24 @@ document.addEventListener('DOMContentLoaded', async () => {
             };
           });
       }
+
+      // Inclui também os torneios encerrados que o usuário organizou
+      (userCreatedTournaments || []).forEach(t => {
+        const st = String(t?.status || '').toLowerCase();
+        if (!t || !st.includes('encerrad')) return;
+        if (torneiosFrequentados.some(f => String(f.id) === String(t.id))) return;
+        torneiosFrequentados.push({
+          id: t.id,
+          nome: t.nome || 'Torneio',
+          jogo: t.jogo || 'Livre',
+          data: t.data || 'Encerrado',
+          status: 'Encerrado',
+          statusClass: 'status-encerrado',
+          banner: (t.banner && !String(t.banner).includes('cerradocup')) ? t.banner : '/images/logo_versushub.png',
+          link: t.link || `/torneio/custom.html?id=${encodeURIComponent(t.id)}`,
+          inscricaoStatus: 'Organizador'
+        });
+      });
 
       userVisitedTournaments = torneiosFrequentados;
     } catch (err) {
@@ -569,23 +654,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         resolve('/images/logo_versushub.png');
       }
     });
-  }
-
-  function dataURLtoBlob(dataUrl) {
-    try {
-      const arr = dataUrl.split(',');
-      const mimeMatch = arr[0].match(/:(.*?);/);
-      const mime = mimeMatch ? mimeMatch[1] : 'image/jpeg';
-      const bstr = atob(arr[1]);
-      let n = bstr.length;
-      const u8arr = new Uint8Array(n);
-      while (n--) {
-        u8arr[n] = bstr.charCodeAt(n);
-      }
-      return new Blob([u8arr], { type: mime });
-    } catch (e) {
-      return null;
-    }
   }
 
   // ==============================================================================
@@ -926,36 +994,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         bannerFinal = bannerComprimidoDataUrl || bannerPreview.src;
 
-        // Se for data URL, tenta subir o blob comprimido para o Storage do Supabase
-        if (bannerFinal && bannerFinal.startsWith('data:')) {
-          try {
-            const blobComprimido = dataURLtoBlob(bannerFinal);
-            if (blobComprimido) {
-              const fileName = `banner_${torneio.id}_${Date.now()}.jpg`;
-              const filePath = `banners/${fileName}`;
-
-              const { data: uploadData, error: uploadErr } = await supabase.storage
-                .from('torneios')
-                .upload(filePath, blobComprimido, {
-                  contentType: 'image/jpeg',
-                  cacheControl: '3600',
-                  upsert: true
-                });
-
-              if (!uploadErr && uploadData) {
-                const { data: publicUrlData } = supabase.storage
-                  .from('torneios')
-                  .getPublicUrl(filePath);
-
-                if (publicUrlData && publicUrlData.publicUrl) {
-                  bannerFinal = publicUrlData.publicUrl;
-                }
-              }
-            }
-          } catch (storageErr) {
-            console.warn('Salvando banner comprimido JPEG diretamente no registro:', storageErr);
-          }
-        }
+        // Envia para o Storage (bucket 'imagens'); o torneio guarda só a URL
+        bannerFinal = await imagemParaStorage(bannerFinal, 'banners-torneio');
       }
 
       const novoNome = form.querySelector('#editNome').value.trim();

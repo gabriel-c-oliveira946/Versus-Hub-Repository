@@ -1,5 +1,5 @@
 // /criar_torneio/js/criar.js
-import { supabase } from '/supabaseClient.js';
+import { supabase, imagemParaStorage } from '/supabaseClient.js';
 
 // Limpeza preventiva total de torneios estáticos
 
@@ -613,7 +613,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const id = 'custom-' + Date.now();
     const inicioIso = dataValue && horaValue ? `${dataValue}T${horaValue}` : '';
-    const bannerFinal = bannerDataUrl || '/images/logo_versushub.png';
+    const bannerFinal = (await imagemParaStorage(bannerDataUrl, 'banners-torneio')) || '/images/logo_versushub.png';
     const tipoSelecionado = tipoInscricaoSelect ? tipoInscricaoSelect.value : 'Apenas Solo (1v1)';
 
     // Objeto de dados estruturados
