@@ -1071,38 +1071,49 @@ export function calcularStatusParticipantes(partidas = [], participantesConfirma
   const fmtStr = String(formatoTorneio || '').toLowerCase();
   const isMataMata = !fmtStr.includes('pontos') && !fmtStr.includes('liga');
 
-  // Coleta participantes únicos
+  // Coleta participantes únicos.
+  // Cada participante é um único registro, encontrado tanto pelo nome quanto
+  // pelo e-mail/ID. (Antes os inscritos eram guardados pelo e-mail e os
+  // jogadores das partidas pelo nome, e a mesma pessoa aparecia duas vezes.)
   const mapPart = new Map();
+  const registrarAlias = (alias, entry) => {
+    const k = String(alias || '').trim().toLowerCase();
+    if (k && !mapPart.has(k)) mapPart.set(k, entry);
+  };
+  const buscarParticipante = (...aliases) => {
+    for (const alias of aliases) {
+      const k = String(alias || '').trim().toLowerCase();
+      if (k && mapPart.has(k)) return mapPart.get(k);
+    }
+    return null;
+  };
 
   (participantesConfirmados || []).forEach(c => {
     const n = removerTagNome(c.nome || c.equipe_nome || c.user_email || '').trim();
     if (n && n.toLowerCase() !== 'a definir') {
-      const key = (c.user_email || n).trim().toLowerCase();
-      mapPart.set(key, {
-        nome: n,
-        email: (c.user_email || '').trim().toLowerCase(),
-        wins: 0,
-        totalPlacar: 0,
-        placarSofrido: 0
-      });
+      const email = (c.user_email || '').trim().toLowerCase();
+      const idPart = String(c.realId || c.equipe_id || c.id_participante || '').trim();
+      let entry = buscarParticipante(n, email, idPart);
+      if (!entry) {
+        entry = { nome: n, email, wins: 0, totalPlacar: 0, placarSofrido: 0 };
+      }
+      registrarAlias(n, entry);
+      registrarAlias(email, entry);
+      registrarAlias(idPart, entry);
     }
   });
 
   todasPartidas.forEach(p => {
-    const p1 = removerTagNome(p.p1_nome || '').trim();
-    if (p1 && p1.toLowerCase() !== 'a definir' && !p1.toLowerCase().startsWith('competidor')) {
-      const k1 = p1.toLowerCase();
-      if (!mapPart.has(k1)) {
-        mapPart.set(k1, { nome: p1, email: '', wins: 0, totalPlacar: 0, placarSofrido: 0 });
+    [[p.p1_nome, p.p1_id], [p.p2_nome, p.p2_id]].forEach(([nomeBruto, idBruto]) => {
+      const nome = removerTagNome(nomeBruto || '').trim();
+      if (!nome || nome.toLowerCase() === 'a definir' || nome.toLowerCase().startsWith('competidor')) return;
+      let entry = buscarParticipante(nome, idBruto);
+      if (!entry) {
+        entry = { nome, email: '', wins: 0, totalPlacar: 0, placarSofrido: 0 };
       }
-    }
-    const p2 = removerTagNome(p.p2_nome || '').trim();
-    if (p2 && p2.toLowerCase() !== 'a definir' && !p2.toLowerCase().startsWith('competidor')) {
-      const k2 = p2.toLowerCase();
-      if (!mapPart.has(k2)) {
-        mapPart.set(k2, { nome: p2, email: '', wins: 0, totalPlacar: 0, placarSofrido: 0 });
-      }
-    }
+      registrarAlias(nome, entry);
+      registrarAlias(idBruto, entry);
+    });
   });
 
   const perdedoresMataMata = new Set();
@@ -1138,22 +1149,18 @@ export function calcularStatusParticipantes(partidas = [], participantesConfirma
 
     // Apenas partidas com vencedor definido computam pontuação e saldo de vitórias
     if (vNome) {
-      const entry1 = mapPart.get(k1);
-      const entry2 = mapPart.get(k2);
+      const entry1 = buscarParticipante(k1, p.p1_id);
+      const entry2 = buscarParticipante(k2, p.p2_id);
       if (entry1) { entry1.totalPlacar += sc1; entry1.placarSofrido += sc2; }
       if (entry2) { entry2.totalPlacar += sc2; entry2.placarSofrido += sc1; }
 
-      const vKey = vNome.toLowerCase();
-      let vEntry = mapPart.get(vKey);
-      if (!vEntry) {
-        for (const [k, val] of mapPart.entries()) {
-          if (val.nome && val.nome.toLowerCase() === vKey) { vEntry = val; break; }
-        }
-      }
+      const vEntry = buscarParticipante(vNome, p.vencedor_id);
       if (vEntry) vEntry.wins += 1;
 
       if (pNome && pNome.toLowerCase() !== 'a definir') {
-        perdedoresMataMata.add(pNome.toLowerCase());
+        // Guarda o nome oficial do registro (pode diferir do nome salvo na partida)
+        const pEntry = buscarParticipante(pNome, pNome === p1 ? p.p1_id : p.p2_id);
+        perdedoresMataMata.add((pEntry ? pEntry.nome : pNome).toLowerCase());
       }
     }
 
@@ -1162,7 +1169,8 @@ export function calcularStatusParticipantes(partidas = [], participantesConfirma
     }
   });
 
-  const partArray = Array.from(mapPart.values());
+  // Lista sem repetição (vários apelidos apontam para o mesmo registro)
+  const partArray = Array.from(new Set(mapPart.values()));
 
   // 1. SE O TORNEIO ESTIVER OCORRENDO (NÃO ENCERRADO):
   if (!isTorneioEncerrado) {

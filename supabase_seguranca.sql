@@ -376,7 +376,8 @@ CREATE POLICY "notificacoes_delete_proprias" ON public.notificacoes
 --      - cada participante realmente está no torneio;
 --      - vitórias/derrotas não passam do número de partidas;
 --      - há no máximo 2 campeões (empate) e 1 vice.
---    Pontuação: campeão +500, vice +250 (igual ao pódio exibido no site).
+--    Pontuação: campeão +500, vice +250; em empate perfeito, 375 para cada
+--    co-campeão (igual ao pódio exibido no site).
 -- ------------------------------------------------------------------------------
 
 -- Converte texto em número sem dar erro (valor inválido vira NULL)
@@ -546,7 +547,14 @@ BEGIN
         v_vit  := coalesce(public.vh_num(r ->> 'vitorias'), 0);
         v_der  := coalesce(public.vh_num(r ->> 'derrotas'), 0);
         v_col  := coalesce(public.vh_num(r ->> 'colocacao'), 0);
-        v_pts  := CASE v_col WHEN 1 THEN 500 WHEN 2 THEN 250 ELSE 0 END;
+        -- Empate perfeito (2 co-campeões): o bônus de 1º + 2º é dividido (375 cada),
+        -- como mostra o pódio do site.
+        v_pts  := CASE
+                    WHEN v_col = 1 AND v_campeoes = 2 THEN 375
+                    WHEN v_col = 1 THEN 500
+                    WHEN v_col = 2 THEN 250
+                    ELSE 0
+                  END;
 
         IF v_tipo = 'usuario' THEN
             v_atualizados := v_atualizados + public.vh_somar_stats_usuario(
