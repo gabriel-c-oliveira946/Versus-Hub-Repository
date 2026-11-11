@@ -244,6 +244,37 @@
       </aside>
 
       </section>
+
+      <!-- COMENTÁRIOS DO TORNEIO (torneio/js/comentarios.js) -->
+      <section class="torneio-card-box comentarios-box" id="comentariosSecao" aria-labelledby="comentariosTitulo">
+        <h2 id="comentariosTitulo">
+          <i class="fa-regular fa-comments" style="color: #ff3b30; margin-right: 8px;"></i>Comentários
+          <span class="comentarios-contagem" id="comentariosContagem"></span>
+        </h2>
+
+        <form class="comentario-form" id="comentarioForm" hidden>
+          <img class="comentario-avatar" id="comentarioMeuAvatar" src="/image/boneco_logo_ofc.png" alt="">
+          <div class="comentario-form-corpo">
+            <label for="comentarioTexto" class="comentario-sr">Escreva um comentário</label>
+            <textarea id="comentarioTexto" maxlength="500" rows="3" placeholder="Deixe um recado para os participantes..." required></textarea>
+            <div class="comentario-form-rodape">
+              <span class="comentario-contador" id="comentarioContador">0/500</span>
+              <button type="submit" class="comentario-btn-enviar" id="comentarioEnviar">
+                <i class="fa-solid fa-paper-plane"></i> Comentar
+              </button>
+            </div>
+            <p class="comentario-erro" id="comentarioErro" role="alert" hidden></p>
+          </div>
+        </form>
+
+        <p class="comentario-login-aviso" id="comentarioLoginAviso" hidden>
+          <i class="fa-solid fa-lock"></i> <a href="/login/login.html">Entre na sua conta</a> para comentar.
+        </p>
+
+        <ul class="comentarios-lista" id="comentariosLista" aria-live="polite"></ul>
+        <p class="comentarios-vazio" id="comentariosVazio" hidden>Nenhum comentário ainda. Seja o primeiro!</p>
+        <button type="button" class="comentarios-mais" id="comentariosMais" hidden>Ver comentários anteriores</button>
+      </section>
     </div>
     <!-- FIM ABA 1 -->
 
@@ -454,5 +485,6 @@
   <!-- ========= SCRIPTS ========= -->
   <script src="/pagina_inicial/js/script.js"></script>
   <script type="module" src="/torneio/js/custom.js"></script>
+  <script type="module" src="/torneio/js/comentarios.js"></script>
 </body>
 </html>
