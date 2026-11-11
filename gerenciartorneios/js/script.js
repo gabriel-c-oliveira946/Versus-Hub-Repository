@@ -392,6 +392,8 @@ document.addEventListener('DOMContentLoaded', async () => {
           .filter(i => !i.torneio_id.startsWith('equipe:'))
           // Ignora inscrições de torneios que foram excluídos
           .filter(i => errTorneios || mapaTorneios[String(i.torneio_id)])
+          // Torneios encerrados saem de "Participando" e vão para "Torneios frequentados"
+          .filter(i => !String(mapaTorneios[String(i.torneio_id)]?.status || '').toLowerCase().includes('encerrad'))
           .map(insc => {
             const t = mapaTorneios[String(insc.torneio_id)] || {};
             return {
@@ -470,6 +472,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         // 3. Filtra apenas torneios cujo status seja 'Encerrado'
         torneiosFrequentados = (torneiosDb || [])
           .filter(t => t.status && (t.status === 'Encerrado' || t.status.toLowerCase().includes('encerrad')))
+          // Só conta como frequentado se a inscrição foi aceita (pendente/recusada não jogou)
+          .filter(t => String(mapaInsc[String(t.id)]?.status || '').toLowerCase() === 'aceito')
           .map(t => {
             const insc = mapaInsc[String(t.id)] || {};
             return {
