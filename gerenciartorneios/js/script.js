@@ -316,7 +316,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       const { data, error } = await supabase
         .from('torneios')
-        .select('id, nome, jogo, status, statusClass, data, maxParticipantes, limite, modalidade, banner, link')
+        .select('*')
         .eq('criadorEmail', loggedUser.email)
         .order('created_at', { ascending: false });
 
@@ -325,16 +325,26 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
 
       let criadosDb = data || [];
-
-      // Une com os salvos localmente caso haja algum recente (apenas torneios válidos do usuário)
       const allLocal = JSON.parse(localStorage.getItem('vh_createdTournaments') || '[]');
       const userLocal = allLocal.filter(t => t  && (!t.criadorEmail || t.criadorEmail === loggedUser.email));
 
-      userLocal.forEach(loc => {
-        if (!criadosDb.some(d => String(d.id) === String(loc.id))) {
-          criadosDb.push(loc);
-        }
-      });
+      if (error) {
+        // Banco indisponível: usa a cópia salva no navegador
+        userLocal.forEach(loc => {
+          if (!criadosDb.some(d => String(d.id) === String(loc.id))) {
+            criadosDb.push(loc);
+          }
+        });
+      } else {
+        // O banco é a fonte oficial: remove da cópia local os torneios que não existem mais
+        try {
+          const idsDb = new Set(criadosDb.map(d => String(d.id)));
+          const limpo = allLocal.filter(t => t && (
+            (t.criadorEmail && t.criadorEmail !== loggedUser.email) || idsDb.has(String(t.id))
+          ));
+          localStorage.setItem('vh_createdTournaments', JSON.stringify(limpo));
+        } catch (eLimpa) {}
+      }
 
       userCreatedTournaments = criadosDb;
     } catch (e) {
@@ -362,15 +372,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         .filter(id => id && !id.startsWith('equipe:'));
 
       let torneiosCarregados = [];
+      let falhaConsulta = Boolean(error);
 
       if (torneiosIds.length > 0) {
         const { data: torneiosDb, error: errTorneios } = await supabase
           .from('torneios')
-          .select('id, nome, jogo, status, statusClass, data, maxParticipantes, limite, modalidade, banner, link')
+          .select('*')
           .in('id', torneiosIds);
 
         if (errTorneios) {
           console.warn('Erro ao consultar torneios das inscrições:', errTorneios);
+          falhaConsulta = true;
         }
 
         const mapaTorneios = {};
@@ -399,13 +411,19 @@ document.addEventListener('DOMContentLoaded', async () => {
           });
       }
 
-      // Une com cache local por segurança
-      const localJoined = JSON.parse(localStorage.getItem(`vh_joinedTournaments_${loggedUser.email}`) || '[]');
-      localJoined.forEach(loc => {
-        if (!torneiosCarregados.some(j => String(j.id) === String(loc.id))) {
-          torneiosCarregados.push(loc);
-        }
-      });
+      const chaveLocal = `vh_joinedTournaments_${loggedUser.email}`;
+      if (falhaConsulta) {
+        // Banco indisponível: completa com a cópia salva no navegador
+        const localJoined = JSON.parse(localStorage.getItem(chaveLocal) || '[]');
+        localJoined.forEach(loc => {
+          if (!torneiosCarregados.some(j => String(j.id) === String(loc.id))) {
+            torneiosCarregados.push(loc);
+          }
+        });
+      } else {
+        // O banco é a fonte oficial: a cópia local passa a refletir só o que existe
+        try { localStorage.setItem(chaveLocal, JSON.stringify(torneiosCarregados)); } catch (eLimpa) {}
+      }
 
       userJoinedTournaments = torneiosCarregados;
     } catch (e) {
@@ -439,7 +457,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // 2. Consulte na tabela 'torneios' os torneios correspondentes
         const { data: torneiosDb, error: errT } = await supabase
           .from('torneios')
-          .select('id, nome, jogo, status, statusClass, data, maxParticipantes, limite, modalidade, banner, link')
+          .select('*')
           .in('id', torneiosIds);
 
         if (errT) {
@@ -467,6 +485,24 @@ document.addEventListener('DOMContentLoaded', async () => {
             };
           });
       }
+
+      // Inclui também os torneios encerrados que o usuário organizou
+      (userCreatedTournaments || []).forEach(t => {
+        const st = String(t?.status || '').toLowerCase();
+        if (!t || !st.includes('encerrad')) return;
+        if (torneiosFrequentados.some(f => String(f.id) === String(t.id))) return;
+        torneiosFrequentados.push({
+          id: t.id,
+          nome: t.nome || 'Torneio',
+          jogo: t.jogo || 'Livre',
+          data: t.data || 'Encerrado',
+          status: 'Encerrado',
+          statusClass: 'status-encerrado',
+          banner: (t.banner && !String(t.banner).includes('cerradocup')) ? t.banner : '/images/logo_versushub.png',
+          link: t.link || `/torneio/custom.html?id=${encodeURIComponent(t.id)}`,
+          inscricaoStatus: 'Organizador'
+        });
+      });
 
       userVisitedTournaments = torneiosFrequentados;
     } catch (err) {
