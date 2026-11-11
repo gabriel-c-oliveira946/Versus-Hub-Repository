@@ -316,7 +316,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       const { data, error } = await supabase
         .from('torneios')
-        .select('id, nome, jogo, status, data, maxParticipantes, max_participantes, banner, link')
+        .select('id, nome, jogo, status, statusClass, data, maxParticipantes, limite, modalidade, banner, link')
         .eq('criadorEmail', loggedUser.email)
         .order('created_at', { ascending: false });
 
@@ -364,22 +364,31 @@ document.addEventListener('DOMContentLoaded', async () => {
       let torneiosCarregados = [];
 
       if (torneiosIds.length > 0) {
-        const { data: torneiosDb } = await supabase
+        const { data: torneiosDb, error: errTorneios } = await supabase
           .from('torneios')
-          .select('id, nome, jogo, status, data, maxParticipantes, max_participantes, banner, link')
+          .select('id, nome, jogo, status, statusClass, data, maxParticipantes, limite, modalidade, banner, link')
           .in('id', torneiosIds);
+
+        if (errTorneios) {
+          console.warn('Erro ao consultar torneios das inscrições:', errTorneios);
+        }
 
         const mapaTorneios = {};
         (torneiosDb || []).forEach(t => { mapaTorneios[String(t.id)] = t; });
 
         torneiosCarregados = listaInscricoes
           .filter(i => !i.torneio_id.startsWith('equipe:'))
+          // Ignora inscrições de torneios que foram excluídos
+          .filter(i => errTorneios || mapaTorneios[String(i.torneio_id)])
           .map(insc => {
             const t = mapaTorneios[String(insc.torneio_id)] || {};
             return {
               id: insc.torneio_id,
-              nome: t.nome || insc.torneio_id,
+              nome: t.nome || 'Torneio',
               jogo: t.jogo || 'Livre',
+              maxParticipantes: t.maxParticipantes,
+              limite: t.limite,
+              modalidade: t.modalidade,
               data: t.data || 'Em breve',
               status: t.status || 'Inscrição ' + insc.status,
               statusClass: t.statusClass || 'status-aberto',
@@ -430,7 +439,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // 2. Consulte na tabela 'torneios' os torneios correspondentes
         const { data: torneiosDb, error: errT } = await supabase
           .from('torneios')
-          .select('id, nome, jogo, status, data, maxParticipantes, max_participantes, banner, link')
+          .select('id, nome, jogo, status, statusClass, data, maxParticipantes, limite, modalidade, banner, link')
           .in('id', torneiosIds);
 
         if (errT) {

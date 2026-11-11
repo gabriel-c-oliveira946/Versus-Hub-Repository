@@ -1065,7 +1065,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const btnEncerrarConsolidar = document.getElementById('btnEncerrarConsolidarTorneio');
     if (btnEncerrarConsolidar) {
       if (isCriador) {
-        if (torneio.status === 'Encerrado') {
+        if (torneioPontosConsolidados(torneio)) {
           btnEncerrarConsolidar.textContent = 'Torneio Encerrado';
           btnEncerrarConsolidar.disabled = true;
           btnEncerrarConsolidar.style.background = '#232331';
@@ -1132,6 +1132,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           torneioId: torneio.id,
           permiteEditar: isCriador,
           isEncerrado: torneio.status === 'Encerrado',
+          pontosConsolidados: torneioPontosConsolidados(torneio),
           statusTorneio: torneio.status,
           participantesConfirmados: confirmados,
           formatoTorneio: formatoTorneioVal,
@@ -3600,4 +3601,15 @@ function exibirModalAuthCurtir() {
   const fechar = () => { modal.style.display = 'none'; };
   document.getElementById('btnFecharAuthCurtirModal').onclick = fechar;
   modal.onclick = (e) => { if (e.target === modal) fechar(); };
+}
+
+/**
+ * Indica se a pontuação final do torneio já foi gravada no ranking.
+ * Usa a coluna pontos_consolidados; se ela ainda não existir no banco,
+ * considera o status 'Encerrado' (comportamento antigo).
+ */
+function torneioPontosConsolidados(torneio) {
+  if (!torneio) return false;
+  if (typeof torneio.pontos_consolidados === 'boolean') return torneio.pontos_consolidados;
+  return torneio.status === 'Encerrado';
 }

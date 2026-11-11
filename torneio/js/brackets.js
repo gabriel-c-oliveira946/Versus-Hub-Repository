@@ -713,13 +713,15 @@ export async function recalcularEAtualizarStatusTorneio(torneioId) {
     let novoStatus = 'Inscrições abertas';
     let novaStatusClass = 'status-aberto';
 
-    const partidaFinal = partidas.find(p => p.rodada === 4 || (p.nome_rodada && p.nome_rodada.toLowerCase().includes('final')));
-    const temVencedorFinal = Boolean(partidaFinal && (partidaFinal.status === 'Encerrado' || partidaFinal.status === 'Encerrada') && partidaFinal.vencedor_id);
+    // O torneio só é marcado como 'Encerrado' pelo botão "Encerrar Torneio e
+    // Consolidar Pontos" (função vh_encerrar_torneio no banco). Se já estiver
+    // encerrado, o status não é alterado aqui.
+    const { data: torneioAtual } = await supabase.from('torneios').select('status').eq('id', String(torneioId)).maybeSingle();
+    if (torneioAtual && String(torneioAtual.status || '').toLowerCase().startsWith('encerrad')) {
+      return { status: torneioAtual.status, statusClass: 'status-encerrado' };
+    }
 
-    if (encerradas.length === total && temVencedorFinal) {
-      novoStatus = 'Encerrado';
-      novaStatusClass = 'status-encerrado';
-    } else if (temAoVivo) {
+    if (temAoVivo) {
       novoStatus = 'Ao Vivo';
       novaStatusClass = 'status-andamento';
     } else if (encerradas.length > 0 || total > 0) {
@@ -732,42 +734,6 @@ export async function recalcularEAtualizarStatusTorneio(torneioId) {
       statusClass: novaStatusClass
     }).eq('id', String(torneioId));
 
-    if (novoStatus === 'Encerrado') {
-      try {
-        console.log('[VersusHub Notificações] RecalcularStatus detectou encerramento. Notificando participantes:', torneioId);
-        const { data: inscs, error: errInscRecalc } = await supabase
-          .from('inscricoes')
-          .select('user_email')
-          .eq('torneio_id', String(torneioId));
-
-        if (errInscRecalc) {
-          console.warn('[VersusHub Notificações] Aviso ao consultar inscrições no recalcularStatus:', errInscRecalc?.message || errInscRecalc);
-        } else if (inscs && Array.isArray(inscs) && inscs.length > 0) {
-          const notifRecords = [...new Set(inscs.map(i => (i.user_email || '').toLowerCase().trim()).filter(Boolean))]
-            .map(email => ({
-              user_email: email,
-              titulo: 'Torneio Encerrado!',
-              mensagem: 'O torneio foi finalizado e os campeões foram consolidados!',
-              tipo: 'torneio',
-              lida: false,
-              link: `/torneio/custom.html?id=${encodeURIComponent(torneioId)}`
-            }));
-
-          if (notifRecords.length > 0) {
-            try {
-              const { data: insData, error: insErr } = await supabase.from('notificacoes').insert(notifRecords).select();
-              if (insErr) {
-                console.warn('[VersusHub Notificações] Aviso ao inserir notificações de encerramento via recalcularStatus:', insErr?.message || insErr);
-              }
-            } catch (insEx) {
-              console.warn('[VersusHub Notificações] Exceção ao inserir notificações:', insEx?.message || insEx);
-            }
-          }
-        }
-      } catch (eNotif) {
-        console.warn('[VersusHub Notificações] Aviso no disparo de notificações de encerramento via recalcularStatus:', eNotif?.message || eNotif);
-      }
-    }
     try {
       const created = JSON.parse(localStorage.getItem('vh_createdTournaments') || '[]');
       created.forEach(t => {
@@ -1105,38 +1071,49 @@ export function calcularStatusParticipantes(partidas = [], participantesConfirma
   const fmtStr = String(formatoTorneio || '').toLowerCase();
   const isMataMata = !fmtStr.includes('pontos') && !fmtStr.includes('liga');
 
-  // Coleta participantes únicos
+  // Coleta participantes únicos.
+  // Cada participante é um único registro, encontrado tanto pelo nome quanto
+  // pelo e-mail/ID. (Antes os inscritos eram guardados pelo e-mail e os
+  // jogadores das partidas pelo nome, e a mesma pessoa aparecia duas vezes.)
   const mapPart = new Map();
+  const registrarAlias = (alias, entry) => {
+    const k = String(alias || '').trim().toLowerCase();
+    if (k && !mapPart.has(k)) mapPart.set(k, entry);
+  };
+  const buscarParticipante = (...aliases) => {
+    for (const alias of aliases) {
+      const k = String(alias || '').trim().toLowerCase();
+      if (k && mapPart.has(k)) return mapPart.get(k);
+    }
+    return null;
+  };
 
   (participantesConfirmados || []).forEach(c => {
     const n = removerTagNome(c.nome || c.equipe_nome || c.user_email || '').trim();
     if (n && n.toLowerCase() !== 'a definir') {
-      const key = (c.user_email || n).trim().toLowerCase();
-      mapPart.set(key, {
-        nome: n,
-        email: (c.user_email || '').trim().toLowerCase(),
-        wins: 0,
-        totalPlacar: 0,
-        placarSofrido: 0
-      });
+      const email = (c.user_email || '').trim().toLowerCase();
+      const idPart = String(c.realId || c.equipe_id || c.id_participante || '').trim();
+      let entry = buscarParticipante(n, email, idPart);
+      if (!entry) {
+        entry = { nome: n, email, wins: 0, totalPlacar: 0, placarSofrido: 0 };
+      }
+      registrarAlias(n, entry);
+      registrarAlias(email, entry);
+      registrarAlias(idPart, entry);
     }
   });
 
   todasPartidas.forEach(p => {
-    const p1 = removerTagNome(p.p1_nome || '').trim();
-    if (p1 && p1.toLowerCase() !== 'a definir' && !p1.toLowerCase().startsWith('competidor')) {
-      const k1 = p1.toLowerCase();
-      if (!mapPart.has(k1)) {
-        mapPart.set(k1, { nome: p1, email: '', wins: 0, totalPlacar: 0, placarSofrido: 0 });
+    [[p.p1_nome, p.p1_id], [p.p2_nome, p.p2_id]].forEach(([nomeBruto, idBruto]) => {
+      const nome = removerTagNome(nomeBruto || '').trim();
+      if (!nome || nome.toLowerCase() === 'a definir' || nome.toLowerCase().startsWith('competidor')) return;
+      let entry = buscarParticipante(nome, idBruto);
+      if (!entry) {
+        entry = { nome, email: '', wins: 0, totalPlacar: 0, placarSofrido: 0 };
       }
-    }
-    const p2 = removerTagNome(p.p2_nome || '').trim();
-    if (p2 && p2.toLowerCase() !== 'a definir' && !p2.toLowerCase().startsWith('competidor')) {
-      const k2 = p2.toLowerCase();
-      if (!mapPart.has(k2)) {
-        mapPart.set(k2, { nome: p2, email: '', wins: 0, totalPlacar: 0, placarSofrido: 0 });
-      }
-    }
+      registrarAlias(nome, entry);
+      registrarAlias(idBruto, entry);
+    });
   });
 
   const perdedoresMataMata = new Set();
@@ -1172,22 +1149,18 @@ export function calcularStatusParticipantes(partidas = [], participantesConfirma
 
     // Apenas partidas com vencedor definido computam pontuação e saldo de vitórias
     if (vNome) {
-      const entry1 = mapPart.get(k1);
-      const entry2 = mapPart.get(k2);
+      const entry1 = buscarParticipante(k1, p.p1_id);
+      const entry2 = buscarParticipante(k2, p.p2_id);
       if (entry1) { entry1.totalPlacar += sc1; entry1.placarSofrido += sc2; }
       if (entry2) { entry2.totalPlacar += sc2; entry2.placarSofrido += sc1; }
 
-      const vKey = vNome.toLowerCase();
-      let vEntry = mapPart.get(vKey);
-      if (!vEntry) {
-        for (const [k, val] of mapPart.entries()) {
-          if (val.nome && val.nome.toLowerCase() === vKey) { vEntry = val; break; }
-        }
-      }
+      const vEntry = buscarParticipante(vNome, p.vencedor_id);
       if (vEntry) vEntry.wins += 1;
 
       if (pNome && pNome.toLowerCase() !== 'a definir') {
-        perdedoresMataMata.add(pNome.toLowerCase());
+        // Guarda o nome oficial do registro (pode diferir do nome salvo na partida)
+        const pEntry = buscarParticipante(pNome, pNome === p1 ? p.p1_id : p.p2_id);
+        perdedoresMataMata.add((pEntry ? pEntry.nome : pNome).toLowerCase());
       }
     }
 
@@ -1196,7 +1169,8 @@ export function calcularStatusParticipantes(partidas = [], participantesConfirma
     }
   });
 
-  const partArray = Array.from(mapPart.values());
+  // Lista sem repetição (vários apelidos apontam para o mesmo registro)
+  const partArray = Array.from(new Set(mapPart.values()));
 
   // 1. SE O TORNEIO ESTIVER OCORRENDO (NÃO ENCERRADO):
   if (!isTorneioEncerrado) {
@@ -1390,6 +1364,8 @@ export function renderizarChaveamentoVisual(container, partidas, opcoes = {}) {
   const isTorneioSolo = Boolean(opcoes.isTorneioSolo || tipoStr.includes('solo') || tipoStr.includes('1v1'));
   const isTorneioEquipe = !isTorneioSolo && Boolean(opcoes.isTorneioEquipe || tipoStr.includes('equipe'));
   const isEncerrado = Boolean(opcoes.isEncerrado || opcoes.statusTorneio === 'Encerrado');
+  // Pontos já gravados no ranking? (se o banco não informar, usa o status do torneio)
+  const pontosConsolidados = typeof opcoes.pontosConsolidados === 'boolean' ? opcoes.pontosConsolidados : isEncerrado;
   const acaoCriarPartida = onCriarPartida || onCriarPartidaExtra || (() => {
     abrirModalCriarPartidaManual(torneioId, participantesConfirmados, () => {
       if (typeof onAtualizado === 'function') onAtualizado();
@@ -1432,8 +1408,8 @@ export function renderizarChaveamentoVisual(container, partidas, opcoes = {}) {
               <i class="fa-solid fa-plus"></i> Criar Partida
             </button>
           ` : ''}
-          <button type="button" id="btnToolbarEncerrarTorneio" ${isEncerrado || !todasPartidasComVencedor ? 'disabled' : ''} style="${isEncerrado ? 'background: #232331; color: #9ca3af; cursor: not-allowed; border: 1px solid #3b3b4f;' : (!todasPartidasComVencedor ? 'background: #1e293b; color: #64748b; cursor: not-allowed; border: 1px solid #334155; opacity: 0.7;' : 'background: #10b981; color: #fff; cursor: pointer; border: none;')} padding: 8px 14px; border-radius: 6px; font-weight: 700; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;" title="${isEncerrado ? 'Torneio encerrado' : (!todasPartidasComVencedor ? 'O botão só é liberado quando todas as partidas cadastradas tiverem um vencedor definido.' : 'Encerrar torneio e consolidar pontos')}">
-            <i class="fa-solid fa-flag-checkered"></i> ${isEncerrado ? 'Torneio Encerrado' : 'Encerrar Torneio e Consolidar Pontos'}
+          <button type="button" id="btnToolbarEncerrarTorneio" ${pontosConsolidados || !todasPartidasComVencedor ? 'disabled' : ''} style="${pontosConsolidados ? 'background: #232331; color: #9ca3af; cursor: not-allowed; border: 1px solid #3b3b4f;' : (!todasPartidasComVencedor ? 'background: #1e293b; color: #64748b; cursor: not-allowed; border: 1px solid #334155; opacity: 0.7;' : 'background: #10b981; color: #fff; cursor: pointer; border: none;')} padding: 8px 14px; border-radius: 6px; font-weight: 700; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;" title="${pontosConsolidados ? 'Torneio encerrado' : (!todasPartidasComVencedor ? 'O botão só é liberado quando todas as partidas cadastradas tiverem um vencedor definido.' : 'Encerrar torneio e consolidar pontos')}">
+            <i class="fa-solid fa-flag-checkered"></i> ${pontosConsolidados ? 'Torneio Encerrado' : 'Encerrar Torneio e Consolidar Pontos'}
           </button>
         </div>
       </div>
@@ -4166,15 +4142,8 @@ export async function abrirModalConfirmacaoEncerramentoTorneio({ torneioId, onCo
         if (ranking[1]) ranking[1].isVice = true;
       }
 
-      // 4. Verifica modalidade do Torneio (Solo vs Equipe)
-      const { data: dbTorneio } = await supabase.from('torneios').select('*').eq('id', String(torneioId)).maybeSingle();
-      const isTorneioEquipe = Boolean(
-        (dbTorneio && (
-          (dbTorneio.tipoInscricao && dbTorneio.tipoInscricao.toLowerCase().includes('equipe')) ||
-          (Number(dbTorneio.maxIntegrantes) > 1)
-        )) ||
-        confirmados.some(c => c.tipo === 'equipe' || Boolean(c.equipe_id))
-      );
+      // 4. A modalidade (jogador ou equipe) é decidida por participante logo
+      // abaixo: torneios "Solo ou Equipe" podem ter os dois tipos inscritos.
 
       const { data: usuariosDb } = await supabase.from('usuarios').select('*');
       const userList = Array.isArray(usuariosDb) ? usuariosDb : [];
@@ -4182,221 +4151,67 @@ export async function abrirModalConfirmacaoEncerramentoTorneio({ torneioId, onCo
       const { data: equipesDb } = await supabase.from('equipes').select('*');
       const equipeList = Array.isArray(equipesDb) ? equipesDb : [];
 
-      // 5. Consolidação de Estatísticas e Classificação Oficial
+      // 5. Monta a classificação final e envia ao banco.
+      // A gravação dos pontos é feita pela função vh_encerrar_torneio no Supabase,
+      // porque o organizador não tem permissão para alterar o perfil de outros
+      // jogadores diretamente. A função confere tudo, grava os pontos e marca o
+      // torneio como 'Encerrado' de uma só vez.
+      const resultados = [];
+      const alvosVistos = new Set();
+      const acharEquipe = (data) => equipeList.find(eq =>
+        (data.equipe_id && String(eq.id) === String(data.equipe_id)) ||
+        (data.realId && String(eq.id) === String(data.realId)) ||
+        (data.nome && removerTagNome(eq.nome || '').toLowerCase() === data.nome.toLowerCase())
+      );
+      const acharUsuario = (data) => userList.find(u =>
+        (data.email && u.email && u.email.trim().toLowerCase() === data.email) ||
+        (data.realId && u.email && u.email.trim().toLowerCase() === data.realId.toLowerCase()) ||
+        (data.realId && u.id && String(u.id) === String(data.realId)) ||
+        (data.nome && u.nome && u.nome.trim().toLowerCase() === data.nome.toLowerCase())
+      );
+
+      const naoEncontrados = [];
       for (const data of ranking) {
-        if (isTorneioEquipe) {
-          // --- TORNEIO DE EQUIPE: Título e Pontuação vão EXCLUSIVAMENTE para public.equipes ---
-          const dbEquipe = equipeList.find(eq =>
-            (data.equipe_id && String(eq.id) === String(data.equipe_id)) ||
-            (data.realId && String(eq.id) === String(data.realId)) ||
-            (data.nome && removerTagNome(eq.nome).toLowerCase() === data.nome.toLowerCase())
-          );
+        const colocacao = (data.isCampeao || data.isCoCampeao) ? 1 : (data.isVice ? 2 : 0);
+        const vitorias = Number(data.wins) || 0;
+        const derrotas = Number(data.losses) || 0;
 
-          if (dbEquipe) {
-            let eqStats = dbEquipe.stats || {};
-            if (typeof eqStats === 'string') { try { eqStats = JSON.parse(eqStats); } catch { eqStats = {}; } }
+        // Inscrito como equipe -> pontua a equipe; inscrito sozinho -> pontua o jogador.
+        const inscritoComoEquipe = data.tipo === 'equipe' || Boolean(data.equipe_id);
+        let dbEquipe = inscritoComoEquipe ? acharEquipe(data) : null;
+        const dbUser = dbEquipe ? null : acharUsuario(data);
+        // Participante sem tipo definido (só aparece nas partidas): tenta como equipe
+        if (!dbEquipe && !dbUser && !inscritoComoEquipe) dbEquipe = acharEquipe(data);
 
-            const curEqPts = safeNum(eqStats.points ?? eqStats.pontos ?? 0);
-            const curEqWins = safeNum(eqStats.wins ?? eqStats.vitorias ?? 0);
-            const curEqLosses = safeNum(eqStats.losses ?? eqStats.derrotas ?? 0);
-            const curEqDisputed = safeNum(eqStats.disputed ?? eqStats.torneios_disputados ?? 0);
-            const curEqWon = safeNum(eqStats.won ?? eqStats.torneios_vencidos ?? 0);
-
-            let torneiosGanhosArr = dbEquipe.torneiosGanhos || [];
-            if (typeof torneiosGanhosArr === 'string') {
-              try { torneiosGanhosArr = JSON.parse(torneiosGanhosArr); } catch { torneiosGanhosArr = []; }
-            }
-            if (!Array.isArray(torneiosGanhosArr)) torneiosGanhosArr = [];
-
-            let ptsAdd = 0;
-            let isWon = false;
-            let colocacaoStr = '';
-
-            if (data.isCampeao || data.isCoCampeao) {
-              ptsAdd = 500;
-              isWon = true;
-              colocacaoStr = '1º Lugar';
-            } else if (data.isVice) {
-              ptsAdd = 250;
-              colocacaoStr = '2º Lugar';
-            }
-
-            if (colocacaoStr) {
-              torneiosGanhosArr.push({
-                id: dbTorneio?.id ? String(dbTorneio.id) : String(torneioId),
-                nome: dbTorneio?.nome || `Torneio #${torneioId}`,
-                data: dbTorneio?.data || new Date().toISOString(),
-                colocacao: colocacaoStr,
-                banner: dbTorneio?.banner || ''
-              });
-            }
-
-            const newEqPts = curEqPts + ptsAdd;
-            const newEqWins = curEqWins + data.wins;
-            const newEqLosses = curEqLosses + data.losses;
-            const newEqDisputed = curEqDisputed + 1; // +1 torneio disputado
-            const newEqWon = curEqWon + (isWon ? 1 : 0);
-
-            const updatedEqStats = {
-              points: newEqPts,
-              wins: newEqWins,
-              losses: newEqLosses,
-              disputed: newEqDisputed,
-              won: newEqWon
-            };
-
-            // Atualiza na tabela 'equipes' (salvando torneiosGanhos e testando stats com fallback seguro)
-            try {
-              const { error: eqErr } = await supabase.from('equipes').update({
-                torneiosGanhos: torneiosGanhosArr,
-                stats: updatedEqStats
-              }).eq('id', dbEquipe.id);
-
-              if (eqErr) {
-                // Caso a coluna stats não exista no schema remoto de equipes, atualiza somente torneiosGanhos
-                await supabase.from('equipes').update({
-                  torneiosGanhos: torneiosGanhosArr
-                }).eq('id', dbEquipe.id);
-              }
-            } catch (eqUpErr) {
-              console.warn('Aviso ao atualizar equipe no Supabase, tentando fallback simples:', eqUpErr);
-              await supabase.from('equipes').update({
-                torneiosGanhos: torneiosGanhosArr
-              }).eq('id', dbEquipe.id);
-            }
-
-            // Jogadores das line-ups inscritas: incrementam +1 torneio disputado ('disputed') em 'stats'
-            const memberEmails = new Set();
-            if (dbEquipe.leaderEmail) memberEmails.add(dbEquipe.leaderEmail.toLowerCase().trim());
-            if (Array.isArray(data.lineup)) {
-              data.lineup.forEach(m => {
-                const em = typeof m === 'string' ? m : (m.email || m.user_email);
-                if (em) memberEmails.add(String(em).toLowerCase().trim());
-              });
-            }
-
-            try {
-              const { data: membrosDb } = await supabase.from('membros_equipe').select('user_email').eq('equipe_id', dbEquipe.id).eq('status', 'Aceito');
-              (membrosDb || []).forEach(m => {
-                if (m.user_email) memberEmails.add(m.user_email.toLowerCase().trim());
-              });
-            } catch (mErr) {}
-
-            for (const mEmail of memberEmails) {
-              const dbUser = userList.find(u => u.email && u.email.trim().toLowerCase() === mEmail);
-              if (dbUser) {
-                let uStats = dbUser.stats || {};
-                if (typeof uStats === 'string') { try { uStats = JSON.parse(uStats); } catch { uStats = {}; } }
-
-                const curUPts = safeNum(dbUser.pontos || uStats.points || 0);
-                const curUWins = safeNum(dbUser.vitorias || uStats.wins || 0);
-                const curULosses = safeNum(dbUser.derrotas || uStats.losses || 0);
-                const curUDisputed = safeNum(dbUser.torneios_disputados || uStats.disputed || 0);
-                const curUWon = safeNum(uStats.won || 0);
-
-                const newUWins = curUWins + data.wins;
-                const newULosses = curULosses + data.losses;
-                const newUDisputed = curUDisputed + 1; // +1 torneio disputado
-
-                const updatedUStats = {
-                  ...uStats,
-                  points: curUPts,
-                  wins: newUWins,
-                  losses: newULosses,
-                  disputed: newUDisputed,
-                  won: curUWon
-                };
-
-                const userCol = dbUser.id ? 'id' : 'email';
-                const userVal = dbUser.id || dbUser.email;
-
-                try {
-                  await supabase.from('usuarios').update({
-                    vitorias: newUWins,
-                    derrotas: newULosses,
-                    torneios_disputados: newUDisputed,
-                    stats: updatedUStats
-                  }).eq(userCol, userVal);
-                } catch (uErr) {
-                  console.warn('Aviso ao atualizar integrante da equipe:', uErr);
-                  await supabase.from('usuarios').update({ stats: updatedUStats }).eq(userCol, userVal);
-                }
-              }
-            }
-          }
+        if (dbEquipe) {
+          const chave = 'equipe:' + String(dbEquipe.id);
+          if (alvosVistos.has(chave)) continue;
+          alvosVistos.add(chave);
+          resultados.push({ tipo: 'equipe', equipe_id: String(dbEquipe.id), vitorias, derrotas, colocacao });
+        } else if (dbUser && dbUser.email) {
+          const chave = dbUser.email.trim().toLowerCase();
+          if (alvosVistos.has(chave)) continue;
+          alvosVistos.add(chave);
+          resultados.push({ tipo: 'usuario', email: chave, vitorias, derrotas, colocacao });
         } else {
-          // --- TORNEIO SOLO: Título e Pontuação vão diretamente para public.usuarios ---
-          const dbUser = userList.find(u =>
-            (data.email && u.email && u.email.trim().toLowerCase() === data.email) ||
-            (data.realId && u.email && u.email.trim().toLowerCase() === data.realId.toLowerCase()) ||
-            (data.realId && u.id && String(u.id) === String(data.realId)) ||
-            (data.nome && u.nome && u.nome.trim().toLowerCase() === data.nome.toLowerCase())
-          );
-
-          if (dbUser) {
-            let uStats = dbUser.stats || {};
-            if (typeof uStats === 'string') { try { uStats = JSON.parse(uStats); } catch { uStats = {}; } }
-
-            const curUPts = safeNum(uStats.points ?? dbUser.pontos ?? 0);
-            const curUWins = safeNum(uStats.wins ?? dbUser.vitorias ?? 0);
-            const curULosses = safeNum(uStats.losses ?? dbUser.derrotas ?? 0);
-            const curUDisputed = safeNum(uStats.disputed ?? dbUser.torneios_disputados ?? 0);
-            const curUWon = safeNum(uStats.won ?? 0);
-
-            let bonusPts = 0;
-            let isWon = false;
-
-            if (data.isCampeao || data.isCoCampeao) {
-              bonusPts = 500;
-              isWon = true;
-            } else if (data.isVice) {
-              bonusPts = 250;
-            }
-
-            const newUPts = curUPts + bonusPts;
-            const newUWins = curUWins + data.wins;
-            const newULosses = curULosses + data.losses;
-            const newUDisputed = curUDisputed + 1; // +1 torneio disputado
-            const newUWon = curUWon + (isWon ? 1 : 0);
-
-            const updatedUStats = {
-              ...uStats,
-              points: newUPts,
-              wins: newUWins,
-              losses: newULosses,
-              disputed: newUDisputed,
-              won: newUWon
-            };
-
-            const userUpdatePayload = {
-              pontos: newUPts,
-              vitorias: newUWins,
-              derrotas: newULosses,
-              torneios_disputados: newUDisputed,
-              stats: updatedUStats
-            };
-
-            const targetCol = dbUser.id ? 'id' : 'email';
-            const targetVal = dbUser.id || dbUser.email;
-
-            try {
-              const { error: upErr } = await supabase.from('usuarios').update(userUpdatePayload).eq(targetCol, targetVal);
-              if (upErr) {
-                console.warn('Aviso no update de usuario solo, tentando fallback seguro de stats:', upErr);
-                await supabase.from('usuarios').update({ stats: updatedUStats }).eq(targetCol, targetVal);
-              }
-            } catch (eUp) {
-              await supabase.from('usuarios').update({ stats: updatedUStats }).eq(targetCol, targetVal);
-            }
-          }
+          naoEncontrados.push(data.nome || data.realId || '?');
         }
       }
 
-      // 5. Altera status do torneio para 'Encerrado'
-      await supabase.from('torneios').update({
-        status: 'Encerrado',
-        statusClass: 'status-encerrado'
-      }).eq('id', String(torneioId));
+      if (naoEncontrados.length > 0) {
+        console.warn('Participantes sem cadastro encontrado (não pontuados):', naoEncontrados);
+      }
+      if (resultados.length === 0) {
+        throw new Error('Nenhum participante cadastrado foi encontrado para receber a pontuação.');
+      }
+
+      const { error: rpcErr } = await supabase.rpc('vh_encerrar_torneio', {
+        p_torneio_id: String(torneioId),
+        p_resultados: resultados
+      });
+      if (rpcErr) {
+        throw new Error(rpcErr.message || 'Falha ao consolidar a pontuação no banco.');
+      }
 
       // 6. Notifica todos os participantes cadastrados sobre o encerramento do torneio
       try {
@@ -4490,7 +4305,7 @@ export async function abrirModalConfirmacaoEncerramentoTorneio({ torneioId, onCo
       }
     } catch (err) {
       console.error('Erro ao consolidar torneio:', err);
-      showBracketToast('Erro ao consolidar pontuação do torneio.', 'error');
+      showBracketToast(err?.message ? `Erro ao consolidar pontuação: ${err.message}` : 'Erro ao consolidar pontuação do torneio.', 'error');
       btnConfirmar.disabled = false;
       btnConfirmar.innerHTML = `<i class="fa-solid fa-flag-checkered"></i> <span>Sim, Encerrar e Consolidar</span>`;
       todosBtnsEnc.forEach(b => {

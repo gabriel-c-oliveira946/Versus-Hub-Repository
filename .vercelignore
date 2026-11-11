@@ -2,3 +2,4 @@ scripts/
 *.py
 *.md
 .vscode/
+*.sql

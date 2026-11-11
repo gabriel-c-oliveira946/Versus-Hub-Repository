@@ -8,7 +8,6 @@ CREATE TABLE IF NOT EXISTS public.usuarios (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     nome TEXT NOT NULL,
     email TEXT NOT NULL UNIQUE,
-    senha TEXT DEFAULT '',
     "dataNasc" TEXT,
     bio TEXT DEFAULT '',
     avatar TEXT DEFAULT '/image/boneco_logo_ofc.png',
@@ -145,24 +144,7 @@ CREATE INDEX IF NOT EXISTS idx_torneios_criador ON public.torneios("criadorEmail
 CREATE INDEX IF NOT EXISTS idx_partidas_torneio ON public.partidas(torneio_id);
 CREATE INDEX IF NOT EXISTS idx_partidas_rodada ON public.partidas(torneio_id, rodada);
 
--- ==============================================================================
--- POLÍTICAS DE ACESSO (Row Level Security - RLS)
--- ==============================================================================
-
-ALTER TABLE public.usuarios ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.torneios ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.equipes ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.curtidas ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.inscricoes ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.membros_equipe ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.partidas ENABLE ROW LEVEL SECURITY;
-
 -- Migrações seguras para tabelas pré-existentes
-ALTER TABLE IF EXISTS public.usuarios ALTER COLUMN senha DROP NOT NULL;
-ALTER TABLE IF EXISTS public.usuarios ALTER COLUMN senha SET DEFAULT '';
--- Purga qualquer senha antiga em texto puro
-UPDATE public.usuarios SET senha = '' WHERE senha IS NOT NULL AND senha <> '';
-
 ALTER TABLE IF EXISTS public.usuarios ADD COLUMN IF NOT EXISTS pontos INTEGER DEFAULT 0;
 ALTER TABLE IF EXISTS public.usuarios ADD COLUMN IF NOT EXISTS pontuacao_total INTEGER DEFAULT 0;
 ALTER TABLE IF EXISTS public.usuarios ADD COLUMN IF NOT EXISTS torneios_disputados INTEGER DEFAULT 0;
@@ -184,242 +166,12 @@ ALTER TABLE IF EXISTS public.partidas ADD COLUMN IF NOT EXISTS is_extra BOOLEAN 
 ALTER TABLE IF EXISTS public.partidas ADD COLUMN IF NOT EXISTS detalhes TEXT DEFAULT '';
 ALTER TABLE IF EXISTS public.partidas ADD COLUMN IF NOT EXISTS data_agendada TEXT DEFAULT '';
 
--- ------------------------------------------------------------------------------
--- 1. TABELA: usuarios
--- Leitura pública dos perfis, mas apenas o próprio usuário pode alterar ou excluir seu registro.
--- ------------------------------------------------------------------------------
-DROP POLICY IF EXISTS "Acesso público usuarios" ON public.usuarios;
-DROP POLICY IF EXISTS "Usuarios podem ser visualizados publicamente" ON public.usuarios;
-CREATE POLICY "Usuarios podem ser visualizados publicamente" ON public.usuarios
-    FOR SELECT USING (true);
-
-DROP POLICY IF EXISTS "Usuarios podem criar seu proprio perfil" ON public.usuarios;
-CREATE POLICY "Usuarios podem criar seu proprio perfil" ON public.usuarios
-    FOR INSERT WITH CHECK (
-        id = auth.uid() 
-        OR lower(trim(email)) = lower(trim(auth.jwt() ->> 'email'))
-        OR auth.role() = 'anon'
-    );
-
--- UPDATE: Exige auth.uid() = id_usuario ou e-mail autenticado correspondente
-DROP POLICY IF EXISTS "Usuarios so podem atualizar seu proprio perfil" ON public.usuarios;
-CREATE POLICY "Usuarios so podem atualizar seu proprio perfil" ON public.usuarios
-    FOR UPDATE USING (
-        id = auth.uid() 
-        OR lower(trim(email)) = lower(trim(auth.jwt() ->> 'email'))
-    ) WITH CHECK (
-        id = auth.uid() 
-        OR lower(trim(email)) = lower(trim(auth.jwt() ->> 'email'))
-    );
-
--- DELETE: Exige auth.uid() = id_usuario ou e-mail autenticado correspondente
-DROP POLICY IF EXISTS "Usuarios so podem excluir seu proprio perfil" ON public.usuarios;
-CREATE POLICY "Usuarios so podem excluir seu proprio perfil" ON public.usuarios
-    FOR DELETE USING (
-        id = auth.uid() 
-        OR lower(trim(email)) = lower(trim(auth.jwt() ->> 'email'))
-    );
-
--- ------------------------------------------------------------------------------
--- 2. TABELA: equipes
--- Leitura pública, mas apenas o líder pode editar ou excluir a equipe.
--- ------------------------------------------------------------------------------
-DROP POLICY IF EXISTS "Acesso público equipes" ON public.equipes;
-DROP POLICY IF EXISTS "Equipes podem ser visualizadas publicamente" ON public.equipes;
-CREATE POLICY "Equipes podem ser visualizadas publicamente" ON public.equipes
-    FOR SELECT USING (true);
-
-DROP POLICY IF EXISTS "Usuarios autenticados podem criar equipes" ON public.equipes;
-CREATE POLICY "Usuarios autenticados podem criar equipes" ON public.equipes
-    FOR INSERT WITH CHECK (
-        auth.role() = 'authenticated'
-        OR "leaderId" = auth.uid()
-        OR lower(trim("leaderEmail")) = lower(trim(auth.jwt() ->> 'email'))
-        OR auth.role() = 'anon'
-    );
-
--- UPDATE: Apenas o líder da equipe pode atualizar os dados
-DROP POLICY IF EXISTS "Apenas o lider pode atualizar sua equipe" ON public.equipes;
-CREATE POLICY "Apenas o lider pode atualizar sua equipe" ON public.equipes
-    FOR UPDATE USING (
-        "leaderId" = auth.uid()
-        OR lower(trim("leaderEmail")) = lower(trim(auth.jwt() ->> 'email'))
-    ) WITH CHECK (
-        "leaderId" = auth.uid()
-        OR lower(trim("leaderEmail")) = lower(trim(auth.jwt() ->> 'email'))
-    );
-
--- DELETE: Apenas o líder da equipe pode excluir a equipe
-DROP POLICY IF EXISTS "Apenas o lider pode excluir sua equipe" ON public.equipes;
-CREATE POLICY "Apenas o lider pode excluir sua equipe" ON public.equipes
-    FOR DELETE USING (
-        "leaderId" = auth.uid()
-        OR lower(trim("leaderEmail")) = lower(trim(auth.jwt() ->> 'email'))
-    );
-
--- ------------------------------------------------------------------------------
--- 3. TABELA: membros_equipe
--- Leitura pública; alteração e exclusão exigem ser o próprio membro ou o líder da equipe.
--- ------------------------------------------------------------------------------
-DROP POLICY IF EXISTS "Acesso público membros_equipe" ON public.membros_equipe;
-DROP POLICY IF EXISTS "Membros de equipe podem ser visualizados publicamente" ON public.membros_equipe;
-CREATE POLICY "Membros de equipe podem ser visualizados publicamente" ON public.membros_equipe
-    FOR SELECT USING (true);
-
-DROP POLICY IF EXISTS "Usuarios podem solicitar ou entrar em equipes" ON public.membros_equipe;
-CREATE POLICY "Usuarios podem solicitar ou entrar em equipes" ON public.membros_equipe
-    FOR INSERT WITH CHECK (
-        user_id = auth.uid()
-        OR lower(trim(user_email)) = lower(trim(auth.jwt() ->> 'email'))
-        OR equipe_id IN (
-            SELECT eq.id FROM public.equipes eq 
-            WHERE eq."leaderId" = auth.uid() 
-            OR lower(trim(eq."leaderEmail")) = lower(trim(auth.jwt() ->> 'email'))
-        )
-        OR auth.role() = 'anon'
-    );
-
--- UPDATE: O próprio membro (para responder a convite) ou o líder da equipe (para aprovar/recusar)
-DROP POLICY IF EXISTS "Membro ou lider pode atualizar solicitacao de membro" ON public.membros_equipe;
-CREATE POLICY "Membro ou lider pode atualizar solicitacao de membro" ON public.membros_equipe
-    FOR UPDATE USING (
-        user_id = auth.uid()
-        OR lower(trim(user_email)) = lower(trim(auth.jwt() ->> 'email'))
-        OR equipe_id IN (
-            SELECT eq.id FROM public.equipes eq 
-            WHERE eq."leaderId" = auth.uid() 
-            OR lower(trim(eq."leaderEmail")) = lower(trim(auth.jwt() ->> 'email'))
-        )
-    ) WITH CHECK (
-        user_id = auth.uid()
-        OR lower(trim(user_email)) = lower(trim(auth.jwt() ->> 'email'))
-        OR equipe_id IN (
-            SELECT eq.id FROM public.equipes eq 
-            WHERE eq."leaderId" = auth.uid() 
-            OR lower(trim(eq."leaderEmail")) = lower(trim(auth.jwt() ->> 'email'))
-        )
-    );
-
--- DELETE: O próprio membro (sair da equipe) ou o líder da equipe (remover/recusar membro)
-DROP POLICY IF EXISTS "Membro ou lider pode remover registro de membro" ON public.membros_equipe;
-CREATE POLICY "Membro ou lider pode remover registro de membro" ON public.membros_equipe
-    FOR DELETE USING (
-        user_id = auth.uid()
-        OR lower(trim(user_email)) = lower(trim(auth.jwt() ->> 'email'))
-        OR equipe_id IN (
-            SELECT eq.id FROM public.equipes eq 
-            WHERE eq."leaderId" = auth.uid() 
-            OR lower(trim(eq."leaderEmail")) = lower(trim(auth.jwt() ->> 'email'))
-        )
-    );
-
--- ------------------------------------------------------------------------------
--- 4. TABELAS: torneios, curtidas, inscricoes
--- ------------------------------------------------------------------------------
-DROP POLICY IF EXISTS "Acesso público torneios" ON public.torneios;
-CREATE POLICY "Torneios podem ser visualizados publicamente" ON public.torneios
-    FOR SELECT USING (true);
-CREATE POLICY "Criador autenticado pode criar torneio" ON public.torneios
-    FOR INSERT WITH CHECK (
-        auth.role() = 'authenticated'
-        OR lower(trim("criadorEmail")) = lower(trim(auth.jwt() ->> 'email'))
-        OR auth.role() = 'anon'
-    );
-CREATE POLICY "Apenas o criador pode atualizar seu torneio" ON public.torneios
-    FOR UPDATE USING (
-        lower(trim("criadorEmail")) = lower(trim(auth.jwt() ->> 'email'))
-    ) WITH CHECK (
-        lower(trim("criadorEmail")) = lower(trim(auth.jwt() ->> 'email'))
-    );
-CREATE POLICY "Apenas o criador pode excluir seu torneio" ON public.torneios
-    FOR DELETE USING (
-        lower(trim("criadorEmail")) = lower(trim(auth.jwt() ->> 'email'))
-    );
-
-DROP POLICY IF EXISTS "Acesso público curtidas" ON public.curtidas;
-CREATE POLICY "Curtidas podem ser visualizadas publicamente" ON public.curtidas
-    FOR SELECT USING (true);
-CREATE POLICY "Usuarios autenticados podem curtir" ON public.curtidas
-    FOR INSERT WITH CHECK (
-        lower(trim(user_email)) = lower(trim(auth.jwt() ->> 'email'))
-        OR auth.role() = 'authenticated'
-        OR auth.role() = 'anon'
-    );
-CREATE POLICY "Usuarios podem descurtir suas curtidas" ON public.curtidas
-    FOR DELETE USING (
-        lower(trim(user_email)) = lower(trim(auth.jwt() ->> 'email'))
-    );
-
-DROP POLICY IF EXISTS "Acesso público inscricoes" ON public.inscricoes;
-CREATE POLICY "Inscricoes podem ser visualizadas publicamente" ON public.inscricoes
-    FOR SELECT USING (true);
-CREATE POLICY "Usuarios podem se inscrever" ON public.inscricoes
-    FOR INSERT WITH CHECK (
-        lower(trim(user_email)) = lower(trim(auth.jwt() ->> 'email'))
-        OR auth.role() = 'authenticated'
-        OR auth.role() = 'anon'
-    );
-CREATE POLICY "Participante ou organizador pode atualizar inscricao" ON public.inscricoes
-    FOR UPDATE USING (
-        lower(trim(user_email)) = lower(trim(auth.jwt() ->> 'email'))
-        OR torneio_id IN (
-            SELECT id FROM public.torneios
-            WHERE lower(trim("criadorEmail")) = lower(trim(auth.jwt() ->> 'email'))
-        )
-    ) WITH CHECK (
-        lower(trim(user_email)) = lower(trim(auth.jwt() ->> 'email'))
-        OR torneio_id IN (
-            SELECT id FROM public.torneios
-            WHERE lower(trim("criadorEmail")) = lower(trim(auth.jwt() ->> 'email'))
-        )
-    );
-CREATE POLICY "Participante ou organizador pode excluir inscricao" ON public.inscricoes
-    FOR DELETE USING (
-        lower(trim(user_email)) = lower(trim(auth.jwt() ->> 'email'))
-        OR torneio_id IN (
-            SELECT id FROM public.torneios
-            WHERE lower(trim("criadorEmail")) = lower(trim(auth.jwt() ->> 'email'))
-        )
-    );
-
--- 4.1 TABELA: partidas (Chaveamento / Brackets)
-DROP POLICY IF EXISTS "Acesso público partidas" ON public.partidas;
-CREATE POLICY "Partidas podem ser visualizadas publicamente" ON public.partidas
-    FOR SELECT USING (true);
-CREATE POLICY "Organizador ou autenticado pode criar partidas" ON public.partidas
-    FOR INSERT WITH CHECK (
-        auth.role() = 'authenticated'
-        OR auth.role() = 'anon'
-        OR torneio_id IN (
-            SELECT id FROM public.torneios
-            WHERE lower(trim("criadorEmail")) = lower(trim(auth.jwt() ->> 'email'))
-        )
-    );
-CREATE POLICY "Organizador ou autenticado pode atualizar partidas" ON public.partidas
-    FOR UPDATE USING (
-        auth.role() = 'authenticated'
-        OR auth.role() = 'anon'
-        OR torneio_id IN (
-            SELECT id FROM public.torneios
-            WHERE lower(trim("criadorEmail")) = lower(trim(auth.jwt() ->> 'email'))
-        )
-    ) WITH CHECK (
-        auth.role() = 'authenticated'
-        OR auth.role() = 'anon'
-        OR torneio_id IN (
-            SELECT id FROM public.torneios
-            WHERE lower(trim("criadorEmail")) = lower(trim(auth.jwt() ->> 'email'))
-        )
-    );
-CREATE POLICY "Organizador ou autenticado pode excluir partidas" ON public.partidas
-    FOR DELETE USING (
-        auth.role() = 'authenticated'
-        OR auth.role() = 'anon'
-        OR torneio_id IN (
-            SELECT id FROM public.torneios
-            WHERE lower(trim("criadorEmail")) = lower(trim(auth.jwt() ->> 'email'))
-        )
-    );
+-- ==============================================================================
+-- POLÍTICAS DE ACESSO (Row Level Security - RLS)
+-- As regras de segurança, a tabela de notificações e o gatilho que cria o perfil
+-- no cadastro ficam em supabase_seguranca.sql. Execute aquele arquivo logo depois
+-- deste.
+-- ==============================================================================
 
 -- ------------------------------------------------------------------------------
 -- 5. VIEW SEGURA PARA USUÁRIOS PÚBLICOS (NÃO EXPÕE A COLUNA SENHA)
@@ -446,6 +198,9 @@ GRANT SELECT ON public.usuarios_publicos TO anon, authenticated;
 -- ------------------------------------------------------------------------------
 -- 6. VIEWS OTIMIZADAS PARA O RANKING (CÁLCULO DIRETO NO BANCO DE DADOS)
 -- ------------------------------------------------------------------------------
+
+DROP VIEW IF EXISTS public.vw_ranking_jogadores;
+DROP VIEW IF EXISTS public.vw_ranking_equipes;
 
 -- 6.1 VIEW: Ranking de Jogadores (vw_ranking_jogadores)
 CREATE OR REPLACE VIEW public.vw_ranking_jogadores AS
@@ -584,12 +339,11 @@ GRANT SELECT ON public.vw_ranking_equipes TO anon, authenticated;
 -- SEED DATA: Usuários e Torneios para testes imediatos (SEM SENHAS EM TEXTO PURO)
 -- ==============================================================================
 
-INSERT INTO public.usuarios (nome, email, senha, "dataNasc", bio, avatar)
+INSERT INTO public.usuarios (nome, email, "dataNasc", bio, avatar)
 VALUES
     (
         'Caíque Brandão',
         'caique@gmail.com',
-        '',
         '2008-01-01',
         'Opa me chamo Caíque, tenho 18 anos, amo jogos, principalmente Brawl Stars e Fortnite. Curto um bom Rock e amo uma resenha',
         '/equipes/images/caiquebrandao.jpg'
@@ -597,7 +351,6 @@ VALUES
     (
         'zZ_Dinho_Winchexxter_Zz',
         'dinho@gmail.com',
-        '',
         '1999-05-15',
         'Fala aí, eu sou o Dinho. Curto jogar FPS e participar de campeonatos on-line.',
         '/equipes/images/dinhowinches.jpg'
@@ -605,7 +358,6 @@ VALUES
     (
         'Mar_cuzcuz',
         'marcuzcuz@gmail.com',
-        '',
         '2000-11-20',
         'Eu sou o Marcuzcuz, gosto de Cuzcuz, galinhas e do Vasco.',
         '/equipes/images/marcuzcuz.jpg'
@@ -616,6 +368,10 @@ ON CONFLICT (email) DO NOTHING;
 -- 7. VIEWS E FUNÇÕES RPC PARA CÁLCULO OFICIAL DO RANKING NO SUPABASE
 -- Permite consultar ranking ordenado pelas inscrições aceitas e vitórias reais
 -- ==============================================================================
+
+-- As views abaixo substituem as da seção 6 (com colunas diferentes), por isso são recriadas.
+DROP VIEW IF EXISTS public.vw_ranking_jogadores;
+DROP VIEW IF EXISTS public.vw_ranking_equipes;
 
 -- VIEW 1: Ranking de Jogadores (Agregação por inscrições aceitas)
 CREATE OR REPLACE VIEW public.vw_ranking_jogadores AS
