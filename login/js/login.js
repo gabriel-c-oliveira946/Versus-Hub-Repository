@@ -113,7 +113,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // Redirecionamento rápido
             setTimeout(() => {
-                window.location.href = "/pagina_inicial/index.html";
+                window.location.href = "/";
             }, 1000);
         } catch (err) {
             console.error("Erro no fluxo de login:", err);

@@ -3,6 +3,21 @@
   "outputDirectory": ".",
   "redirects": [
     {
+      "source": "/pagina_inicial/index.html",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/pagina_inicial",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/pagina_inicial/",
+      "destination": "/",
+      "permanent": true
+    },
+    {
       "source": "/torneios.html",
       "destination": "/pagina_inicial/torneios.html",
       "permanent": true
