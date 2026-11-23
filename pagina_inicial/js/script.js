@@ -984,6 +984,11 @@ function startMutationObserver() {
 let currentNotifUserEmail = '';
 let notifInterval = null;
 let realtimeChannel = null;
+// Intervalos da consulta de reserva (o normal é receber os avisos pelo Realtime)
+const NOTIF_RESERVA_COM_REALTIME_MS = 120000; // Realtime conectado: só um "seguro" a cada 2 min
+const NOTIF_RESERVA_SEM_REALTIME_MS = 15000;  // Realtime fora do ar: consulta a cada 15 s
+let notifIntervaloAtual = NOTIF_RESERVA_SEM_REALTIME_MS;
+let notifVisibilidadeConfigurada = false;
 
 function timeAgo(dateString) {
   if (!dateString) return '';
@@ -1721,6 +1726,16 @@ async function marcarTodasComoLidas() {
   }
 }
 
+function agendarConsultaNotificacoes(emailClean, intervalo) {
+  notifIntervaloAtual = intervalo;
+  if (notifInterval) clearInterval(notifInterval);
+  notifInterval = setInterval(() => {
+    // Aba em segundo plano: não consulta (atualiza ao voltar)
+    if (document.hidden) return;
+    carregarNotificacoes(emailClean);
+  }, intervalo);
+}
+
 function iniciarEscutaNotificacoes(userEmail) {
   if (!userEmail) return;
   const emailClean = userEmail.toLowerCase().trim();
@@ -1728,11 +1743,14 @@ function iniciarEscutaNotificacoes(userEmail) {
 
   renderNotifBellUI();
   carregarNotificacoes(emailClean);
+  agendarConsultaNotificacoes(emailClean, NOTIF_RESERVA_SEM_REALTIME_MS);
 
-  if (notifInterval) clearInterval(notifInterval);
-  notifInterval = setInterval(() => {
-    carregarNotificacoes(emailClean);
-  }, 10000);
+  if (!notifVisibilidadeConfigurada) {
+    notifVisibilidadeConfigurada = true;
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && currentNotifUserEmail) carregarNotificacoes(currentNotifUserEmail);
+    });
+  }
 
   getSupabase().then(supabase => {
     if (!supabase || typeof supabase.channel !== 'function') return;
@@ -1752,7 +1770,15 @@ function iniciarEscutaNotificacoes(userEmail) {
             carregarNotificacoes(emailClean);
           }
         )
-        .subscribe();
+        .subscribe((status) => {
+          if (status === 'SUBSCRIBED') {
+            agendarConsultaNotificacoes(emailClean, NOTIF_RESERVA_COM_REALTIME_MS);
+          } else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
+            if (notifIntervaloAtual !== NOTIF_RESERVA_SEM_REALTIME_MS) {
+              agendarConsultaNotificacoes(emailClean, NOTIF_RESERVA_SEM_REALTIME_MS);
+            }
+          }
+        });
     } catch (e) {
       console.warn('[VersusHub Notificações] Erro ao subscrever canal realtime:', e);
     }

@@ -216,6 +216,8 @@ async function enviarComentario(evento) {
   el('comentarioContador').textContent = '0/500';
   await carregarPerfis([estado.meuEmail]);
   const lista = el('comentariosLista');
+  // O tempo real pode ter colocado este comentário na lista antes desta resposta
+  if (lista.querySelector(`.comentario-item[data-id="${CSS.escape(String(data.id))}"]`)) return;
   lista.querySelector('.comentarios-aviso')?.remove();
   lista.prepend(criarItem(data));
   estado.carregados += 1;
@@ -298,6 +300,52 @@ async function iniciar() {
 
   // Vindo da notificação ("...comentaram no torneio X"): rola até os comentários
   if (window.location.hash === '#comentarios') rolarParaComentarios(secao);
+
+  iniciarTempoRealComentarios();
+}
+
+/**
+ * Comentários novos (de outras pessoas) aparecem sem recarregar a página, e os
+ * apagados somem. O Supabase só envia algo quando alguém comenta ou apaga.
+ */
+function iniciarTempoRealComentarios() {
+  if (typeof supabase.channel !== 'function') return;
+  const lista = el('comentariosLista');
+  const jaExiste = (id) => Boolean(lista.querySelector(`.comentario-item[data-id="${CSS.escape(String(id))}"]`));
+
+  try {
+    const canal = supabase
+      .channel(`comentarios-${estado.torneioId}`)
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'comentarios', filter: `torneio_id=eq.${estado.torneioId}` }, async (payload) => {
+        const c = payload?.new;
+        if (!c?.id || jaExiste(c.id)) return; // o próprio comentário já foi colocado ao enviar
+        await carregarPerfis([String(c.user_email || '').toLowerCase().trim()]);
+        if (jaExiste(c.id)) return;
+        lista.querySelector('.comentarios-aviso')?.remove();
+        const item = criarItem(c);
+        item.classList.add('comentario-novo');
+        lista.prepend(item);
+        estado.carregados += 1;
+        estado.total += 1;
+        atualizarContagem();
+      })
+      // Exclusões não aceitam filtro no Supabase: confere se o id está na lista
+      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'comentarios' }, (payload) => {
+        const id = payload?.old?.id;
+        if (!id || !jaExiste(id)) return;
+        lista.querySelector(`.comentario-item[data-id="${CSS.escape(String(id))}"]`)?.remove();
+        estado.carregados = Math.max(0, estado.carregados - 1);
+        estado.total = Math.max(0, estado.total - 1);
+        atualizarContagem();
+      })
+      .subscribe();
+
+    window.addEventListener('pagehide', () => {
+      try { supabase.removeChannel(canal); } catch (e) {}
+    });
+  } catch (err) {
+    console.warn('[VersusHub Comentários] Tempo real indisponível:', err);
+  }
 }
 
 /**

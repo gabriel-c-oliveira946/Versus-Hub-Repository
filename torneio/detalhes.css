@@ -1930,3 +1930,20 @@
     height: 34px;
   }
 }
+
+/* Comentário que chegou em tempo real: destaque suave que some */
+@keyframes comentarioChegou {
+  from { background: rgba(255, 59, 48, 0.12); }
+  to { background: transparent; }
+}
+
+.torneio-card-box .comentario-novo {
+  animation: comentarioChegou 2.5s ease-out;
+  border-radius: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .torneio-card-box .comentario-novo {
+    animation: none;
+  }
+}

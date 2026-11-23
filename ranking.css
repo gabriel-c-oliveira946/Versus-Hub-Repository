@@ -886,3 +886,98 @@
     gap: 4px !important;
   }
 }
+
+/* Pódio vazio: ninguém pontuou ainda */
+.ranking-podio-vazio {
+  flex: 1 1 100%;
+  max-width: 620px;
+  margin: 8px auto 0;
+  padding: 28px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  text-align: center;
+  background: #121218;
+  border: 1px dashed rgba(255, 115, 0, 0.45);
+  border-radius: 16px;
+  color: #9cb1cf;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.ranking-podio-vazio i {
+  font-size: 30px;
+  color: #ff7300;
+}
+
+.ranking-podio-vazio strong {
+  color: #f8fafc;
+  font-size: 17px;
+}
+
+.ranking-podio-vazio a {
+  margin-top: 6px;
+  padding: 8px 18px;
+  border-radius: 999px;
+  background: #d41111;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.ranking-podio-vazio a:hover {
+  filter: brightness(1.1);
+}
+
+/* ==============================================================================
+   TABELA DO RANKING: colunas por tamanho de tela
+   Antes: no tablet sobravam 6 itens para 5 colunas (o último pulava de linha)
+   e no celular eram 8 colunas espremidas, com nome encostando nos pontos.
+   Ordem dos itens: 1 posição, 2 jogador, 3 pontos, 4 torneios, 5 vitórias,
+   6 derrotas, 7 aproveitamento, 8 perfil.
+   ============================================================================== */
+@media (max-width: 992px) {
+  body .leaderboard-header-row,
+  body .leaderboard-row {
+    min-width: 0;
+    grid-template-columns: 56px minmax(0, 1fr) 96px 84px 76px 56px;
+  }
+
+  body .leaderboard-header-row > *:nth-child(5),
+  body .leaderboard-row > *:nth-child(5) {
+    display: revert;
+  }
+
+  body .leaderboard-header-row > *:nth-child(4),
+  body .leaderboard-header-row > *:nth-child(6),
+  body .leaderboard-row > *:nth-child(4),
+  body .leaderboard-row > *:nth-child(6) {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  body .leaderboard-header-row,
+  body .leaderboard-row {
+    grid-template-columns: 40px minmax(0, 1fr) auto;
+    column-gap: 10px;
+    padding: 12px 14px;
+  }
+
+  body .leaderboard-header-row > *:nth-child(n+4),
+  body .leaderboard-row > *:nth-child(n+4) {
+    display: none;
+  }
+
+  body .leaderboard-row .player-identity {
+    min-width: 0;
+  }
+
+  body .leaderboard-row .player-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
