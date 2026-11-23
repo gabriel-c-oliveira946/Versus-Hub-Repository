@@ -189,7 +189,8 @@ function renderTableList(items, isFiltered = false) {
     const avatarSrc = escapeHtml(isTeam ? (item.logo || '/image/logo.png') : item.avatar);
     const fallbackSrc = escapeHtml(isTeam ? '/image/logo.png' : '/image/boneco_logo_ofc.png');
 
-    const rawSubTitle = isTeam ? (item.tag ? `[${item.tag}] ${item.jogos || 'E-Sports'}` : (item.jogos || 'E-Sports')) : (item.email || '');
+    // Jogadores: mostra a região, nunca o e-mail (dado pessoal, não deve ficar público)
+    const rawSubTitle = isTeam ? (item.tag ? `[${item.tag}] ${item.jogos || 'E-Sports'}` : (item.jogos || 'E-Sports')) : (item.regiao || 'Brasil');
     const subTitle = escapeHtml(rawSubTitle);
     const escapedNome = escapeHtml(item.nome);
     const escapedPoints = escapeHtml(item.points);
@@ -348,7 +349,7 @@ async function loadRealRankingData() {
   try {
     const { data: dbUsers, error: usersErr } = await supabase
       .from('usuarios')
-      .select('id, nome, email, avatar, stats');
+      .select('id, nome, email, avatar, stats, regiao');
 
     if (usersErr) {
       console.warn('Aviso ao consultar usuarios para o ranking:', usersErr?.message || usersErr);
@@ -373,6 +374,7 @@ async function loadRealRankingData() {
         id: String(usuario.id || ''),
         nome: usuario.nome || (usuario.email ? usuario.email.split('@')[0] : 'Jogador'),
         email: usuario.email || '',
+        regiao: usuario.regiao || 'Brasil',
         avatar: resolvePlayerAvatar(usuario),
         logo: '/image/logo.png',
         tag: usuario.tag || '',
