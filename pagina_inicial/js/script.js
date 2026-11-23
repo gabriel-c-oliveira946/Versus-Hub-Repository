@@ -1466,6 +1466,9 @@ function atualizarInterfaceNotificacoes(notificacoes) {
     } else if (n.tipo === 'sistema') {
       iconClass = 'fa-solid fa-shield-halved';
       typeClass = 'sistema';
+    } else if (n.tipo === 'comentario') {
+      iconClass = 'fa-solid fa-comments';
+      typeClass = 'torneio';
     }
 
     const unreadClass = !n.lida ? 'unread' : '';

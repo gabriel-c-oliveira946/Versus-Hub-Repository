@@ -19,6 +19,8 @@
 --   6. Cria o bucket 'imagens' no Storage, onde ficam avatares, logos e
 --      banners (o banco guarda só o endereço da imagem).
 --   7. Cria a tabela de comentários dos torneios, com regras e limite anti-spam.
+--   8. Avisa o organizador sobre comentários com uma notificação agrupada
+--      ("fulano e mais 3 pessoas comentaram no torneio X").
 -- ==============================================================================
 
 -- ------------------------------------------------------------------------------
@@ -748,3 +750,110 @@ CREATE POLICY "comentarios_delete_autor_ou_organizador" ON public.comentarios
             WHERE lower(trim(t."criadorEmail")) = public.vh_email_logado()
         )
     );
+
+-- ------------------------------------------------------------------------------
+-- 8. NOTIFICAÇÃO AGRUPADA DE COMENTÁRIOS PARA O ORGANIZADOR
+--    Estilo Instagram: enquanto a notificação não for lida, novos comentários
+--    atualizam a MESMA notificação em vez de criar outra:
+--      "fered comentou no torneio "Copa X"."
+--      "fered e gabriel comentaram no torneio "Copa X"."
+--      "fered e mais 3 pessoas comentaram no torneio "Copa X"."
+--    Depois que o organizador lê (ou apaga), o próximo comentário abre um novo
+--    grupo. Comentários do próprio organizador não geram notificação.
+-- ------------------------------------------------------------------------------
+ALTER TABLE IF EXISTS public.notificacoes ADD COLUMN IF NOT EXISTS chave_grupo TEXT;
+ALTER TABLE IF EXISTS public.notificacoes ADD COLUMN IF NOT EXISTS agrupado_desde TIMESTAMP WITH TIME ZONE;
+CREATE INDEX IF NOT EXISTS idx_notificacoes_grupo ON public.notificacoes(user_email, chave_grupo) WHERE lida = false;
+
+CREATE OR REPLACE FUNCTION public.vh_notificar_comentario()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+    v_org      TEXT;
+    v_nome_t   TEXT;
+    v_chave    TEXT := 'comentarios:' || NEW.torneio_id;
+    v_notif    public.notificacoes%ROWTYPE;
+    v_desde    TIMESTAMP WITH TIME ZONE;
+    v_emails   TEXT[];
+    v_qtd      INT;
+    v_nome1    TEXT;
+    v_nome2    TEXT;
+    v_msg      TEXT;
+    v_titulo   TEXT;
+BEGIN
+    SELECT lower(btrim(coalesce("criadorEmail", ''))), coalesce(nome, 'seu torneio')
+      INTO v_org, v_nome_t
+      FROM public.torneios WHERE id = NEW.torneio_id;
+
+    IF v_org IS NULL OR v_org = '' OR v_org = NEW.user_email THEN
+        RETURN NEW;
+    END IF;
+
+    SELECT * INTO v_notif
+      FROM public.notificacoes
+     WHERE lower(btrim(user_email)) = v_org AND chave_grupo = v_chave AND lida = false
+     ORDER BY created_at DESC
+     LIMIT 1
+     FOR UPDATE;
+
+    v_desde := CASE WHEN FOUND THEN coalesce(v_notif.agrupado_desde, v_notif.created_at) ELSE NEW.created_at END;
+
+    -- Pessoas diferentes que comentaram desde o início do grupo (a mais recente primeiro)
+    SELECT array_agg(x.email ORDER BY x.ultimo DESC), count(*)
+      INTO v_emails, v_qtd
+      FROM (
+        SELECT c.user_email AS email, max(c.created_at) AS ultimo
+          FROM public.comentarios c
+         WHERE c.torneio_id = NEW.torneio_id
+           AND c.created_at >= v_desde
+           AND c.user_email <> v_org
+         GROUP BY c.user_email
+      ) x;
+
+    IF coalesce(v_qtd, 0) = 0 THEN
+        RETURN NEW;
+    END IF;
+
+    SELECT coalesce(nullif(btrim(u.nome), ''), split_part(v_emails[1], '@', 1)) INTO v_nome1
+      FROM (SELECT 1) s LEFT JOIN public.usuarios u ON lower(btrim(u.email)) = v_emails[1];
+    IF v_qtd >= 2 THEN
+        SELECT coalesce(nullif(btrim(u.nome), ''), split_part(v_emails[2], '@', 1)) INTO v_nome2
+          FROM (SELECT 1) s LEFT JOIN public.usuarios u ON lower(btrim(u.email)) = v_emails[2];
+    END IF;
+
+    v_msg := CASE
+        WHEN v_qtd = 1 THEN v_nome1 || ' comentou no torneio "' || v_nome_t || '".'
+        WHEN v_qtd = 2 THEN v_nome1 || ' e ' || v_nome2 || ' comentaram no torneio "' || v_nome_t || '".'
+        ELSE v_nome1 || ' e mais ' || (v_qtd - 1) || ' pessoas comentaram no torneio "' || v_nome_t || '".'
+    END;
+    v_titulo := CASE WHEN v_qtd = 1 THEN 'Novo comentário' ELSE 'Novos comentários' END;
+
+    IF v_notif.id IS NOT NULL THEN
+        -- Atualiza o grupo e sobe a notificação para o topo da lista
+        UPDATE public.notificacoes
+           SET titulo = v_titulo, mensagem = v_msg, created_at = NEW.created_at
+         WHERE id = v_notif.id;
+    ELSE
+        INSERT INTO public.notificacoes
+            (user_email, titulo, mensagem, tipo, link, lida, chave_grupo, agrupado_desde)
+        VALUES
+            (v_org, v_titulo, v_msg, 'comentario',
+             '/torneio/custom.html?id=' || NEW.torneio_id || '#comentarios',
+             false, v_chave, NEW.created_at);
+    END IF;
+
+    RETURN NEW;
+EXCEPTION WHEN OTHERS THEN
+    -- Um erro na notificação nunca impede o comentário de ser publicado
+    RAISE WARNING 'vh_notificar_comentario: %', SQLERRM;
+    RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS vh_notificar_comentario ON public.comentarios;
+CREATE TRIGGER vh_notificar_comentario
+    AFTER INSERT ON public.comentarios
+    FOR EACH ROW EXECUTE FUNCTION public.vh_notificar_comentario();
