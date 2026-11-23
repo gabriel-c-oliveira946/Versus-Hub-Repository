@@ -4233,3 +4233,185 @@ gap: 100px;
   color: #ef4444;
   background: rgba(239, 68, 68, 0.15);
 }
+
+/* ==============================================================================
+   RODAPÉ (versão escura)
+   Fundo escuro com borda vermelha no topo, no lugar do vermelho sólido com
+   títulos laranja (pouco contraste). Seletores com "body footer" para valer
+   em todas as páginas, independentemente da ordem dos outros CSS.
+   ============================================================================== */
+body footer {
+  margin-top: 48px;
+  font-weight: 400;
+  color: #d1d1e6;
+}
+
+body footer #footer_content {
+  background: #0b0b10;
+  border-top: 3px solid #d41111;
+  display: grid;
+  grid-template-columns: 140px repeat(3, minmax(0, 1fr));
+  gap: 48px;
+  max-width: none;
+  padding: 44px max(24px, calc((100% - 1160px) / 2)) 40px;
+  align-items: start;
+}
+
+body footer #footer_logo {
+  display: flex;
+  justify-content: flex-start;
+}
+
+body footer #logofooter {
+  width: 110px;
+  height: auto;
+}
+
+body footer h1 {
+  color: #ffffff;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  position: relative;
+  padding-bottom: 10px;
+}
+
+body footer h1::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 32px;
+  height: 3px;
+  border-radius: 3px;
+  background: #d41111;
+}
+
+/* Os <br> logo após os títulos criavam um espaço grande demais */
+body footer h1 + br {
+  display: none;
+}
+
+body footer h1 + * {
+  margin-top: 14px;
+}
+
+body footer p,
+body footer li {
+  color: #9ca3af;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+body footer #footer_politicas a {
+  color: #d1d1e6;
+}
+
+body footer #footer_politicas a:hover {
+  color: #ff3b30;
+}
+
+body footer #footer_politicas li::marker {
+  color: #d41111;
+}
+
+@media (max-width: 768px) {
+  body footer #footer_content {
+    grid-template-columns: 1fr !important;
+    gap: 28px !important;
+    padding: 32px 20px 40px !important;
+    text-align: center;
+  }
+
+  body footer #footer_logo {
+    justify-content: center;
+  }
+
+  body footer #logofooter {
+    width: 84px;
+  }
+
+  body footer h1::after {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
+/* ==============================================================================
+   CABEÇALHO: "Criar Torneio" como ação principal
+   O cabeçalho é vermelho, então o destaque é o botão branco com texto vermelho;
+   "Ao Vivo" e "Equipes" ficam secundários (fundo translúcido).
+   ============================================================================== */
+body .botoes_header #aovivo_header,
+body .botoes_header #equipes_header {
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  color: #ffffff;
+}
+
+body .botoes_header #aovivo_header:hover,
+body .botoes_header #equipes_header:hover {
+  background: rgba(0, 0, 0, 0.32);
+  border-color: #ffffff;
+}
+
+body .botoes_header #criar_header {
+  background: #ffffff;
+  border: 1px solid #ffffff;
+  color: #b00d0d;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+}
+
+body .botoes_header #criar_header::before {
+  content: '+';
+  font-size: 17px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+body .botoes_header #criar_header:hover {
+  background: #fff1f1;
+  color: #8f0a0a;
+}
+
+.botoes_header button:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+}
+
+/* ==============================================================================
+   CATEGORIAS NO CELULAR: linha deslizante em vez de quebrar em 4 + 1
+   ============================================================================== */
+@media (max-width: 768px) {
+  body .btscategorias {
+    flex-wrap: nowrap !important;
+    justify-content: flex-start !important;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+    scroll-padding-inline: 16px; /* sem isto, o encaixe colava o 1º botão na borda */
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 10px !important;
+    padding: 10px 16px 14px !important;
+    max-width: 100%;
+  }
+
+  body .btscategorias::-webkit-scrollbar {
+    display: none;
+  }
+
+  body .btscategorias button {
+    scroll-snap-align: start;
+    margin: 0 !important;
+  }
+
+  /* Centraliza quando todas couberem (telas um pouco maiores) */
+  body .btscategorias button:first-child {
+    margin-left: auto !important;
+  }
+
+  body .btscategorias button:last-child {
+    margin-right: auto !important;
+  }
+}

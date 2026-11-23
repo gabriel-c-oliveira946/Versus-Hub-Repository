@@ -53,18 +53,39 @@ let tabEquipesBtn = null;
 // ==============================================================================
 // RENDERIZAÇÃO DO PODIUM (TOP 3) DIRETO DOS DADOS DA VIEW
 // ==============================================================================
+/**
+ * Só entra no pódio quem já tem pontos. Antes, com todos zerados, alguém
+ * aparecia como "Líder Supremo" com 0 pts.
+ */
+function quantidadeNoPodio(items) {
+  return Math.min(3, (items || []).filter(i => Number(i.points) > 0).length);
+}
+
 function renderPodium(items) {
   if (!podiumContainer) return;
   podiumContainer.innerHTML = '';
 
-  const top3 = items.slice(0, 3);
+  const top3 = items.slice(0, quantidadeNoPodio(items));
   if (!top3.length) {
-    podiumContainer.style.display = 'none';
     podiumContainer.setAttribute('aria-busy', 'false');
-    return;
-  } else {
+    if (!items.length) {
+      podiumContainer.style.display = 'none';
+      return;
+    }
+    const isTeam = currentTab === 'equipes';
     podiumContainer.style.display = 'flex';
+    const aviso = document.createElement('div');
+    aviso.className = 'ranking-podio-vazio';
+    aviso.innerHTML = `
+      <i class="fa-solid fa-trophy" aria-hidden="true"></i>
+      <strong>O pódio ainda está vazio</strong>
+      <span>Nenhum${isTeam ? 'a equipe' : ' jogador'} pontuou ainda. Os três primeiros aparecem aqui assim que um torneio for encerrado. Que tal disputar um?</span>
+      <a href="/pagina_inicial/torneios.html">Ver torneios abertos</a>
+    `;
+    podiumContainer.appendChild(aviso);
+    return;
   }
+  podiumContainer.style.display = 'flex';
   podiumContainer.setAttribute('aria-busy', 'false');
 
   // Mapeamento visual das 3 posições: 2º (esquerda), 1º (centro/destaque), 3º (direita)
@@ -139,7 +160,7 @@ function renderTableList(items, isFiltered = false) {
   tableContainer.innerHTML = '';
 
   const isTeam = currentTab === 'equipes';
-  const startIndex = isFiltered ? 0 : 3;
+  const startIndex = isFiltered ? 0 : quantidadeNoPodio(items);
   const listToShow = items.slice(startIndex);
 
   if (listToShow.length === 0) {
@@ -244,18 +265,18 @@ function matchesSearch(item, rawTerm) {
   if (!term) return true;
 
   const nome = normalizeText(item.nome);
-  const email = normalizeText(item.email || '');
   const tag = normalizeText(item.tag || '');
   const leader = normalizeText(item.leaderName || '');
   const jogos = normalizeText(item.jogos || '');
 
-  if (nome.includes(term) || email.includes(term) || tag.includes(term) || leader.includes(term) || jogos.includes(term)) {
+  // A busca não usa o e-mail: não deve dar para descobrir quem é quem pelo e-mail
+  if (nome.includes(term) || tag.includes(term) || leader.includes(term) || jogos.includes(term)) {
     return true;
   }
 
   const words = term.split(/\s+/).filter(Boolean);
   if (words.length > 1) {
-    const combined = `${nome} ${email} ${tag} ${leader} ${jogos}`;
+    const combined = `${nome} ${tag} ${leader} ${jogos}`;
     return words.every(w => combined.includes(w));
   }
 
