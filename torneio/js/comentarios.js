@@ -295,6 +295,25 @@ async function iniciar() {
 
   el('comentariosMais')?.addEventListener('click', () => carregarComentarios(true));
   await carregarComentarios(false);
+
+  // Vindo da notificação ("...comentaram no torneio X"): rola até os comentários
+  if (window.location.hash === '#comentarios') rolarParaComentarios(secao);
+}
+
+/**
+ * A página do torneio fica oculta até terminar de carregar, então espera ela
+ * aparecer (até ~6 s) antes de rolar até a seção.
+ */
+function rolarParaComentarios(secao) {
+  let tentativas = 0;
+  const timer = setInterval(() => {
+    const pagina = el('torneioPage');
+    const visivel = !pagina || getComputedStyle(pagina).display !== 'none';
+    if (visivel || ++tentativas > 30) {
+      clearInterval(timer);
+      secao.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, 200);
 }
 
 if (document.readyState === 'loading') {
