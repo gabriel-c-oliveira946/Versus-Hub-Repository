@@ -9,7 +9,7 @@
 
 <br>
 
-**🌍 Acesso ao site:** [Clique aqui para acessar o projeto online](https://versus-hub-repository-jyb7.vercel.app/)
+**🌍 Acesso ao site:** [Clique aqui para acessar o projeto online](https://versus-hub-torneios.vercel.app/)
 
 > **A plataforma definitiva para organizar, gerenciar e vivenciar torneios de e-sports amadores e independentes.**
 
