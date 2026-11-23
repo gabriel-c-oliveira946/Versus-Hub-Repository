@@ -2,6 +2,19 @@
 //  AUTENTICAÇÃO & ELEMENTOS DO HEADER
 // ===================================
 
+// Link de "esqueci minha senha" que chegou fora da página de login (por exemplo,
+// quando o Supabase usa o Site URL, que aponta para a página inicial): leva para
+// o login mantendo o token, para a tela de nova senha abrir.
+(function encaminharRecuperacaoDeSenha() {
+  try {
+    const { pathname, search, hash } = window.location;
+    const ehRecuperacao = /(^|[#&?])type=recovery(&|$)/.test(hash) || /(^|[?&])type=recovery(&|$)/.test(search);
+    if (ehRecuperacao && !pathname.startsWith('/login/')) {
+      window.location.replace('/login/login.html' + search + hash);
+    }
+  } catch (e) {}
+})();
+
 // Limpeza preventiva total de torneios e equipes estáticos
 
 
