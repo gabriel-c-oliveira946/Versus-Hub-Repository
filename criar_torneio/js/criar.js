@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           <p style="font-size: 16px; color: #9ca3af; margin-bottom: 30px; line-height: 1.6; font-family: system-ui, sans-serif;">Você precisa estar logado na sua conta VersusHub para poder criar e gerenciar torneios.</p>
           <div style="display: flex; gap: 15px; justify-content: center;">
             <a href="/login/login.html" class="btn-principal-criar" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Fazer Login</a>
-            <a href="/pagina_inicial/index.html" class="btn-secondary-criar" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Voltar ao Início</a>
+            <a href="/" class="btn-secondary-criar" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Voltar ao Início</a>
           </div>
         </div>
       `;

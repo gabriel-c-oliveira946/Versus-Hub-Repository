@@ -92,7 +92,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           <p style="font-size: 16px; color: #9ca3af; margin-bottom: 30px; line-height: 1.6; font-family: system-ui, sans-serif;">Você precisa estar logado na sua conta VersusHub para poder visualizar e gerenciar seus torneios.</p>
           <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
             <a href="/login/login.html" style="background: #d41111; color: #fff; text-decoration: none; padding: 12px 24px; border-radius: 999px; font-weight: 700; font-size: 14px; transition: 0.2s;">Fazer Login</a>
-            <a href="/pagina_inicial/index.html" style="background: #222230; color: #fff; text-decoration: none; padding: 12px 24px; border-radius: 999px; font-weight: 700; font-size: 14px; border: 1px solid #353545; transition: 0.2s;">Voltar ao Início</a>
+            <a href="/" style="background: #222230; color: #fff; text-decoration: none; padding: 12px 24px; border-radius: 999px; font-weight: 700; font-size: 14px; border: 1px solid #353545; transition: 0.2s;">Voltar ao Início</a>
           </div>
         </div>
       `;

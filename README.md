@@ -3,13 +3,13 @@
 <div align="center">
   <img src="https://img.shields.io/badge/Status-Em%20Produ%C3%A7%C3%A3o-success?style=for-the-badge" alt="Status do Projeto">
   <img src="https://img.shields.io/badge/Vers%C3%A3o-1.0.0-blue?style=for-the-badge" alt="Versão">
-  <img src="https://img.shields.io/badge/Licen%C3%A7a-MIT-lightgrey?style=for-the-badge" alt="Licença">
+  <img src="https://img.shields.io/badge/Projeto-Acad%C3%AAmico-lightgrey?style=for-the-badge" alt="Projeto Acadêmico">
   <img src="https://img.shields.io/badge/TCC-SENAI%20Dendezeiros-d41111?style=for-the-badge" alt="TCC SENAI Dendezeiros">
 </div>
 
 <br>
 
-**🌍 Acesso ao site:** [Clique aqui para acessar o projeto online](https://versus-hub-repository-jyb7.vercel.app/pagina_inicial/index.html)
+**🌍 Acesso ao site:** [Clique aqui para acessar o projeto online](https://versus-hub-repository-jyb7.vercel.app/)
 
 > **A plataforma definitiva para organizar, gerenciar e vivenciar torneios de e-sports amadores e independentes.**
 
@@ -172,19 +172,21 @@ Versus-Hub-Repository/
 
 <br>
 
-O site é estático, mas os caminhos são absolutos (`/pagina_inicial/...`), então ele precisa ser servido a partir da **raiz do projeto**. Qualquer servidor estático serve, por exemplo:
+O site é estático, mas os caminhos são absolutos (`/pagina_inicial/...`), então ele precisa ser servido a partir da **raiz do projeto**. A forma recomendada é o `serve`, que lê o arquivo `serve.json` e abre a página inicial direto em `/`, igual ao site publicado:
 
 ```bash
 npx serve .
 ```
 
-ou
+Depois abra o endereço que aparecer no terminal (normalmente `http://localhost:3000`).
+
+Também funciona com qualquer outro servidor estático, como o do Python:
 
 ```bash
 python -m http.server 8000
 ```
 
-Depois abra `http://localhost:8000/pagina_inicial/index.html` (ou a porta indicada pelo `serve`).
+Nesse caso, abra `http://localhost:8000/pagina_inicial/index.html`. O logo e o botão "Início" levam para `/`, que nesses servidores mostra a lista de arquivos em vez da página inicial.
 
 </details>
 

@@ -385,7 +385,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       setTimeout(() => {
-        window.location.href = '/pagina_inicial/index.html';
+        window.location.href = '/';
       }, 500);
     } catch (err) {
       if (isNicknameDuplicateError(err)) {
