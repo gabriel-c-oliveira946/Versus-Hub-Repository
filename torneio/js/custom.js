@@ -1226,6 +1226,65 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.addEventListener('versus:bracket-updated', recarregarInscricoesETorneio);
     document.addEventListener('versus:inscricoes-updated', recarregarInscricoesETorneio);
 
+    // ==========================================================================
+    // TEMPO REAL (Supabase Realtime)
+    // Quem está com a página aberta recebe as mudanças na hora, sem recarregar:
+    // placar/partidas, status do torneio (Ao Vivo, Encerrado) e novas inscrições.
+    // Não é consulta repetida: o Supabase só envia algo quando o dado muda.
+    // ==========================================================================
+    iniciarTempoRealTorneio();
+
+    function iniciarTempoRealTorneio() {
+      if (!torneio?.id || typeof supabase.channel !== 'function') return;
+      const tId = String(torneio.id);
+      let timerChave = null;
+      let timerInscricoes = null;
+
+      // Várias mudanças seguidas (ex.: salvar placar e avançar vencedor) viram 1 atualização
+      const atualizarChave = () => {
+        clearTimeout(timerChave);
+        timerChave = setTimeout(() => {
+          if (bracketInicializado) {
+            carregarERenderizarChaveamento();
+          } else {
+            carregarPartidasTorneio(tId).then(lista => {
+              if (badgeTabChave) {
+                badgeTabChave.style.display = lista.length > 0 ? 'inline-block' : 'none';
+                badgeTabChave.textContent = `${lista.length} partidas`;
+              }
+              if (typeof atualizarPainelTransmissaoTopo === 'function') atualizarPainelTransmissaoTopo(lista);
+            }).catch(() => {});
+          }
+        }, 500);
+      };
+
+      const atualizarInscricoes = () => {
+        clearTimeout(timerInscricoes);
+        timerInscricoes = setTimeout(recarregarInscricoesETorneio, 500);
+      };
+
+      try {
+        const canal = supabase
+          .channel(`torneio-${tId}`)
+          .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'partidas', filter: `torneio_id=eq.${tId}` }, atualizarChave)
+          .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'partidas', filter: `torneio_id=eq.${tId}` }, atualizarChave)
+          // Exclusões não aceitam filtro no Supabase: recebe todas e recarrega (são raras)
+          .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'partidas' }, atualizarChave)
+          .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'torneios', filter: `id=eq.${tId}` }, (payload) => {
+            if (payload?.new) Object.assign(torneio, payload.new);
+            atualizarInscricoes();
+          })
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'inscricoes', filter: `torneio_id=eq.${tId}` }, atualizarInscricoes)
+          .subscribe();
+
+        window.addEventListener('pagehide', () => {
+          try { supabase.removeChannel(canal); } catch (e) {}
+        });
+      } catch (eRt) {
+        console.warn('[VersusHub Tempo Real] Não foi possível iniciar no torneio:', eRt);
+      }
+    }
+
     // Inicializa verificação de aba requisitada pela URL ou hash
     const tabUrl = params.get('tab') || window.location.hash.replace('#', '');
     if (tabUrl === 'brackets' || tabUrl === 'chaveamento') {

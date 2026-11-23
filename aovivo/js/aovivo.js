@@ -197,13 +197,45 @@ function configurarBuscaHeader() {
   }
 }
 
-// Inicialização segura após o carregamento do DOM
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
-    configurarBuscaHeader();
-    buscarTorneiosAoVivo();
-  });
-} else {
+/**
+ * Tempo real: quando um torneio entra ou sai do ar (status muda, ou uma partida
+ * ganha link/vencedor), a lista se atualiza sozinha. O Supabase só envia algo
+ * quando esses dados mudam.
+ */
+function iniciarTempoRealAoVivo() {
+  if (typeof supabase.channel !== 'function') return;
+  let timer = null;
+  const atualizar = () => {
+    clearTimeout(timer);
+    timer = setTimeout(async () => {
+      await buscarTorneiosAoVivo();
+      const busca = document.getElementById('searchInput');
+      if (busca && busca.value) renderizarTorneiosAoVivo(cacheTorneiosAoVivo, busca.value);
+    }, 800);
+  };
+  try {
+    const canal = supabase
+      .channel('aovivo-lista')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'torneios' }, atualizar)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'partidas' }, atualizar)
+      .subscribe();
+    window.addEventListener('pagehide', () => {
+      try { supabase.removeChannel(canal); } catch (e) {}
+    });
+  } catch (err) {
+    console.warn('[VersusHub Ao Vivo] Tempo real indisponível:', err);
+  }
+}
+
+function iniciarPaginaAoVivo() {
   configurarBuscaHeader();
   buscarTorneiosAoVivo();
+  iniciarTempoRealAoVivo();
+}
+
+// Inicialização segura após o carregamento do DOM
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', iniciarPaginaAoVivo);
+} else {
+  iniciarPaginaAoVivo();
 }

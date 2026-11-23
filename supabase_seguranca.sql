@@ -21,6 +21,7 @@
 --   7. Cria a tabela de comentários dos torneios, com regras e limite anti-spam.
 --   8. Avisa o organizador sobre comentários com uma notificação agrupada
 --      ("fulano e mais 3 pessoas comentaram no torneio X").
+--   9. Liga o tempo real (placar, comentários, notificações) nas tabelas usadas.
 -- ==============================================================================
 
 -- ------------------------------------------------------------------------------
@@ -857,3 +858,35 @@ DROP TRIGGER IF EXISTS vh_notificar_comentario ON public.comentarios;
 CREATE TRIGGER vh_notificar_comentario
     AFTER INSERT ON public.comentarios
     FOR EACH ROW EXECUTE FUNCTION public.vh_notificar_comentario();
+
+-- ------------------------------------------------------------------------------
+-- 9. TEMPO REAL (Supabase Realtime)
+--    Liga o envio de mudanças em tempo real para as tabelas que o site escuta:
+--    placar/partidas, status do torneio, inscrições, comentários e notificações.
+--    As regras de leitura (RLS) continuam valendo: cada pessoa só recebe as
+--    mudanças que ela poderia ler (ex.: notificações, só as próprias).
+-- ------------------------------------------------------------------------------
+DO $$
+DECLARE
+    v_tabela TEXT;
+    v_todas  BOOLEAN;
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime') THEN
+        CREATE PUBLICATION supabase_realtime;
+    END IF;
+
+    SELECT puballtables INTO v_todas FROM pg_publication WHERE pubname = 'supabase_realtime';
+    IF v_todas THEN
+        RETURN; -- a publicação já inclui todas as tabelas
+    END IF;
+
+    FOREACH v_tabela IN ARRAY ARRAY['partidas', 'torneios', 'inscricoes', 'comentarios', 'notificacoes'] LOOP
+        IF NOT EXISTS (
+            SELECT 1 FROM pg_publication_tables
+            WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = v_tabela
+        ) THEN
+            EXECUTE format('ALTER PUBLICATION supabase_realtime ADD TABLE public.%I', v_tabela);
+        END IF;
+    END LOOP;
+END;
+$$;
