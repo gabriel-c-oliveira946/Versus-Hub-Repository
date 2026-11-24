@@ -22,6 +22,7 @@
 --   8. Avisa o organizador sobre comentários com uma notificação agrupada
 --      ("fulano e mais 3 pessoas comentaram no torneio X").
 --   9. Liga o tempo real (placar, comentários, notificações) nas tabelas usadas.
+--  10. Remove inscrições repetidas e impede que voltem a acontecer.
 -- ==============================================================================
 
 -- ------------------------------------------------------------------------------
@@ -890,3 +891,45 @@ BEGIN
     END LOOP;
 END;
 $$;
+
+-- ------------------------------------------------------------------------------
+-- 10. INSCRIÇÕES SEM REPETIÇÃO
+--     O convite do organizador gravava o código do usuário (UUID) como
+--     id_participante, enquanto a inscrição feita pela própria pessoa grava o
+--     e-mail. Assim a mesma pessoa podia ficar com duas inscrições no torneio.
+--     1) padroniza inscrições individuais para usar o e-mail;
+--     2) apaga as repetidas, mantendo a melhor de cada pessoa/equipe
+--        (Aceito > Pendente > Rejeitado; em empate, a mais antiga);
+--     3) cria travas: uma inscrição por jogador e uma por equipe em cada torneio.
+-- ------------------------------------------------------------------------------
+UPDATE public.inscricoes
+   SET id_participante = lower(btrim(user_email))
+ WHERE coalesce(lower(tipo), 'individual') <> 'equipe'
+   AND id_participante ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+   AND coalesce(btrim(user_email), '') <> '';
+
+WITH ordenadas AS (
+    SELECT id,
+           row_number() OVER (
+               PARTITION BY torneio_id,
+                            CASE WHEN coalesce(lower(tipo), 'individual') = 'equipe'
+                                 THEN 'equipe:' || coalesce(id_participante, '')
+                                 ELSE 'jogador:' || lower(btrim(user_email)) END
+               ORDER BY CASE status WHEN 'Aceito' THEN 0 WHEN 'Rejeitado' THEN 2 ELSE 1 END,
+                        created_at,
+                        id
+           ) AS posicao
+      FROM public.inscricoes
+)
+DELETE FROM public.inscricoes i
+ USING ordenadas o
+ WHERE i.id = o.id
+   AND o.posicao > 1;
+
+CREATE UNIQUE INDEX IF NOT EXISTS inscricoes_unica_por_jogador
+    ON public.inscricoes (torneio_id, lower(btrim(user_email)))
+ WHERE coalesce(lower(tipo), 'individual') <> 'equipe';
+
+CREATE UNIQUE INDEX IF NOT EXISTS inscricoes_unica_por_equipe
+    ON public.inscricoes (torneio_id, id_participante)
+ WHERE coalesce(lower(tipo), 'individual') = 'equipe';

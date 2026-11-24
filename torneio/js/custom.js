@@ -3359,8 +3359,8 @@ async function pesquisarParticipantesSupabase(termo, filtro, torneioId, torneioN
       const { data: inscs } = await supabase
         .from('inscricoes')
         .select('user_email, status, id_participante')
-        .eq('torneio_id', String(torneioId))
-        .in('user_email', emailsBusca);
+        .eq('torneio_id', String(torneioId));
+      // Comparação sem diferenciar maiúsculas (feita abaixo, em minúsculas)
       inscricoesExistentes = inscs || [];
     }
 
@@ -3428,7 +3428,9 @@ async function pesquisarParticipantesSupabase(termo, filtro, torneioId, torneioN
             torneio_id: String(torneioId),
             user_email: emailPart,
             tipo: tipo === 'equipe' ? 'equipe' : 'individual',
-            id_participante: tipo === 'equipe' ? String(idPart) : String(idPart || emailPart),
+            // Jogador: o e-mail, igual à inscrição feita pela própria pessoa (antes era o
+            // código do usuário, e a mesma pessoa aparecia duas vezes nas solicitações)
+            id_participante: tipo === 'equipe' ? String(idPart) : emailPart,
             equipe_nome: tipo === 'equipe' ? nomePart : '',
             status: 'Pendente'
           };
