@@ -23,6 +23,7 @@
 --      ("fulano e mais 3 pessoas comentaram no torneio X").
 --   9. Liga o tempo real (placar, comentários, notificações) nas tabelas usadas.
 --  10. Remove inscrições repetidas e impede que voltem a acontecer.
+--  11. Impede escalação de equipe maior que o limite de jogadores do torneio.
 -- ==============================================================================
 
 -- ------------------------------------------------------------------------------
@@ -467,6 +468,7 @@ DECLARE
     v_eq_st      JSONB;
     v_ganhos     JSONB;
     v_atualizados INT := 0;
+    v_tem_escalacao BOOLEAN;
 BEGIN
     IF v_email = '' THEN
         RAISE EXCEPTION 'É preciso estar logado para encerrar o torneio.' USING ERRCODE = '42501';
@@ -594,14 +596,23 @@ BEGIN
             WHERE id = v_equipe.id;
             v_atualizados := v_atualizados + 1;
 
-            -- Integrantes: líder + membros aceitos + line-up inscrita (somam vitórias,
-            -- derrotas e torneio disputado; os pontos de pódio ficam com a equipe)
+            -- Integrantes que somam vitórias, derrotas e torneio disputado (os pontos de
+            -- pódio ficam com a equipe): só a escalação inscrita, quando houver;
+            -- senão, líder + membros aceitos.
+            SELECT EXISTS (
+                SELECT 1 FROM public.inscricoes i
+                 WHERE i.torneio_id = p_torneio_id AND i.id_participante = v_equipe.id
+                   AND jsonb_typeof(i.lineup) = 'array' AND jsonb_array_length(i.lineup) > 0
+            ) INTO v_tem_escalacao;
+
             FOR v_membro IN
                 SELECT DISTINCT lower(trim(e)) FROM (
                     SELECT v_equipe."leaderEmail" AS e
+                     WHERE NOT v_tem_escalacao
                     UNION ALL
                     SELECT m.user_email FROM public.membros_equipe m
                     WHERE m.equipe_id = v_equipe.id AND m.status = 'Aceito'
+                      AND NOT v_tem_escalacao
                     UNION ALL
                     SELECT CASE jsonb_typeof(l.item)
                                WHEN 'string' THEN l.item #>> '{}'
@@ -971,3 +982,64 @@ CREATE UNIQUE INDEX IF NOT EXISTS inscricoes_unica_por_jogador
 CREATE UNIQUE INDEX IF NOT EXISTS inscricoes_unica_por_equipe
     ON public.inscricoes (torneio_id, id_participante)
  WHERE coalesce(lower(tipo), 'individual') = 'equipe';
+
+-- ------------------------------------------------------------------------------
+-- 11. LIMITE DE JOGADORES POR EQUIPE
+--     Uma equipe não pode se inscrever com mais jogadores do que o torneio
+--     permite ("maxIntegrantes"). Conta a escalação enviada (lineup); se ela vier
+--     vazia, conta o líder + membros aceitos da equipe.
+--     Vale só ao criar a inscrição ou ao mudar a escalação: inscrições antigas
+--     continuam podendo ser aprovadas/rejeitadas normalmente.
+-- ------------------------------------------------------------------------------
+ALTER TABLE IF EXISTS public.inscricoes ADD COLUMN IF NOT EXISTS lineup JSONB DEFAULT '[]'::jsonb;
+
+CREATE OR REPLACE FUNCTION public.vh_validar_escalacao()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+    v_torneio JSONB;
+    v_limite  INT;
+    v_total   INT;
+    v_lider   TEXT;
+BEGIN
+    IF coalesce(lower(NEW.tipo), 'individual') <> 'equipe' THEN
+        RETURN NEW;
+    END IF;
+
+    -- Lido como JSON para funcionar com "maxIntegrantes" ou "max_integrantes"
+    SELECT to_jsonb(t) INTO v_torneio FROM public.torneios t WHERE t.id = NEW.torneio_id;
+    v_limite := coalesce(
+        public.vh_num(v_torneio ->> 'maxIntegrantes'),
+        public.vh_num(v_torneio ->> 'max_integrantes')
+    );
+    IF v_limite IS NULL OR v_limite <= 0 THEN
+        RETURN NEW; -- torneio sem limite definido
+    END IF;
+
+    IF jsonb_typeof(NEW.lineup) = 'array' AND jsonb_array_length(NEW.lineup) > 0 THEN
+        v_total := jsonb_array_length(NEW.lineup);
+    ELSE
+        SELECT lower(btrim(coalesce("leaderEmail", ''))) INTO v_lider
+          FROM public.equipes WHERE id = NEW.id_participante;
+        SELECT count(DISTINCT e) INTO v_total FROM (
+            SELECT v_lider AS e WHERE coalesce(v_lider, '') <> ''
+            UNION
+            SELECT lower(btrim(m.user_email)) FROM public.membros_equipe m
+             WHERE m.equipe_id = NEW.id_participante AND m.status = 'Aceito'
+        ) membros;
+    END IF;
+
+    IF v_total > v_limite THEN
+        RAISE EXCEPTION 'A escalação tem % jogadores, mas este torneio aceita no máximo % por equipe.', v_total, v_limite;
+    END IF;
+    RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS vh_validar_escalacao ON public.inscricoes;
+CREATE TRIGGER vh_validar_escalacao
+    BEFORE INSERT OR UPDATE OF lineup ON public.inscricoes
+    FOR EACH ROW EXECUTE FUNCTION public.vh_validar_escalacao();
