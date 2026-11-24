@@ -876,6 +876,25 @@ BEGIN
         CREATE PUBLICATION supabase_realtime;
     END IF;
 
+    -- Tabela publicada sem chave primária não aceita UPDATE/DELETE ("does not have a
+    -- replica identity"). Nesses casos o Postgres passa a identificar a linha pelo
+    -- conteúdo inteiro (REPLICA IDENTITY FULL). Tabelas com chave primária ficam como estão.
+    FOREACH v_tabela IN ARRAY ARRAY['partidas', 'torneios', 'inscricoes', 'comentarios', 'notificacoes'] LOOP
+        IF EXISTS (
+            SELECT 1
+              FROM pg_class c
+              JOIN pg_namespace n ON n.oid = c.relnamespace
+             WHERE n.nspname = 'public'
+               AND c.relname = v_tabela
+               AND c.relreplident IN ('d', 'n')
+               AND NOT EXISTS (
+                   SELECT 1 FROM pg_index i WHERE i.indrelid = c.oid AND i.indisprimary
+               )
+        ) THEN
+            EXECUTE format('ALTER TABLE public.%I REPLICA IDENTITY FULL', v_tabela);
+        END IF;
+    END LOOP;
+
     SELECT puballtables INTO v_todas FROM pg_publication WHERE pubname = 'supabase_realtime';
     IF v_todas THEN
         RETURN; -- a publicação já inclui todas as tabelas
