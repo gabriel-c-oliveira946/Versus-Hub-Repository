@@ -3393,6 +3393,36 @@ export function abrirModalMontagemManual(torneioId, participantesConfirmados = [
 }
 
 /**
+ * Chave que identifica quem está inscrito: o e-mail para jogadores (é o que o
+ * banco usa como único por torneio) e o id da equipe para equipes.
+ */
+function chavePessoaInscricao(i) {
+  if (!i) return '';
+  if (i.tipo === 'equipe') return 'equipe:' + String(i.id_participante || i.equipe_nome || '').trim().toLowerCase();
+  return 'jogador:' + String(i.user_email || i.id_participante || '').trim().toLowerCase();
+}
+
+/**
+ * Remove inscrições repetidas da mesma pessoa/equipe, mantendo a mais relevante:
+ * aprovada > pendente > rejeitada; em empate, a mais antiga.
+ */
+function removerInscricoesRepetidas(lista) {
+  const peso = (st) => (st === 'Aceito' ? 0 : (st === 'Rejeitado' ? 2 : 1));
+  const melhor = new Map();
+  (lista || []).forEach(i => {
+    const k = chavePessoaInscricao(i);
+    const atual = melhor.get(k);
+    if (!atual) { melhor.set(k, i); return; }
+    const pi = peso(i.status || 'Pendente');
+    const pa = peso(atual.status || 'Pendente');
+    if (pi < pa || (pi === pa && String(i.created_at || '') < String(atual.created_at || ''))) {
+      melhor.set(k, i);
+    }
+  });
+  return (lista || []).filter(i => melhor.get(chavePessoaInscricao(i)) === i);
+}
+
+/**
  * MODAL PARA GERENCIAR SOLICITAÇÕES DE INSCRIÇÃO (Aprovar / Rejeitar)
  */
 export async function abrirModalGerenciarSolicitacoes(torneioId) {
@@ -3489,6 +3519,7 @@ export async function abrirModalGerenciarSolicitacoes(torneioId) {
   // Carrega e mescla dados (Supabase + Local Storage)
   try {
     let remoteInscricoes = [];
+    let falhaBanco = false;
 
     // 1. Busca do Supabase por ID string
     try {
@@ -3499,8 +3530,11 @@ export async function abrirModalGerenciarSolicitacoes(torneioId) {
 
       if (!error && Array.isArray(data)) {
         remoteInscricoes = data;
+      } else {
+        falhaBanco = true;
       }
     } catch (eDb) {
+      falhaBanco = true;
       console.warn('Aviso ao consultar inscrições por String(torneioId):', eDb);
     }
 
@@ -3520,19 +3554,51 @@ export async function abrirModalGerenciarSolicitacoes(torneioId) {
 
     totalInscricoes = [...remoteInscricoes];
 
-    // 2. Mescla com local storage (vh_inscricoes)
+    // 2. Cópia salva no navegador (vh_inscricoes): só completa a lista quando o banco
+    //    não respondeu. Com o banco funcionando ela é substituída pelos dados reais,
+    //    senão inscrições antigas ou apagadas voltavam a aparecer, duplicadas.
     const localInsc = getLocalInscricoes();
-    localInsc
-      .filter(loc => String(loc.torneio_id) === String(torneioId))
-      .forEach(locItem => {
-        const jaExiste = totalInscricoes.some(rem => 
-          (rem.id && locItem.id && String(rem.id) === String(locItem.id)) ||
-          (rem.user_email && locItem.user_email && String(rem.user_email).toLowerCase() === String(locItem.user_email).toLowerCase() && String(rem.id_participante || rem.equipe_nome) === String(locItem.id_participante || locItem.equipe_nome))
-        );
-        if (!jaExiste) {
-          totalInscricoes.push(locItem);
-        }
-      });
+    if (falhaBanco) {
+      localInsc
+        .filter(loc => String(loc.torneio_id) === String(torneioId))
+        .forEach(locItem => {
+          const jaExiste = totalInscricoes.some(rem =>
+            (rem.id && locItem.id && String(rem.id) === String(locItem.id)) ||
+            chavePessoaInscricao(rem) === chavePessoaInscricao(locItem)
+          );
+          if (!jaExiste) totalInscricoes.push(locItem);
+        });
+    } else {
+      saveLocalInscricoes([
+        ...localInsc.filter(loc => String(loc.torneio_id) !== String(torneioId)),
+        ...remoteInscricoes
+      ]);
+    }
+
+    // 3. Uma pessoa (ou equipe) aparece uma vez só, mesmo que haja dois registros
+    //    dela (ex.: inscrição própria + convite do organizador). Fica o mais relevante.
+    totalInscricoes = removerInscricoesRepetidas(totalInscricoes);
+
+    // 4. Nome real dos jogadores (antes aparecia o e-mail ou o código do usuário)
+    const emailsSolo = [...new Set(totalInscricoes
+      .filter(i => i.tipo !== 'equipe' && i.user_email)
+      .map(i => String(i.user_email).trim().toLowerCase()))];
+    if (emailsSolo.length > 0) {
+      try {
+        const { data: perfis } = await supabase
+          .from('usuarios')
+          .select('id, nome, email')
+          .in('email', emailsSolo);
+        (perfis || []).forEach(u => {
+          const em = String(u.email || '').trim().toLowerCase();
+          totalInscricoes
+            .filter(i => i.tipo !== 'equipe' && String(i.user_email || '').trim().toLowerCase() === em)
+            .forEach(i => { i._nomeExibicao = u.nome || ''; i._perfilId = u.id || ''; });
+        });
+      } catch (ePerfis) {
+        console.warn('Aviso ao buscar nomes dos inscritos:', ePerfis);
+      }
+    }
 
     // Enriquece solicitações de equipe com busca completa no Supabase e cache local
     const promessasEnriquecer = totalInscricoes.map(async (i) => {
@@ -3638,7 +3704,9 @@ export async function abrirModalGerenciarSolicitacoes(torneioId) {
 
     let html = '';
     listaFiltrada.forEach(i => {
-      const nomePart = i.equipe_nome || i.id_participante || i.user_email || 'Participante';
+      const nomePart = i.tipo === 'equipe'
+        ? (i.equipe_nome || i.id_participante || 'Equipe')
+        : (i._nomeExibicao || String(i.user_email || '').split('@')[0] || 'Participante');
       const status = i.status || 'Pendente';
       const isAceito = status === 'Aceito';
       const isRejeitado = status === 'Rejeitado';
@@ -3661,12 +3729,12 @@ export async function abrirModalGerenciarSolicitacoes(torneioId) {
 
       const perfilUrlModal = i.tipo === 'equipe'
         ? `/equipes/template_equipe.html?id=${encodeURIComponent(i.id_participante || i.equipe_nome || nomePart)}`
-        : `/perfil/perfil-publico.html?id=${encodeURIComponent(i.user_email || i.id_participante || nomePart)}`;
+        : `/perfil/perfil-publico.html?id=${encodeURIComponent(i._perfilId || i.user_email || i.id_participante || nomePart)}`;
 
       html += `
         <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 12px 14px; border-radius: 8px; margin-bottom: 10px;">
-          <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; flex-wrap: wrap;">
-            <div>
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px 14px; flex-wrap: wrap;">
+            <div style="flex: 1 1 240px; min-width: 0;">
               <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 4px;">
                 <a href="${perfilUrlModal}" target="_blank" title="Ver ${i.tipo === 'equipe' ? 'equipe' : 'perfil'}" style="color: #fff; font-size: 15px; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; transition: color 0.15s;" onmouseenter="this.style.color='#ef4444';" onmouseleave="this.style.color='#fff';">${escapeHtml(nomePart)} <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 10px; color: #ef4444;"></i></a>
                 ${statusBadge}
@@ -3678,7 +3746,7 @@ export async function abrirModalGerenciarSolicitacoes(torneioId) {
               ${lineupHtml}
             </div>
 
-            <div style="display: flex; gap: 6px; align-items: center;">
+            <div style="display: flex; gap: 6px; align-items: center; flex-shrink: 0;">
               ${!isAceito ? `
                 <button type="button" class="btn-aprovar-insc" data-id="${i.id || ''}" data-email="${escapeHtml(i.user_email || '')}" data-part="${escapeHtml(i.id_participante || i.equipe_nome || '')}" style="background: #10b981; color: #fff; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 600; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 4px;">
                   <i class="fa-solid fa-check"></i> Aprovar

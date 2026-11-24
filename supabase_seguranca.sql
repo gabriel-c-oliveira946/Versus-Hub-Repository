@@ -22,6 +22,7 @@
 --   8. Avisa o organizador sobre comentários com uma notificação agrupada
 --      ("fulano e mais 3 pessoas comentaram no torneio X").
 --   9. Liga o tempo real (placar, comentários, notificações) nas tabelas usadas.
+--  10. Remove inscrições repetidas e impede que voltem a acontecer.
 -- ==============================================================================
 
 -- ------------------------------------------------------------------------------
@@ -875,6 +876,25 @@ BEGIN
         CREATE PUBLICATION supabase_realtime;
     END IF;
 
+    -- Tabela publicada sem chave primária não aceita UPDATE/DELETE ("does not have a
+    -- replica identity"). Nesses casos o Postgres passa a identificar a linha pelo
+    -- conteúdo inteiro (REPLICA IDENTITY FULL). Tabelas com chave primária ficam como estão.
+    FOREACH v_tabela IN ARRAY ARRAY['partidas', 'torneios', 'inscricoes', 'comentarios', 'notificacoes'] LOOP
+        IF EXISTS (
+            SELECT 1
+              FROM pg_class c
+              JOIN pg_namespace n ON n.oid = c.relnamespace
+             WHERE n.nspname = 'public'
+               AND c.relname = v_tabela
+               AND c.relreplident IN ('d', 'n')
+               AND NOT EXISTS (
+                   SELECT 1 FROM pg_index i WHERE i.indrelid = c.oid AND i.indisprimary
+               )
+        ) THEN
+            EXECUTE format('ALTER TABLE public.%I REPLICA IDENTITY FULL', v_tabela);
+        END IF;
+    END LOOP;
+
     SELECT puballtables INTO v_todas FROM pg_publication WHERE pubname = 'supabase_realtime';
     IF v_todas THEN
         RETURN; -- a publicação já inclui todas as tabelas
@@ -890,3 +910,64 @@ BEGIN
     END LOOP;
 END;
 $$;
+
+-- ------------------------------------------------------------------------------
+-- 10. INSCRIÇÕES SEM REPETIÇÃO
+--     O convite do organizador gravava o código do usuário (UUID) como
+--     id_participante, enquanto a inscrição feita pela própria pessoa grava o
+--     e-mail. Assim a mesma pessoa podia ficar com duas inscrições no torneio.
+--     1) padroniza inscrições individuais para usar o e-mail;
+--     2) apaga as repetidas, mantendo a melhor de cada pessoa/equipe
+--        (Aceito > Pendente > Rejeitado; em empate, a mais antiga);
+--     3) cria travas: uma inscrição por jogador e uma por equipe em cada torneio.
+-- ------------------------------------------------------------------------------
+-- Garante as colunas usadas abaixo e pelo site (bancos antigos podem não ter "id")
+ALTER TABLE public.inscricoes ADD COLUMN IF NOT EXISTS id UUID DEFAULT gen_random_uuid();
+UPDATE public.inscricoes SET id = gen_random_uuid() WHERE id IS NULL;
+ALTER TABLE public.inscricoes ALTER COLUMN id SET NOT NULL;
+ALTER TABLE public.inscricoes ADD COLUMN IF NOT EXISTS created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now());
+
+UPDATE public.inscricoes
+   SET id_participante = lower(btrim(user_email))
+ WHERE coalesce(lower(tipo), 'individual') <> 'equipe'
+   AND id_participante ~* '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+   AND coalesce(btrim(user_email), '') <> '';
+
+-- Usa o identificador interno da linha (ctid), que existe em qualquer tabela
+WITH ordenadas AS (
+    SELECT ctid AS linha,
+           row_number() OVER (
+               PARTITION BY torneio_id,
+                            CASE WHEN coalesce(lower(tipo), 'individual') = 'equipe'
+                                 THEN 'equipe:' || coalesce(id_participante, '')
+                                 ELSE 'jogador:' || lower(btrim(user_email)) END
+               ORDER BY CASE status WHEN 'Aceito' THEN 0 WHEN 'Rejeitado' THEN 2 ELSE 1 END,
+                        created_at NULLS LAST,
+                        id
+           ) AS posicao
+      FROM public.inscricoes
+)
+DELETE FROM public.inscricoes i
+ USING ordenadas o
+ WHERE i.ctid = o.linha
+   AND o.posicao > 1;
+
+-- Chave primária em "id" (se a tabela ainda não tiver nenhuma)
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_index i
+         WHERE i.indrelid = 'public.inscricoes'::regclass AND i.indisprimary
+    ) THEN
+        ALTER TABLE public.inscricoes ADD CONSTRAINT inscricoes_pkey PRIMARY KEY (id);
+    END IF;
+END;
+$$;
+
+CREATE UNIQUE INDEX IF NOT EXISTS inscricoes_unica_por_jogador
+    ON public.inscricoes (torneio_id, lower(btrim(user_email)))
+ WHERE coalesce(lower(tipo), 'individual') <> 'equipe';
+
+CREATE UNIQUE INDEX IF NOT EXISTS inscricoes_unica_por_equipe
+    ON public.inscricoes (torneio_id, id_participante)
+ WHERE coalesce(lower(tipo), 'individual') = 'equipe';
