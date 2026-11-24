@@ -2718,20 +2718,45 @@ if (typeof window !== 'undefined') {
 
       const emailsSet = new Set();
       const leaderEmail = (teamData?.leaderEmail || '').toLowerCase().trim();
-      if (leaderEmail) emailsSet.add(leaderEmail);
 
-      try {
-        const { data: membrosAceitos } = await supabase
-          .from('membros_equipe')
-          .select('id, equipe_id, user_email, status')
-          .in('equipe_id', searchIds)
-          .eq('status', 'Aceito');
+      // Escalação inscrita neste torneio tem prioridade: mostra só quem vai jogar
+      let escalacaoTorneio = Array.isArray(lineup) ? lineup : [];
+      const torneioDaPagina = new URLSearchParams(window.location.search).get('id');
+      if (escalacaoTorneio.length === 0 && torneioDaPagina && (teamData?.id || teamId)) {
+        try {
+          const { data: inscEq } = await supabase
+            .from('inscricoes')
+            .select('lineup')
+            .eq('torneio_id', String(torneioDaPagina))
+            .eq('id_participante', String(teamData?.id || teamId))
+            .maybeSingle();
+          if (Array.isArray(inscEq?.lineup)) escalacaoTorneio = inscEq.lineup;
+        } catch (eInsc) {}
+      }
+      const emailsEscalados = escalacaoTorneio
+        .map(m => (typeof m === 'string' ? m : (m?.email || m?.user_email)))
+        .filter(Boolean)
+        .map(e => String(e).toLowerCase().trim());
 
-        (membrosAceitos || []).forEach(m => {
-          if (m.user_email) emailsSet.add(m.user_email.toLowerCase().trim());
-        });
-      } catch (errMem) {
-        console.warn('Aviso ao consultar membros_equipe no modal público:', errMem);
+      if (emailsEscalados.length > 0) {
+        emailsEscalados.forEach(e => emailsSet.add(e));
+        const legenda = overlay.querySelector('#containerMembrosLineupModal')?.previousElementSibling;
+        if (legenda) legenda.textContent = `Escalados para este torneio (${emailsEscalados.length}):`;
+      } else {
+        if (leaderEmail) emailsSet.add(leaderEmail);
+        try {
+          const { data: membrosAceitos } = await supabase
+            .from('membros_equipe')
+            .select('id, equipe_id, user_email, status')
+            .in('equipe_id', searchIds)
+            .eq('status', 'Aceito');
+
+          (membrosAceitos || []).forEach(m => {
+            if (m.user_email) emailsSet.add(m.user_email.toLowerCase().trim());
+          });
+        } catch (errMem) {
+          console.warn('Aviso ao consultar membros_equipe no modal público:', errMem);
+        }
       }
 
       const emails = Array.from(emailsSet);
@@ -2945,6 +2970,10 @@ function abrirModalEscolhaInscricao(torneio, loggedUser, onSucesso) {
   let tipoSelecionado = apenasEquipe ? 'equipe' : 'individual';
   let equipeSelecionadaId = null;
   let equipesLideradas = [];
+  // Escalação: membros da equipe escolhida e quem vai jogar (no máximo maxIntegrantes)
+  let membrosEquipe = [];
+  let escalados = new Set();
+  let escalacaoPronta = false;
 
   function renderDetalhesIndividual() {
     tipoSelecionado = 'individual';
@@ -3050,14 +3079,122 @@ function abrirModalEscolhaInscricao(torneio, loggedUser, onSucesso) {
               </div>
             </div>
             <span style="font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: rgba(99, 102, 241, 0.15); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.3); white-space: nowrap;">
-              Inscrição Direta
+              <i class="fa-solid fa-shield-halved"></i> Equipe
             </span>
           </div>
-          <div style="margin-top: 12px; background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 8px; padding: 10px 12px; font-size: 12px; color: #93c5fd; display: flex; align-items: center; gap: 8px;">
-            <i class="fa-solid fa-circle-check" style="color: #60a5fa; font-size: 14px; flex-shrink: 0;"></i>
-            <span>Sua equipe será inscrita diretamente com o escudo e os integrantes ativos vinculados. Não é necessário escalar manualmente.</span>
+          <div id="containerEscalacao" style="margin-top: 12px;">
+            <div style="text-align: center; padding: 10px 0; color: #9ca3af; font-size: 12.5px;">
+              <i class="fa-solid fa-spinner fa-spin" style="color: #ef4444;"></i> Carregando integrantes...
+            </div>
           </div>
         `;
+      };
+
+      // Busca líder + membros aceitos da equipe, com nome e foto
+      const carregarMembrosEquipe = async (eq) => {
+        const emails = [];
+        const lider = String(eq.leaderEmail || '').trim().toLowerCase();
+        if (lider) emails.push(lider);
+        try {
+          const { data: mems } = await supabase
+            .from('membros_equipe')
+            .select('user_email, status')
+            .eq('equipe_id', String(eq.id))
+            .eq('status', 'Aceito');
+          (mems || []).forEach(m => {
+            const em = String(m.user_email || '').trim().toLowerCase();
+            if (em && !emails.includes(em)) emails.push(em);
+          });
+        } catch (eMem) {
+          console.warn('Aviso ao carregar membros da equipe:', eMem);
+        }
+        let perfis = [];
+        if (emails.length > 0) {
+          try {
+            const { data: us } = await supabase.from('usuarios').select('nome, email, avatar').in('email', emails);
+            perfis = us || [];
+          } catch (eUs) {}
+        }
+        return emails.map(em => {
+          const u = perfis.find(x => String(x.email || '').trim().toLowerCase() === em) || {};
+          return { email: em, nome: u.nome || em.split('@')[0], avatar: u.avatar || '/image/boneco_logo_ofc.png', lider: em === lider };
+        });
+      };
+
+      // Mostra a escalação: equipe dentro do limite entra inteira; acima do limite, o líder escolhe
+      const renderEscalacao = () => {
+        if (tipoSelecionado !== 'equipe') return;
+        const cont = areaDetalhes.querySelector('#containerEscalacao');
+        if (!cont) return;
+        const total = membrosEquipe.length;
+
+        if (total === 0) {
+          escalacaoPronta = false;
+          btnConfirmar.disabled = true;
+          cont.innerHTML = `
+            <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 8px; padding: 10px 12px; font-size: 12.5px; color: #fca5a5;">
+              <i class="fa-solid fa-triangle-exclamation"></i> Não foi possível carregar os integrantes desta equipe. Tente novamente.
+            </div>`;
+          return;
+        }
+
+        if (total <= maxIntegrantes) {
+          escalados = new Set(membrosEquipe.map(m => m.email));
+          escalacaoPronta = true;
+          btnConfirmar.disabled = false;
+          cont.innerHTML = `
+            <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 8px; padding: 10px 12px; font-size: 12.5px; color: #6ee7b7; display: flex; gap: 8px; align-items: flex-start;">
+              <i class="fa-solid fa-circle-check" style="margin-top: 2px;"></i>
+              <span>Todos os <strong>${total}</strong> integrantes serão inscritos: ${membrosEquipe.map(m => escapeHtml(m.nome)).join(', ')}.</span>
+            </div>`;
+          return;
+        }
+
+        // Equipe maior que o limite: escolher quem joga
+        const marcados = escalados.size;
+        escalacaoPronta = marcados >= 1 && marcados <= maxIntegrantes;
+        btnConfirmar.disabled = !escalacaoPronta;
+        cont.innerHTML = `
+          <div style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 8px; padding: 10px 12px; font-size: 12.5px; color: #fcd34d; margin-bottom: 10px;">
+            <i class="fa-solid fa-circle-info"></i> Sua equipe tem <strong>${total}</strong> integrantes, mas este torneio aceita até <strong>${maxIntegrantes}</strong> por equipe. Escolha quem vai jogar.
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <span style="font-size: 12.5px; font-weight: 600; color: #e5e5ff;">Escalação</span>
+            <span id="contadorEscalacao" style="font-size: 12px; font-weight: 700; color: ${marcados === maxIntegrantes ? '#34d399' : '#9ca3af'};">${marcados} de ${maxIntegrantes} selecionados</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px; max-height: 220px; overflow-y: auto;">
+            ${membrosEquipe.map(m => {
+              const marcado = escalados.has(m.email);
+              const bloqueado = !marcado && marcados >= maxIntegrantes;
+              return `
+                <label style="display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; background: ${marcado ? 'rgba(239, 68, 68, 0.1)' : '#111118'}; border: 1px solid ${marcado ? 'rgba(239, 68, 68, 0.45)' : '#28283a'}; cursor: ${bloqueado ? 'not-allowed' : 'pointer'}; opacity: ${bloqueado ? '0.5' : '1'};">
+                  <input type="checkbox" class="chk-escalacao" value="${escapeHtml(m.email)}" ${marcado ? 'checked' : ''} ${bloqueado ? 'disabled' : ''} style="accent-color: #ef4444; width: 16px; height: 16px;">
+                  <img referrerpolicy="no-referrer" src="${escapeHtml(m.avatar)}" alt="" onerror="this.src='/image/boneco_logo_ofc.png'" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;">
+                  <span style="flex: 1; min-width: 0; color: #fff; font-size: 13.5px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(m.nome)}</span>
+                  ${m.lider ? '<span style="font-size: 10.5px; font-weight: 700; color: #fbbf24;"><i class="fa-solid fa-crown"></i> Líder</span>' : ''}
+                </label>`;
+            }).join('')}
+          </div>`;
+
+        cont.querySelectorAll('.chk-escalacao').forEach(chk => {
+          chk.addEventListener('change', () => {
+            if (chk.checked) {
+              if (escalados.size < maxIntegrantes) escalados.add(chk.value);
+            } else {
+              escalados.delete(chk.value);
+            }
+            renderEscalacao();
+          });
+        });
+      };
+
+      const prepararEscalacao = async (eq) => {
+        escalacaoPronta = false;
+        btnConfirmar.disabled = true;
+        membrosEquipe = await carregarMembrosEquipe(eq);
+        // Começa com o líder e os primeiros membros, até o limite
+        escalados = new Set(membrosEquipe.slice(0, maxIntegrantes).map(m => m.email));
+        renderEscalacao();
       };
 
       areaDetalhes.innerHTML = `
@@ -3074,16 +3211,17 @@ function abrirModalEscolhaInscricao(torneio, loggedUser, onSucesso) {
         </div>
       `;
 
-      btnConfirmar.disabled = false;
-
       const selectEl = areaDetalhes.querySelector('#selectEquipeInscricao');
       const containerPreview = areaDetalhes.querySelector('#containerEquipePreview');
+
+      prepararEscalacao(equipesLideradas[0]);
 
       selectEl.addEventListener('change', () => {
         equipeSelecionadaId = selectEl.value;
         const eqAtual = equipesLideradas.find(t => String(t.id) === String(selectEl.value));
         if (eqAtual && containerPreview) {
           containerPreview.innerHTML = renderEquipePreview(eqAtual);
+          prepararEscalacao(eqAtual);
         }
       });
     } catch (err) {
@@ -3114,10 +3252,18 @@ function abrirModalEscolhaInscricao(torneio, loggedUser, onSucesso) {
         return;
       }
 
+      if (tipoSelecionado === 'equipe' && (!escalacaoPronta || escalados.size === 0 || escalados.size > maxIntegrantes)) {
+        showToast(`Escolha de 1 a ${maxIntegrantes} jogadores para a escalação.`, 'warning');
+        return;
+      }
+
       btnConfirmar.disabled = true;
       btnConfirmar.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Inscrevendo...';
 
       const idParticipante = tipoSelecionado === 'equipe' ? String(equipeSelecionadaId) : loggedUser.email;
+      const lineupEscalada = tipoSelecionado === 'equipe'
+        ? membrosEquipe.filter(m => escalados.has(m.email)).map(m => ({ email: m.email, nome: m.nome }))
+        : [];
       let equipeNome = '';
       let equipeLogo = '/image/logo.png';
       let leaderEmail = loggedUser.email;
@@ -3139,6 +3285,10 @@ function abrirModalEscolhaInscricao(torneio, loggedUser, onSucesso) {
         id_participante: idParticipante,
         status: 'Pendente'
       };
+      if (tipoSelecionado === 'equipe') {
+        payloadInscricao.lineup = lineupEscalada;
+        if (equipeNome) payloadInscricao.equipe_nome = equipeNome;
+      }
 
       const inscricaoLocal = {
         ...payloadInscricao,
@@ -3156,7 +3306,8 @@ function abrirModalEscolhaInscricao(torneio, loggedUser, onSucesso) {
 
         if (insErr) {
           console.error('Erro no Supabase inscricoes:', insErr);
-          showToast('Erro ao salvar no banco de dados remoto', 'error');
+          const msgBanco = String(insErr.message || '');
+          showToast(msgBanco.includes('escalação') || msgBanco.includes('inscrição') ? msgBanco : 'Erro ao salvar no banco de dados remoto', 'error');
           btnConfirmar.disabled = false;
           btnConfirmar.innerHTML = '<i class="fa-solid fa-check"></i> Confirmar Inscrição';
           return;
