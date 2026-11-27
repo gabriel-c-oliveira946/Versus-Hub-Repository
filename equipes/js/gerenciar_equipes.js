@@ -229,17 +229,20 @@ document.addEventListener('DOMContentLoaded', async () => {
       </div>
     `;
     try {
-      // Consulta equipes do Supabase onde o usuário logado é o líder
-      let query = supabase.from('equipes').select('id, nome, tag, jogos, logo, regiao, limite, criador_email, leaderName, leaderEmail, descricao, status, created_at');
-      if (userEmail && loggedUser && loggedUser.nome) {
-        query = query.or(`leaderEmail.ilike.${userEmail},leaderName.ilike.${loggedUser.nome}`);
-      } else if (userEmail) {
-        query = query.ilike('leaderEmail', userEmail);
-      } else if (loggedUser && loggedUser.nome) {
-        query = query.ilike('leaderName', loggedUser.nome);
-      }
-      const { data: dbTeams, error } = await query;
-      equipesLideradas = dbTeams || [];
+      // Equipes em que o usuário logado é o líder.
+      // select('*'): a lista fixa de colunas pedia colunas que não existem no banco
+      // (criador_email, descricao, status), e a busca inteira falhava.
+      // Identifica o líder pelo e-mail (pelo nome, quem tivesse o mesmo apelido
+      // veria a equipe de outra pessoa).
+      const { data: dbTeams, error } = await supabase
+        .from('equipes')
+        .select('*')
+        .ilike('leaderEmail', userEmail)
+        .order('created_at', { ascending: false });
+      if (error) console.warn('Erro ao buscar equipes lideradas:', error);
+      equipesLideradas = (dbTeams || []).filter(eq =>
+        String(eq.leaderEmail || '').trim().toLowerCase() === userEmail
+      );
     } catch (e) {
       equipesLideradas = [];
     }
@@ -251,13 +254,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         card.className = `team-select-card ${equipeSelecionada && String(equipeSelecionada.id) === String(eq.id) ? 'active' : ''}`;
         card.innerHTML = `
           <div class="team-select-info">
-            <img referrerpolicy="no-referrer" src="${eq.logo || '/image/logo.png'}" alt="${eq.nome}" class="team-select-logo" onerror="this.src='/image/logo.png'">
+            <img referrerpolicy="no-referrer" src="${escapeHtml(eq.logo || '/image/logo.png')}" alt="${escapeHtml(eq.nome)}" class="team-select-logo" onerror="this.src='/image/logo.png'">
             <div class="team-select-text">
-              <h4>${eq.nome} ${eq.tag ? `<span style="color:#ef4444; font-size:12px;">[${eq.tag}]</span>` : ''}</h4>
-              <p>${eq.jogos || 'Multi-jogos'}</p>
+              <h4>${escapeHtml(eq.nome)} ${eq.tag ? `<span style="color:#ef4444; font-size:12px;">[${escapeHtml(eq.tag)}]</span>` : ''}</h4>
+              <p>${escapeHtml(eq.jogos || 'Multi-jogos')}</p>
             </div>
           </div>
-          <button type="button" class="btn-team-delete" title="Excluir Equipe Permanentemente" data-id="${eq.id}">
+          <button type="button" class="btn-team-delete" title="Excluir Equipe Permanentemente" data-id="${escapeHtml(eq.id)}">
             <i class="fa-solid fa-trash-can"></i>
           </button>
         `;
@@ -371,44 +374,71 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
       }
 
-      const teamIds = mems.map(m => m.equipe_id).filter(Boolean);
+      const teamIds = [...new Set(mems.map(m => m.equipe_id).filter(Boolean))];
 
-      // 2. Busca detalhes das equipes
-      const { data: dbEqs } = await supabase
+      // 2. Busca detalhes das equipes (select('*'): a lista fixa pedia colunas inexistentes)
+      const { data: dbEqs, error: eqErr } = await supabase
         .from('equipes')
-        .select('id, nome, tag, jogos, logo, regiao, limite, criador_email, leaderName, leaderEmail, descricao, status, created_at')
+        .select('*')
         .in('id', teamIds);
+      if (eqErr) console.warn('Erro ao buscar equipes de que participo:', eqErr);
 
       const mapaEquipes = {};
-      if (dbEqs) {
-        dbEqs.forEach(t => { mapaEquipes[t.id] = t; });
+      (dbEqs || []).forEach(t => { mapaEquipes[t.id] = t; });
+
+      // Nome do líder: quando a equipe não guarda leaderName, busca no perfil
+      const emailsLideres = [...new Set((dbEqs || [])
+        .filter(t => !t.leaderName && t.leaderEmail)
+        .map(t => String(t.leaderEmail).trim().toLowerCase()))];
+      const nomePorEmail = {};
+      if (emailsLideres.length > 0) {
+        const { data: lideres } = await supabase.from('usuarios').select('nome, email').in('email', emailsLideres);
+        (lideres || []).forEach(u => { nomePorEmail[String(u.email || '').trim().toLowerCase()] = u.nome; });
       }
 
-      
+      // Só equipes que ainda existem e que não são lideradas por mim (essas ficam em "Equipes que Lidero")
+      const membresias = mems.filter((m, idx) => {
+        const eq = mapaEquipes[m.equipe_id];
+        if (!eq) return Boolean(eqErr); // equipe apagada: some da lista (a não ser que a busca tenha falhado)
+        if (String(eq.leaderEmail || '').trim().toLowerCase() === userEmail) return false;
+        return mems.findIndex(x => x.equipe_id === m.equipe_id) === idx;
+      });
+
+      if (membresias.length === 0) {
+        equipesQueParticipoList.innerHTML = `
+          <div class="empty-state-box">
+            <i class="fa-solid fa-user-group"></i>
+            Você ainda não participa de nenhuma equipe como membro.
+          </div>
+        `;
+        return;
+      }
 
       equipesQueParticipoList.innerHTML = '';
 
-      mems.forEach(m => {
+      membresias.forEach(m => {
         const rawEq = mapaEquipes[m.equipe_id];
         const eqId = rawEq?.id || m.equipe_id;
-        const eq = rawEq || { id: eqId, nome: 'Equipe ' + eqId, logo: '/image/logo.png', leaderName: 'Líder' };
+        const eq = rawEq
+          ? { ...rawEq, leaderName: rawEq.leaderName || nomePorEmail[String(rawEq.leaderEmail || '').trim().toLowerCase()] || '' }
+          : { id: eqId, nome: 'Equipe indisponível', logo: '/image/logo.png', leaderName: '' };
         const detalhesUrl = `/equipes/template_equipe.html?id=${encodeURIComponent(eqId)}`;
 
         const card = document.createElement('div');
         card.className = 'team-select-card';
         card.innerHTML = `
           <a href="${detalhesUrl}" class="team-select-info team-select-info-link" style="text-decoration: none; color: inherit; cursor: pointer; display: flex; align-items: center; gap: 12px; width: 100%;">
-            <img referrerpolicy="no-referrer" src="${eq.logo || '/image/logo.png'}" alt="${eq.nome}" class="team-select-logo" onerror="this.src='/image/logo.png'">
+            <img referrerpolicy="no-referrer" src="${escapeHtml(eq.logo || '/image/logo.png')}" alt="${escapeHtml(eq.nome)}" class="team-select-logo" onerror="this.src='/image/logo.png'">
             <div class="team-select-text">
-              <h4 style="transition: color 0.2s ease; color: #ffffff;">${eq.nome}</h4>
-              <p>Líder: ${eq.leaderName || 'Não informado'}</p>
+              <h4 style="transition: color 0.2s ease; color: #ffffff;">${escapeHtml(eq.nome)} ${eq.tag ? `<span style="color:#ef4444; font-size:12px;">[${escapeHtml(eq.tag)}]</span>` : ''}</h4>
+              <p><i class="fa-solid fa-crown" style="color:#fbbf24; font-size:10px;"></i> ${escapeHtml(eq.leaderName || 'Líder não informado')}</p>
             </div>
           </a>
           <div class="team-member-actions">
             <a href="${detalhesUrl}" class="btn-team-view-details" title="Ver detalhes da equipe">
               <i class="fa-solid fa-eye"></i> Ver Detalhes
             </a>
-            <button type="button" class="btn-team-leave" title="Sair desta equipe" data-memid="${m.id}" data-nome="${eq.nome}">
+            <button type="button" class="btn-team-leave" title="Sair desta equipe" data-memid="${escapeHtml(m.id)}" data-nome="${escapeHtml(eq.nome)}">
               <i class="fa-solid fa-arrow-right-from-bracket"></i> Sair da Equipe
             </button>
           </div>

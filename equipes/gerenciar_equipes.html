@@ -258,9 +258,10 @@
 
     .btn-create-new-team {
       width: 100%;
-      background: #1f1f2a;
-      border: 1px dashed #3a3a4d;
-      color: #e5e7eb;
+      background: #d41111;
+      border: 1px solid #d41111;
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(212, 17, 17, 0.25);
       padding: 12px;
       border-radius: 10px;
       font-size: 14px;
@@ -276,9 +277,10 @@
     }
 
     .btn-create-new-team:hover {
-      background: #272735;
+      background: #e01b1b;
       border-color: #ff3b30;
       color: #ffffff;
+      transform: translateY(-1px);
     }
 
     /* Painel Detalhado */
@@ -561,6 +563,16 @@
       color: #4b5563;
       display: block;
       margin-bottom: 8px;
+    }
+
+    /* O estilo acima é do ícone grande do aviso; ícones dentro de botões e links
+       (ex.: o "+" de "Criar Equipe") ficam no tamanho e na cor do texto */
+    .empty-state-box a i,
+    .empty-state-box button i {
+      font-size: 1em;
+      color: inherit;
+      display: inline-block;
+      margin: 0;
     }
 
     /* Modal de Edição */

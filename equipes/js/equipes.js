@@ -177,7 +177,8 @@ export async function buscarEquipes() {
   // 1. Consulta em tempo real na tabela public.equipes do Supabase
   try {
     const fetchPromise = Promise.all([
-      supabase.from('equipes').select('id, nome, tag, jogos, logo, regiao, limite, criador_email').order('created_at', { ascending: false }),
+      // select('*'): pedir colunas fixas falha quando alguma não existe no banco
+      supabase.from('equipes').select('*').order('created_at', { ascending: false }),
       supabase.from('membros_equipe').select('id, equipe_id, user_email, status').eq('status', 'Aceito')
     ]);
     const [resEquipes, resMembros] = await fetchPromise;
@@ -206,20 +207,38 @@ export async function buscarEquipes() {
     return;
   }
 
-  // Mapeia os membros aceitos
-  const mapaMembros = {};
+  // Integrantes de cada equipe = líder + membros aceitos, sem repetir ninguém
+  // (mesma conta da página da equipe; antes o líder ficava de fora e a lista
+  // mostrava 1/4 numa equipe com 2 pessoas)
+  const integrantesPorEquipe = {};
+  rawEquipes.forEach(eq => {
+    const lider = String(eq.leaderEmail || '').trim().toLowerCase();
+    integrantesPorEquipe[eq.id] = new Set(lider ? [lider] : []);
+  });
   rawMembros.forEach(m => {
-    if (m.equipe_id) {
-      mapaMembros[m.equipe_id] = (mapaMembros[m.equipe_id] || 0) + 1;
-    }
+    const em = String(m.user_email || '').trim().toLowerCase();
+    if (m.equipe_id && em && integrantesPorEquipe[m.equipe_id]) integrantesPorEquipe[m.equipe_id].add(em);
   });
 
+  // Nome do líder: quando a equipe não guarda leaderName, busca no perfil
+  const nomePorEmail = {};
+  const emailsLideres = [...new Set(rawEquipes
+    .filter(eq => !eq.leaderName && eq.leaderEmail)
+    .map(eq => String(eq.leaderEmail).trim().toLowerCase()))];
+  if (emailsLideres.length > 0) {
+    try {
+      const { data: lideres } = await supabase.from('usuarios').select('nome, email').in('email', emailsLideres);
+      (lideres || []).forEach(u => { nomePorEmail[String(u.email || '').trim().toLowerCase()] = u.nome; });
+    } catch (eLid) {}
+  }
+
   cacheEquipes = rawEquipes.map(eq => {
-    const totalMembros = mapaMembros[eq.id] || 1;
+    const totalMembros = Math.max(1, integrantesPorEquipe[eq.id]?.size || 0);
     const limiteMax = parseInt(eq.limite, 10) || 5;
     const isCheia = totalMembros >= limiteMax;
     return {
       ...eq,
+      leaderName: eq.leaderName || nomePorEmail[String(eq.leaderEmail || '').trim().toLowerCase()] || '',
       membrosCount: totalMembros,
       totalMembrosCalculado: totalMembros,
       limiteMaxCalculado: limiteMax,
